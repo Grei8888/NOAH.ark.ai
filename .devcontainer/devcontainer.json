@@ -1,0 +1,13 @@
+{
+  "name": "NOAH Intelligence",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "NOAH Preview",
+      "onAutoForward": "openPreview",
+      "visibility": "private"
+    }
+  },
+  "postCreateCommand": "npm install"
+}
