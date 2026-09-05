@@ -1,0 +1,42 @@
+// PostgreSQL 연결 단계에서 활성화할 초안.
+// Mock-first v0.1은 DB 없이 실행됩니다.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+}
+
+model Article {
+  id              String   @id @default(cuid())
+  provider        String
+  sourceName      String
+  sourceDomain    String
+  title           String
+  normalizedTitle String
+  url             String
+  canonicalUrl    String   @unique
+  publishedAt     DateTime
+  collectedAt     DateTime @default(now())
+}
+
+model Event {
+  id                  String   @id @default(cuid())
+  representativeTitle String
+  primaryCategory     String
+  importanceScore     Float
+  relevanceScore      Float
+  finalScore          Float
+  grade               String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
