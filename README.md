@@ -77,7 +77,32 @@ lib/
   scoring/
   ark/
 types/
+prisma/
+docs/
 ```
+
+## 개발 문서
+
+NOAH는 Grei, Codex, ChatGPT가 동일한 GitHub 저장소에서 협업합니다.
+코딩 에이전트는 작업 시작 전에 루트의 `AGENTS.md`와 아래 문서를 확인해야 합니다.
+
+- [`AGENTS.md`](./AGENTS.md) — Codex / ChatGPT 공통 필수 작업 지침
+- [`docs/PRODUCT_PRINCIPLES.md`](./docs/PRODUCT_PRINCIPLES.md) — 제품 철학과 판단 기준
+- [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — 현재 시스템 구조
+- [`docs/COLLABORATION_RULES.md`](./docs/COLLABORATION_RULES.md) — 브랜치, 충돌 방지, PR 및 협업 규칙
+- [`docs/NEXT_STEPS.md`](./docs/NEXT_STEPS.md) — 개발 로드맵
+- [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) — 주요 제품·아키텍처·운영 변경 기록
+
+GitHub `main`을 정상 작동 기준본이자 Single Source of Truth로 사용합니다.
+
+기본 작업 브랜치 규칙:
+
+```text
+Codex   → codex/<feature-name>
+ChatGPT → chatgpt/<feature-name>
+```
+
+기능 개발은 원칙적으로 별도 브랜치에서 진행하고 Pull Request를 통해 `main`에 반영합니다.
 
 ## 다음 구현 단계
 
@@ -100,3 +125,5 @@ types/
 - 10개를 억지로 채우지 않습니다.
 
 > 이 기능이 정보의 홍수를 줄이는가, 아니면 다시 늘리는가?
+
+**LESS NEWS. MORE SIGNAL. BETTER DECISIONS.**
