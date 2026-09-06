@@ -1,0 +1,48 @@
+{
+  "name": "noah-intelligence",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "verify": "pnpm run typecheck && pnpm run test && pnpm run lint && pnpm run build",
+    "test:http": "node scripts/http-smoke.mjs",
+    "defaults:apply": "tsx scripts/apply-defaults.ts",
+    "demo:refresh": "node scripts/refresh-demo.mjs",
+    "db:generate": "node scripts/local-schema.mjs && prisma generate && prisma generate --schema prisma/local.prisma",
+    "db:push": "prisma db push",
+    "db:local": "node scripts/local-schema.mjs && prisma db push --schema prisma/local.prisma",
+    "db:seed": "tsx prisma/seed.ts",
+    "pipeline": "tsx scripts/pipeline.ts",
+    "setup:mock": "node scripts/init-env.mjs && pnpm db:generate && pnpm db:local && pnpm db:seed && pnpm pipeline",
+    "postinstall": "pnpm db:generate"
+  },
+  "dependencies": {
+    "@prisma/client": "6.19.0",
+    "dotenv": "^17.2.3",
+    "fast-xml-parser": "^5.3.0",
+    "luxon": "^3.7.2",
+    "next": "^16.0.10",
+    "openai": "^6.15.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.7.1",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "^16.0.10",
+    "prisma": "6.19.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  },
+  "prisma": { "seed": "tsx prisma/seed.ts" }
+}

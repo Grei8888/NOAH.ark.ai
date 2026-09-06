@@ -1,0 +1,3 @@
+# Preserve exact snapshot bytes, including existing line endings.
+deployed-demo/** -text
+local-app/** -text

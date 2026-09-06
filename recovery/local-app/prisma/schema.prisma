@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+  output = "../.generated/postgres"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model User {
+  id String @id
+  name String
+  role String @default("OWNER")
+  profile UserProfile?
+}
+
+model UserProfile {
+  id String @id
+  userId String @unique
+  user User @relation(fields: [userId], references: [id])
+  interests Json
+  regions Json
+  entities Json
+  businessInterests Json
+  researchInterests Json
+  careerInterests Json
+}
+
+model NewsSource {
+  id String @id
+  name String
+  domain String @unique
+  sourceType String
+  reliability Float @default(5)
+}
+
+model SearchQuery {
+  id String @id
+  group String
+  query String @unique
+  enabled Boolean @default(true)
+}
+
+model AppConfig {
+  key String @id
+  value Json
+}
+
+model Article {
+  id String @id
+  ingestionKey String @unique
+  provider String
+  sourceName String
+  sourceDomain String
+  sourceType String
+  author String?
+  title String
+  normalizedTitle String
+  newsLabel String?
+  description String
+  contentSnippet String
+  url String
+  canonicalUrl String
+  imageUrl String?
+  publishedAt DateTime
+  collectedAt DateTime @default(now())
+  language String
+  country String
+  queryGroup String
+  rawPayload Json
+  duplicateOfId String?
+  duplicateOf Article? @relation("Duplicates", fields: [duplicateOfId], references: [id])
+  duplicates Article[] @relation("Duplicates")
+  events EventArticle[]
+  @@index([canonicalUrl])
+  @@index([normalizedTitle])
+  @@index([publishedAt])
+}
+
+model Event {
+  id String @id
+  fingerprint String @unique
+  representativeTitle String
+  primaryCategory String @default("OTHER")
+  secondaryCategories Json
+  tags Json
+  firstSeenAt DateTime
+  lastSeenAt DateTime
+  articleCount Int @default(0)
+  sourceCount Int @default(0)
+  eventSummary String @default("")
+  importanceScore Float @default(0)
+  relevanceScore Float @default(0)
+  finalScore Float @default(0)
+  breakingScore Float @default(0)
+  grade String @default("D")
+  isOpportunity Boolean @default(false)
+  opportunityReason String?
+  officialSourceAvailable Boolean @default(false)
+  analysisStatus String @default("PENDING")
+  analysisHash String?
+  analysis Json?
+  analysisError String?
+  isMock Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  articles EventArticle[]
+  arkItems ArkItem[]
+  breakingCandidates BreakingCandidate[]
+  @@index([lastSeenAt, analysisStatus])
+}
+
+model EventArticle {
+  eventId String
+  articleId String @unique
+  event Event @relation(fields: [eventId], references: [id])
+  article Article @relation(fields: [articleId], references: [id])
+  @@id([eventId, articleId])
+}
+
+model DailyArk {
+  id String @id
+  arkDate String @unique
+  periodStart DateTime
+  periodEnd DateTime
+  generatedAt DateTime
+  publishedAt DateTime?
+  status String
+  eventCount Int
+  overview String
+  isMock Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  items ArkItem[]
+}
+
+model ArkItem {
+  id String @id
+  arkId String
+  eventId String
+  rank Int
+  finalScore Float
+  snapshot Json
+  createdAt DateTime @default(now())
+  ark DailyArk @relation(fields: [arkId], references: [id])
+  event Event @relation(fields: [eventId], references: [id])
+  @@unique([arkId, eventId])
+  @@unique([arkId, rank])
+}
+
+model PipelineLog {
+  id String @id
+  type String
+  startedAt DateTime @default(now())
+  finishedAt DateTime?
+  articlesFetched Int @default(0)
+  articlesInserted Int @default(0)
+  duplicatesRemoved Int @default(0)
+  eventsCreated Int @default(0)
+  eventsUpdated Int @default(0)
+  aiRequests Int @default(0)
+  aiSuccess Int @default(0)
+  aiFailed Int @default(0)
+  arkGenerated Boolean @default(false)
+  status String @default("RUNNING")
+  errorMessage String?
+}
+
+model PipelineLock {
+  id String @id
+  owner String
+  expiresAt DateTime
+}
+
+model BreakingCandidate {
+  id String @id
+  eventId String
+  analysisHash String
+  score Float
+  createdAt DateTime @default(now())
+  alertedAt DateTime?
+  event Event @relation(fields: [eventId], references: [id])
+  @@unique([eventId, analysisHash])
+}

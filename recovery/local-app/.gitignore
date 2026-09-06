@@ -1,0 +1,12 @@
+node_modules/
+.next/
+.generated/
+.env*
+!.env.example
+*.db
+*.db-journal
+*.tsbuildinfo
+coverage/
+prisma/local.prisma
+.noah/
+demo-site/
