@@ -87,6 +87,7 @@ NOAH는 Grei, Codex, ChatGPT가 동일한 GitHub 저장소에서 협업합니다
 코딩 에이전트는 작업 시작 전에 루트의 `AGENTS.md`와 아래 문서를 확인해야 합니다.
 
 - [`AGENTS.md`](./AGENTS.md) — Codex / ChatGPT 공통 필수 작업 지침
+- [`docs/CODEX_HANDOFF.md`](./docs/CODEX_HANDOFF.md) — Codex 시작·재개용 짧은 인수인계 지시서
 - [`docs/PRODUCT_PRINCIPLES.md`](./docs/PRODUCT_PRINCIPLES.md) — 제품 철학과 판단 기준
 - [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — 현재 시스템 구조
 - [`docs/COLLABORATION_RULES.md`](./docs/COLLABORATION_RULES.md) — 브랜치, 충돌 방지, PR 및 협업 규칙
