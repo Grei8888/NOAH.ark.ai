@@ -3,7 +3,7 @@
 Status: proposed / implementation in progress. No live mailing is enabled.
 
 ## Objective
-Weekday 08:30 Asia/Seoul briefing, owner-only production pilot followed by manual KakaoTalk sharing to five office staff. Target recurring operational budget <= KRW 100,000/month, excluding development labor and paid article licenses.
+Weekday 08:15 Asia/Seoul owner preview, 08:40 owner-approved finalization and manual KakaoTalk distribution near 08:55, owner-only production pilot followed by manual KakaoTalk sharing to five office staff. Target recurring operational budget <= KRW 100,000/month, excluding development labor and paid article licenses.
 
 Preserve NOAH's event-first pipeline and existing scoring: importance 0.65, relevance 0.35, minimum 60, at most 10 Events, category cap 4. No quota filling. Public significance and personal relevance remain separate.
 
@@ -21,7 +21,7 @@ Collect (replaceable RSS/official sources) -> normalize -> dedupe -> event clust
 Separate collection (once daily) from personalization (per recipient). Never independently fetch five copies of the same articles. For personal relevance use explicit user preferences, never infer private traits. Produce short KakaoTalk-ready summary text (3 key events) and a PDF. Save both and a source manifest in Drive. Confirm Drive sharing permissions before distributing any links.
 
 ## Scheduling
-Provisional weekdays at 08:30 KST is the delivery target, subject to Grei's confirmation of actual office start time and a two-week measurement of source publication times. First collection 06:00, second collection 07:30, cutoff 08:10, validation/render 08:10–08:25, delivery 08:30. These are planning targets, not measured publisher schedules. Run ingestion earlier, allowing time for retry and verification. If insufficient verified events, send a truthful 'no confirmed major changes' edition rather than fabricated or Mock events. Use a scheduler with timezone explicitly configured; avoid double sending on retry.
+Owner routine: leaves home 08:00–08:10, commutes by subway, arrives at office around 08:55. Proposed weekdays: collect from 06:00, refresh by 08:00, produce owner mobile preview by 08:15, owner reviews on commute around 08:15–08:35, finalize at 08:40 ONLY if approved, and owner manually shares on KakaoTalk around 08:55–09:00. If not approved, remain draft and do not auto-distribute. These are planning targets; publication-time coverage should be measured in pilot. Run ingestion earlier, allowing time for retry and verification. If insufficient verified events, send a truthful 'no confirmed major changes' edition rather than fabricated or Mock events. Use a scheduler with timezone explicitly configured; avoid double sending on retry.
 
 ## Integration and credentials
 Google Drive folder and Gmail sender are selected by Grei. Use OAuth/service identity with least privilege, no credentials in repository. API keys and recipient addresses belong in deployment secrets. No automated staff delivery in MVP. Owner reviews and manually shares; automated mailing is deferred until explicitly approved. Google plugin can be used by ADDY interactively but does not itself provide unattended runtime.
