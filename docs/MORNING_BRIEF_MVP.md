@@ -38,3 +38,10 @@ Google Drive folder and Gmail sender are selected by Grei. Use OAuth/service ide
 
 ## Deferred
 Breaking alerts, NotebookLM automatic ingestion, PLAUD integration, automatic KakaoTalk or email delivery, full self-service account UI, paid subscriptions. These are separate workstreams and must not delay the mailing MVP.
+
+## Implementation checkpoint — live discovery (not publication)
+- Added isolated `GET /api/discovery` using three Google News RSS search feeds; timestamps, Google News URLs, source names and fetch errors are returned.
+- Added mobile `/discovery` page for reviewing unverified article candidates. Existing `/review` remains clearly labeled Mock demo.
+- No event clustering, official-source verification, PDF creation, Drive upload, unattended scheduler or KakaoTalk delivery is active.
+- Google News RSS is a discovery source, not official confirmation; article-level deduplication by URL is preliminary.
+- Requires build and runtime network validation before merging and before production deployment.
