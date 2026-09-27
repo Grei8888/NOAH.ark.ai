@@ -45,3 +45,10 @@ Breaking alerts, NotebookLM automatic ingestion, PLAUD integration, automatic Ka
 - No event clustering, official-source verification, PDF creation, Drive upload, unattended scheduler or KakaoTalk delivery is active.
 - Google News RSS is a discovery source, not official confirmation; article-level deduplication by URL is preliminary.
 - Requires build and runtime network validation before merging and before production deployment.
+
+## UI checkpoint — Cool Gray mobile review
+- Owner-approved direction: cool gray, low saturation, editorial minimalist mobile-first interface.
+- `/review` now has category filters, event list, detail view, include/exclude, fixed review action, and demo-only copy text.
+- All review data remains Mock; no production approval, distribution, PDF, or Drive upload is triggered by UI controls.
+- New styles are scoped to `.noahReview` in `components/morning-review.css` to avoid replacing the existing public demo design.
+- Pending: build, device usability test, accessibility review, then connect verified event snapshot and server-side approval persistence.
