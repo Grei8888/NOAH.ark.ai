@@ -1,0 +1,46 @@
+name: NOAH ARK daily interests production smoke
+on:
+  push:
+    branches:
+      - chatgpt/noah-public-smoke
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  public:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Check actual live Home, daily interest controls, beta invite and honest source-only API
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="https://noah-ark-ai.vercel.app"
+          for attempt in 1 2 3; do
+            status=$(curl -LsS --retry 2 --retry-all-errors --retry-delay 2 --max-time 90 -o /tmp/noah-home.html -w '%{http_code}' "$root/" || true)
+            if [[ "$status" == "200" ]] &&
+                grep -q '오늘의 관심사' /tmp/noah-home.html &&
+                grep -q '창업·소상공인' /tmp/noah-home.html &&
+                grep -q 'AI·기술' /tmp/noah-home.html &&
+                grep -q '금융·지원' /tmp/noah-home.html &&
+                grep -q '정책·제도' /tmp/noah-home.html &&
+                grep -q '수출·해외' /tmp/noah-home.html &&
+                grep -q 'sourceVisualLink' /tmp/noah-home.html &&
+                grep -q 'noahCardImage--cover' /tmp/noah-home.html &&
+                grep -q 'https://www.mss.go.kr/' /tmp/noah-home.html; then
+              echo "PASS: live production shows five daily interest choices, licensed-safe NOAH covers and genuine source links"
+              break
+            fi
+            echo "Attempt $attempt: HTTP $status; waiting for fully-ready production or upstream source links"
+            if [[ "$attempt" == "3" ]]; then exit 1; fi
+            sleep 8
+          done
+          if grep -q '가상 Event로 동작을 확인하는 화면' /tmp/noah-home.html; then echo "FAIL: synthetic demo appeared"; exit 1; fi
+          status=$(curl -LsS --max-time 40 -o /tmp/noah-beta.html -w '%{http_code}' "$root/beta")
+          [[ "$status" == "200" ]] && grep -q '베타테스트에 초대합니다' /tmp/noah-beta.html || { echo "FAIL: /beta regression"; exit 1; }
+          status=$(curl -LsS --max-time 40 -o /tmp/noah-ark.json -w '%{http_code}' "$root/api/ark")
+          [[ "$status" == "200" ]] && grep -q '"mode":"live"' /tmp/noah-ark.json && grep -q '"items":\[\]' /tmp/noah-ark.json || { echo "FAIL: Event news fabricated"; exit 1; }
+          status=$(curl -LsS --max-time 40 -o /dev/null -w '%{http_code}' "$root/api/cron/daily")
+          [[ "$status" == "401" ]] || { echo "FAIL: cron unauthenticated, status $status"; exit 1; }
+          echo "PASS: existing beta invite remains public, no fake Events, protected cron"
