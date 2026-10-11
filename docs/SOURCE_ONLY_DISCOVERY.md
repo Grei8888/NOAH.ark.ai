@@ -27,4 +27,4 @@ An explicitly labeled `/sources` exploration page can show minimal attributable 
 
 ## Next
 
-Check actual RSS feeds in network smoke run; test links and article-specific rights; review impact of manual (non-AI) source browsing on eventual event-first positioning. Paid OpenAI keys **not** required for this feature, but source collection is **not** automated and no public website is deployed.
+Official MSS RSS feeds parsed read-only (20 business notices and 20 press entries in a successful run). A transient network failure appeared in a later run; the smoke script retries once but does not suppress persistent failures. Next: source-specific rights review and an isolated collect→DB→source-link rendering acceptance test before public activation. Paid OpenAI keys **not** required for this feature, but source collection is **not** automated and no public website is deployed.
