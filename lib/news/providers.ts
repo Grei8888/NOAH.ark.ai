@@ -101,7 +101,11 @@ export class RSSProvider implements NewsProvider {
                 // escaped ampersands required for valid original-article query URLs.
                 const canonical = normalizeUrl(a.link.replace(/&amp;/gi, '&'));
                 // An official feed is trusted only for links on its own origin.
-                const sourceType = new URL(canonical).hostname === url.hostname ? feed.sourceType : 'NEWS_MEDIA';
+                // Only the exact host or its www alias is recognized as official.
+                // Other subdomains and external hosts remain ordinary media links.
+                const originHost = url.hostname.toLowerCase().replace(/^www\\./, '');
+                const articleHost = new URL(canonical).hostname.toLowerCase().replace(/^www\\./, '');
+                const sourceType = articleHost === originHost ? feed.sourceType : 'NEWS_MEDIA';
                 articles.push({ provider: this.name, sourceName: feed.name, sourceDomain: new URL(canonical).hostname, sourceType, title: a.title, description, contentSnippet: '', url: canonical, publishedAt, language: 'ko', country: 'KR', queryGroup: 'OTHER', rawPayload: { feed: feed.url } });
             }
         }
