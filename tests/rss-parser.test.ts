@@ -16,6 +16,21 @@ const sample = `<?xml version="1.0" encoding="UTF-8"?>
 </item></channel></rss>`;
 
 describe('RSS official source parser', () => {
+  it('parses ministry compact KST timestamps, even when XML parser returns numbers', () => {
+    expect(parseRSSDate(20261012061806)?.toISOString()).toBe('2026-10-11T21:18:06.000Z');
+    expect(parseRSSDate('20261008152422')?.toISOString()).toBe('2026-10-08T06:24:22.000Z');
+    expect(parseRSSDate('20261308152422')).toBeNull();
+    expect(parseRSSDate('20260230000000')).toBeNull();
+    expect(parseRSSDate(undefined)).toBeNull();
+  });
+  it('accepts actual ministry RSS date format and retains filtered records', async () => {
+    const compact = sample.replace('Sun, 11 Oct 2026 09:00:00 GMT', '20261012061806');
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(compact, { status: 200 })));
+    const list = await new RSSProvider([{ url: feedUrl, name: '중소벤처기업부', sourceType: 'GOVERNMENT' }]).fetchArticles({ query: '', from: new Date('2026-10-11'), to: new Date('2026-10-13') });
+    expect(list).toHaveLength(1);
+    expect(list[0].publishedAt.toISOString()).toBe('2026-10-11T21:18:06.000Z');
+  });
+
   it('parses source title/link/date and keeps attribution as evidence, not AI analysis', async () => {
     const mockFetch = vi.fn().mockResolvedValue(new Response(sample, { status: 200, headers: { 'Content-Type': 'text/xml' } }));
     vi.stubGlobal('fetch', mockFetch);
