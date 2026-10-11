@@ -103,8 +103,8 @@ export class RSSProvider implements NewsProvider {
                 // An official feed is trusted only for links on its own origin.
                 // Only the exact host or its www alias is recognized as official.
                 // Other subdomains and external hosts remain ordinary media links.
-                const originHost = url.hostname.toLowerCase().replace(/^www\\./, '');
-                const articleHost = new URL(canonical).hostname.toLowerCase().replace(/^www\\./, '');
+                const originHost = url.hostname.toLowerCase().replace(/^www\./, '');
+                const articleHost = new URL(canonical).hostname.toLowerCase().replace(/^www\./, '');
                 const sourceType = articleHost === originHost ? feed.sourceType : 'NEWS_MEDIA';
                 articles.push({ provider: this.name, sourceName: feed.name, sourceDomain: new URL(canonical).hostname, sourceType, title: a.title, description, contentSnippet: '', url: canonical, publishedAt, language: 'ko', country: 'KR', queryGroup: 'OTHER', rawPayload: { feed: feed.url } });
             }
