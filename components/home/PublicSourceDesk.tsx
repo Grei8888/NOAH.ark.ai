@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AppShell, type HomeView } from "@/components/home/AppShell";
 import { Icon } from "@/components/home/Icon";
+import { SourceCardVisual } from "@/components/home/SourceCardVisual";
 import type { OfficialFeedSnapshot, OfficialSourceLink } from "@/lib/news/public-official-sources";
 
 type SourceKind = "all" | "notice" | "press";
@@ -167,6 +168,9 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
             ) : filtered.slice(0, view === "home" ? 14 : 40).map((s: OfficialSourceLink, i: number) => (
               <article className="sourceNewsItem" key={s.url}>
                 <div className="eventRank">{String(i + 1).padStart(2, "0")}</div>
+                <a className="sourceVisualLink" href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.title + " 원문 열기"}>
+                  <SourceCardVisual title={s.title} kind={s.kind} />
+                </a>
                 <div className="sourceNewsBody">
                   <div className="eventMeta">
                     <span>{sourceLabel(s.kind)}</span><span className="metaDot">·</span><span>{s.sourceName}</span><span className="metaDot">·</span>
