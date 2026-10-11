@@ -51,7 +51,7 @@ const FeedDate = z.union([z.string(), z.number()]).transform(String);
 export function parseRSSDate(value: string | number | undefined): Date | null {
     if (value === undefined) return null;
     const raw = String(value).trim();
-    if (/^\\d{14}$/.test(raw)) {
+    if (/^\d{14}$/.test(raw)) {
         const year = Number(raw.slice(0, 4));
         const month = Number(raw.slice(4, 6));
         const day = Number(raw.slice(6, 8));
