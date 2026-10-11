@@ -47,6 +47,14 @@ describe('RSS official source parser', () => {
     });
     expect(mockFetch).toHaveBeenCalledTimes(1);
   });
+  it('recognizes only exact or www-prefixed feed host as an official article host', async () => {
+    const aliased = sample.replaceAll('https://mss.go.kr/site/', 'https://www.mss.go.kr/site/');
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(aliased, { status: 200 })));
+    const entries = await new RSSProvider([{ url: feedUrl, name: '중소벤처기업부', sourceType: 'GOVERNMENT' }]).fetchArticles({ query: '', from: new Date('2026-10-01'), to: new Date('2026-10-21') });
+    expect(entries).toHaveLength(1);
+    expect(entries[0].sourceDomain).toBe('www.mss.go.kr');
+    expect(entries[0].sourceType).toBe('GOVERNMENT');
+  });
   it('never labels cross-host article links as an official source', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(sample.replaceAll('https://mss.go.kr/site/smba/ex/bbs/View.do', 'https://outside.example.org/link'), { status: 200 })));
     const items = await new RSSProvider([{ url: feedUrl, name: '중소벤처기업부', sourceType: 'GOVERNMENT' }]).fetchArticles({ query: '', from: new Date('2026-10-01'), to: new Date('2026-10-21') });
