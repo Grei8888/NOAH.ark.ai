@@ -28,6 +28,7 @@ jobs:
       AI_PROVIDER: mock
       DB_MODE: postgres
       DATABASE_URL: postgresql://invalid:invalid@127.0.0.1:5433/never_connect
+      LOCAL_DATABASE_URL: file:.noah/preview-ci.db
       SOURCE_LINKS_ENABLED: "false"
       APP_URL: http://127.0.0.1:3105
     steps:
@@ -42,8 +43,10 @@ jobs:
           cache: pnpm
       - name: Install locked dependencies and Prisma clients
         run: pnpm install --frozen-lockfile
+      - name: Seed isolated SQLite only for the existing unit tests
+        run: DB_MODE=local pnpm setup:mock
       - name: Run unit tests and preview guard checks
-        run: pnpm test
+        run: DB_MODE=local pnpm test
       - name: Check types and lint
         run: |
           pnpm typecheck
