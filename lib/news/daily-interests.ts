@@ -14,10 +14,10 @@ export type TodayTopic = (typeof TODAY_TOPICS)[number]['id'];
 const topicIds = new Set<string>(TODAY_TOPICS.map(t => t.id));
 
 const rules: Record<TodayTopic, RegExp> = {
-  startup: /창업|스타트업|벤처|소상공인|자영업|청년기업|중소기업|중기부|사업화|예비창업/i,
+  startup: /창업|스타트업|벤처|소상공인|자영업|청년기업|사업화|예비창업/i,
   technology: /인공지능|(?:^|\W)AI(?:\W|$)|딥테크|데이터|연구개발|(?:^|\W)R&D(?:\W|$)|디지털|반도체|로봇|스마트|기술|실증|혁신/i,
-  funding: /지원금|지원사업|지원자금|정책자금|투자|융자|금융|보증|펀드|자금|예산|재정|보조금|바우처/i,
-  policy: /정책|규제|법령|법률|시행령|시행규칙|개정|공청회|제도|고시|조례|행정|입법|공고/i,
+  funding: /지원금|지원자금|정책자금|투자|융자|금융|보증|펀드|자금|예산|재정|보조금|바우처/i,
+  policy: /정책|규제|법령|법률|시행령|시행규칙|개정|공청회|제도|고시|조례|행정|입법/i,
   global: /수출|해외|글로벌|수입|통상|국제|무역|FTA|외국|국외|진출/i,
 };
 
