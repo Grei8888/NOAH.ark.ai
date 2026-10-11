@@ -1,0 +1,90 @@
+name: NOAH rights-safe cover cards
+
+on:
+  push:
+    branches:
+      - chatgpt/noah-safe-visual-cards
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: noah-safe-covers-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Existing app and image-permission regression checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEWS_PROVIDER: mock
+      AI_PROVIDER: mock
+      NOAH_LIVE_LINKS_V1: "false"
+      DB_MODE: local
+      DATABASE_URL: postgresql://invalid:invalid@127.0.0.1:5433/never_connect
+      LOCAL_DATABASE_URL: file:.noah/covers-ci.db
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10"
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm setup:mock
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
+      - run: pnpm test:http
+
+  live:
+    name: Official RSS cards show owned covers with no external pictures
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+      VERCEL_ENV: production
+      NOAH_LIVE_LINKS_V1: "true"
+      NEWS_PROVIDER: government
+      AI_PROVIDER: "off"
+      DB_MODE: postgres
+      DATABASE_URL: postgresql://invalid:invalid@127.0.0.1:5433/never_connect
+      SOURCE_LINKS_ENABLED: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10"
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Start production-mode local Next.js
+        run: |
+          node node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3110 >/tmp/noah-safe-cards.log 2>&1 &
+          echo $! >/tmp/noah-safe-cards.pid
+      - name: Check live original-source HTML (no DB, paid AI, photos or fake Events)
+        run: |
+          node --import tsx scripts/verify-public-source-beta.ts
+          node --input-type=module -e '
+            const html=await (await fetch("http://127.0.0.1:3110")).text();
+            if (!html.includes("sourceVisualLink") || !html.includes("noahCardImage--cover") || !html.includes("noahCardImageArt")) throw Error("Safe NOAH cover missing");
+            if (html.includes("noahCardImage--photo")) throw Error("Unreviewed publisher photo was displayed");
+            if (!html.includes("https://www.mss.go.kr/")) throw Error("Real official source not linked");
+            console.log("PASS: official source cards render NOAH-owned SVG cover with links, not scraped photos");
+          '
+      - if: always()
+        run: |
+          if test -f /tmp/noah-safe-cards.pid; then kill "$(cat /tmp/noah-safe-cards.pid)" || true; fi
