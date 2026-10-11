@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { AppShell } from '@/components/home/AppShell';
 import { getSourceLinks, sourceDiscoveryEnabled } from '@/lib/source-links';
+import { getOfficialSourceSnapshot, publicSourceMode } from '@/lib/news/public-official-sources';
+import { PublicSourceDesk } from '@/components/home/PublicSourceDesk';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -11,6 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SourcesPage() {
+  if (publicSourceMode()) return <PublicSourceDesk snapshot={await getOfficialSourceSnapshot()} view="discover" />;
   const enabled = sourceDiscoveryEnabled();
   const sources = enabled ? await getSourceLinks() : [];
   const formatted = new Intl.DateTimeFormat('ko-KR', {
