@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - chatgpt/noah-safe-visual-cards
+      - chatgpt/noah-card-ratio-refine
   workflow_dispatch:
 
 permissions:
