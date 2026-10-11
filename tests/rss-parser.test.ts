@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { RSSProvider } from '@/lib/news/providers';
+import { RSSProvider, parseRSSDate } from '@/lib/news/providers';
 
 afterEach(() => vi.unstubAllGlobals());
 
