@@ -46,7 +46,7 @@ jobs:
       - name: Seed isolated SQLite only for the existing unit tests
         run: DB_MODE=local pnpm setup:mock
       - name: Run unit tests and preview guard checks
-        run: DB_MODE=local pnpm test
+        run: VERCEL_ENV= NOAH_PREVIEW_STATIC_DEMO=false DB_MODE=local pnpm test
       - name: Check types and lint
         run: |
           pnpm typecheck
