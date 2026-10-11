@@ -27,7 +27,7 @@ describe('RSS official source parser', () => {
       sourceName: '중소벤처기업부',
       sourceType: 'GOVERNMENT',
       title: '2026년 창업 지원사업 공고',
-      url: 'https://mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=5',
+      url: 'https://mss.go.kr/site/smba/ex/bbs/View.do?bcIdx=5&cbIdx=310',
       description: '신청 기한은 원문 확인',
     });
     expect(mockFetch).toHaveBeenCalledTimes(1);
