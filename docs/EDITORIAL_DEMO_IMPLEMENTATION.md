@@ -1,5 +1,9 @@
 # Premium editorial photo demo — PR #8
 
+This records the photo pass before the official PNG arrived. The subsequent
+[official logo update](OFFICIAL_LOGO_IMPLEMENTATION.md) resolves the logo blocker
+below and includes fresh branded screenshots and current browser validation.
+
 Continues `codex/personalized-home-v1` and the existing Magazine Editorial Pass.
 The original structure, runtime and preference/source interactions are reused.
 **Official Event Capsule PNG application remains blocked:** no logo attachment

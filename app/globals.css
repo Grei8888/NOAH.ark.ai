@@ -112,9 +112,23 @@ section[id] {
   align-items: flex-start;
   line-height: 1.1;
   white-space: nowrap;
+  width: fit-content;
+  min-height: 44px;
+  justify-content: center;
+}
+.brandIdentity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brandSymbol {
+  display: block;
+  flex-shrink: 0;
+  width: 56px;
+  height: auto;
 }
 .brandWordmark {
-  font-size: 23px;
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: -1px;
   color: var(--navy);
@@ -123,12 +137,13 @@ section[id] {
   margin-left: 5px;
   font-weight: 500;
   letter-spacing: 1px;
-  font-size: 17px;
+  font-size: 15px;
 }
 .brandMotto {
   font-size: 9px;
-  letter-spacing: 1.1px;
+  letter-spacing: 0.5px;
   margin-top: 8px;
+  margin-left: 66px;
   color: var(--muted);
 }
 .desktopNav nav {
@@ -1130,11 +1145,22 @@ section[id] {
     padding: 11px 9px;
     gap: 10px;
   }
+  .brandIdentity {
+    gap: 8px;
+  }
+  .brandSymbol {
+    width: 44px;
+  }
   .brandWordmark {
-    font-size: 21px;
+    font-size: 18px;
   }
   .brandWordmark > span {
-    font-size: 15px;
+    font-size: 13px;
+  }
+  .brandMotto {
+    margin-left: 52px;
+    font-size: 8px;
+    letter-spacing: 0;
   }
   .intelligenceRail {
     padding-left: 18px;
@@ -1208,6 +1234,12 @@ section[id] {
   }
   .mobileHeader .brandLockup {
     margin-right: auto;
+  }
+  .mobileHeader .brandIdentity {
+    gap: 8px;
+  }
+  .mobileHeader .brandSymbol {
+    width: 52px;
   }
   .mobileHeader .brandWordmark {
     font-size: 21px;
