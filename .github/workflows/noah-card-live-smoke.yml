@@ -1,0 +1,45 @@
+name: NOAH public rights-safe cover smoke
+
+on:
+  push:
+    branches:
+      - chatgpt/noah-public-smoke
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Verify active Vercel Production shows owned covers without publisher photos
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="https://noah-ark-ai.vercel.app"
+          for attempt in 1 2 3; do
+            status=$(curl --retry 2 --retry-all-errors --max-time 75 -LsS -o /tmp/noah-source.html -w '%{http_code}' "$root/" || true)
+            if [[ "$status" == "200" ]] && grep -q 'sourceVisualLink' /tmp/noah-source.html &&
+               grep -q 'noahCardImage--cover' /tmp/noah-source.html &&
+               grep -q 'noahCardImageArt' /tmp/noah-source.html &&
+               grep -q 'www.mss.go.kr' /tmp/noah-source.html; then
+              echo "PASS: production serves real ministry source cards with NOAH original SVGs"
+              break
+            fi
+            echo "Attempt $attempt: source card deployment not ready or feed empty, HTTP $status"
+            if [[ "$attempt" == 3 ]]; then exit 1; fi
+            sleep 10
+          done
+          if grep -q 'noahCardImage--photo' /tmp/noah-source.html; then
+            echo "FAIL: unapproved publisher photo appeared"; exit 1
+          fi
+          if grep -q '가상 Event로 동작을 확인하는 화면' /tmp/noah-source.html; then
+            echo "FAIL: DEMO appeared on public service"; exit 1
+          fi
+          beta=$(curl -LsS --max-time 30 -o /tmp/noah-beta.html -w '%{http_code}' "$root/beta")
+          [[ "$beta" == "200" ]] && grep -q '베타테스트에 초대합니다' /tmp/noah-beta.html || { echo "FAIL: /beta regression"; exit 1; }
+          api=$(curl -LsS --max-time 30 -o /tmp/noah-ark.json -w '%{http_code}' "$root/api/ark")
+          [[ "$api" == "200" ]] && grep -q '"mode":"live"' /tmp/noah-ark.json && grep -q '"items":\[\]' /tmp/noah-ark.json || { echo "FAIL: synthetic Events exposed"; exit 1; }
+          echo "PASS: beta tester route and real-source-only boundary unchanged"
