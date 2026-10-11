@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db/prisma';
 import { runtimeMode } from '@/lib/runtime-mode';
 import { AnalysisSchema } from '@/lib/ai/schemas';
 import type { PublicEvent } from '@/types/domain';
+import { protectedPreviewDemoEnabled, protectedPreviewEdition } from '@/lib/preview/edition';
 
 const sourceURL = z.string().url().refine(url => /^https?:/.test(url));
 export const PublicEventSchema = z.object({
@@ -16,6 +17,11 @@ export const PublicEventSchema = z.object({
 });
 export interface Edition { mode: 'mock' | 'live'; date: string | null; publishedAt: string | null; items: PublicEvent[] }
 export async function getEdition(date?: string): Promise<Edition> {
+  // Protected demo has no DB dependency and cannot activate on production deployment.
+  if (protectedPreviewDemoEnabled()) {
+    const preview = protectedPreviewEdition();
+    return date && preview.date !== date ? { ...preview, items: [] } : preview;
+  }
   const { isMock } = runtimeMode();
   const ark = await prisma.dailyArk.findFirst({
     where: { status: 'PUBLISHED', isMock, ...(date ? { arkDate: date } : {}) },
@@ -26,6 +32,7 @@ export async function getEdition(date?: string): Promise<Edition> {
   return { mode: isMock ? 'mock' : 'live', date: ark?.arkDate ?? null, publishedAt: ark?.publishedAt?.toISOString() ?? null, items };
 }
 export async function getPublicEvent(id: string): Promise<PublicEvent | null> {
+  if (protectedPreviewDemoEnabled()) return protectedPreviewEdition().items.find(e => e.id === id) ?? null;
   const { isMock } = runtimeMode();
   // Read the actual published snapshot; failed re-analysis cannot mutate the edition.
   const item = await prisma.arkItem.findFirst({ where: { eventId: id, ark: { status: 'PUBLISHED', isMock } }, orderBy: { ark: { arkDate: 'desc' } } });
