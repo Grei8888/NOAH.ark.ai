@@ -1,0 +1,60 @@
+name: NOAH ARK independent public HTTP smoke
+
+on:
+  push:
+    branches:
+      - chatgpt/noah-public-smoke
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-site:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check real production homepage from outside Vercel
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://noah-ark-ai.vercel.app"
+          for attempt in 1 2 3; do
+            code=$(curl --retry 2 --retry-all-errors --retry-delay 2 --max-time 85 -LsS -o /tmp/noah-home.html -w '%{http_code}' "$base/" || true)
+            if [[ "$code" == "200" ]] && grep -q '실제 정부 RSS' /tmp/noah-home.html &&
+                grep -q 'AI 분석, 중요도 선정' /tmp/noah-home.html &&
+                grep -q 'https://www.mss.go.kr/' /tmp/noah-home.html &&
+                grep -q '원문 보기' /tmp/noah-home.html; then
+              echo "PASS: public homepage served genuine ministry source links in honest live-source mode"
+              break
+            fi
+            echo "Attempt $attempt: HTTP $code or source links missing; retry after short delay"
+            if [[ "$attempt" == 3 ]]; then
+              echo "FAIL: no verifiable original-source Home; no synthetic data accepted" >&2
+              exit 1
+            fi
+            sleep 8
+          done
+          if grep -q '가상 Event로 동작을 확인하는 화면' /tmp/noah-home.html; then
+            echo "FAIL: demo content leaked into production" >&2
+            exit 1
+          fi
+
+      - name: Check public routes, actual view text and empty analyzed edition
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://noah-ark-ai.vercel.app"
+          for item in 'discover:원문 자료 탐색' 'startup:창업' 'saved:내가 저장한 자료' 'my:내 관심 분야' 'settings:서비스 안내'; do
+            key="${item%%:*}"
+            label="${item#*:}"
+            code=$(curl -LsS --max-time 30 -o /tmp/noah-view.html -w '%{http_code}' "$base/?view=$key")
+            [[ "$code" == "200" ]] && grep -q "$label" /tmp/noah-view.html || { echo "FAIL view=$key HTTP=$code" >&2; exit 1; }
+          done
+          code=$(curl -LsS --max-time 30 -o /tmp/noah-sources.html -w '%{http_code}' "$base/sources")
+          [[ "$code" == "200" ]] && grep -q "ORIGINAL SOURCES" /tmp/noah-sources.html
+          code=$(curl -LsS --max-time 30 -o /tmp/noah-ark.json -w '%{http_code}' "$base/api/ark")
+          [[ "$code" == "200" ]] && grep -q '"mode":"live"' /tmp/noah-ark.json && grep -q '"items":\[\]' /tmp/noah-ark.json || { echo "FAIL /api/ark mode or items" >&2; exit 1; }
+          code=$(curl -LsS --max-time 30 -o /dev/null -w '%{http_code}' "$base/api/cron/daily")
+          [[ "$code" == "401" ]] || { echo "FAIL: cron must remain protected, got $code" >&2; exit 1; }
+          echo "PASS: authenticated-free public production, five nav views, real source explorer, protected cron, zero fake Events"
