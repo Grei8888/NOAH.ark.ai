@@ -1,0 +1,9 @@
+node_modules/
+.next/
+.generated/
+.noah/
+.env*
+!.env.example
+*.tsbuildinfo
+prisma/local.prisma
+prisma/*.db*

@@ -1,11 +1,7 @@
-import { NextResponse } from "next/server";
-import { getTodaysArk } from "@/lib/ark/today";
-
+import { NextResponse } from 'next/server';
+import { getEdition } from '@/lib/data';
+export const dynamic = 'force-dynamic';
 export async function GET() {
-  return NextResponse.json({
-    service: "NOAH Intelligence",
-    mode: "mock",
-    generatedAt: new Date().toISOString(),
-    items: getTodaysArk()
-  });
+ try { return NextResponse.json({ service: 'NOAH ARK', ...await getEdition() }, { headers: { 'Cache-Control': 'no-store' } }); }
+ catch { return NextResponse.json({ error: 'Edition unavailable; no demo fallback was used.' }, { status: 503, headers: { 'Cache-Control': 'no-store' } }); }
 }
