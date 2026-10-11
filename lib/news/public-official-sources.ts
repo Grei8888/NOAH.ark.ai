@@ -55,7 +55,7 @@ export function curateOfficialSources(
   for (const row of sorted) {
     const url = validMinistryLink(row.url);
     const date = row.publishedAt.getTime();
-    const title = row.title.replace(/\\s+/g, ' ').trim();
+    const title = row.title.replace(/\s+/g, ' ').trim();
     if (!url || !title || title.length > 240 || !Number.isFinite(date) || date > maxTime || date < minTime || seen.has(url)) continue;
     seen.add(url);
     items.push({
