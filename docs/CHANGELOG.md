@@ -33,3 +33,10 @@ Prisma persistence, pipeline lease and admin/cron boundaries. Removed shared own
 profile dependency; isolated live and mock publications. Added mode/read/snapshot
 regressions. Kept archived investor and D1 prototypes untouched. Design documents
 from draft PR #5 are included as the implementation reference, not merged approval.
+
+## 2026-10-11 — Personalized Home v1 (pending review)
+
+Added responsive Brand v3 shell, For You declared-interest filter, distinct Must Know,
+Startup Radar, data-derived intelligence rail, local interests/save/hide/undo and sourced
+Event detail. No new consumer auth or cohort system; UI discloses local-only state and
+unverified perspective diversity. Browser/screenshot acceptance remains pending.

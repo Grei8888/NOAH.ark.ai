@@ -7,3 +7,5 @@ node_modules/
 *.tsbuildinfo
 prisma/local.prisma
 prisma/*.db*
+test-results/
+playwright-report/

@@ -54,3 +54,16 @@ until data has been collected, analyzed and published.
 
 Feature branches require Product Owner/ChatGPT review before merging. Archived
 recovery and PR #4's Morning Brief experiment are independent and unchanged.
+
+## Personalized Home v1 review layer
+
+Home has local declared-interest personalization, save/hide/undo and five mobile
+navigation destinations. `/` starts with public Must Know until interests are selected;
+`/?view=my` edits them and `/?view=settings` can opt out/reset. Preferences are mode-
+separated and browser-only. Authenticated cross-device state is not simulated.
+Perspective affordances count sources, not unverified viewpoint diversity.
+
+After `pnpm setup:mock` and `pnpm build`, run `pnpm test:http` for seven browser-free
+HTTP acceptance cases (mock and live-isolation test servers). See
+[Home implementation and limitations](docs/HOME_V1_IMPLEMENTATION.md).
+Desktop/mobile screenshots and supported browser interaction checks remain pending.

@@ -16,7 +16,8 @@
     "db:seed": "node --import tsx prisma/seed.ts",
     "pipeline": "node --import tsx scripts/pipeline.ts",
     "setup:mock": "pnpm db:generate && pnpm db:local && pnpm db:seed && pnpm pipeline",
-    "postinstall": "pnpm db:generate"
+    "postinstall": "pnpm db:generate",
+    "test:http": "playwright test"
   },
   "dependencies": {
     "@prisma/client": "6.19.0",
@@ -30,6 +31,7 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "@types/luxon": "^3.7.1",
     "@types/node": "^24.10.0",
     "@types/react": "^19.2.7",
