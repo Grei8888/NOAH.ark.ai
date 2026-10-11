@@ -14,6 +14,7 @@ import { AppShell, type HomeView } from "./AppShell";
 import { Icon } from "./Icon";
 import { EventFeedItem } from "./EventFeedItem";
 import { usePreferences } from "./preferences";
+import { demoImageForEvent } from "@/lib/home/demo-images";
 
 export function PersonalizedHome({
   edition,
@@ -124,6 +125,8 @@ export function PersonalizedHome({
           editorial ? (i === 0 ? "lead" : i < 3 ? "medium" : "compact") : "compact"
         }
         now={now}
+        mode={edition.mode}
+        demoImage={editorial && i < 3 ? demoImageForEvent(event, edition.mode) : undefined}
         prefs={prefs}
         onSave={save}
         onHide={hide}

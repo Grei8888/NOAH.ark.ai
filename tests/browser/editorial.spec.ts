@@ -40,7 +40,15 @@ for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844
     await expect(forYou.locator(".eventFeedItem--compact")).toHaveCount(2);
     const lead = forYou.locator(".eventFeedItem--lead");
     await expect(lead.locator(".leadRecommendation")).toBeVisible();
-    await expect(lead.locator("img")).toHaveCount(0);
+    await expect(lead.locator('[data-image-kind="demo"] img')).toHaveCount(1);
+    await expect(lead.locator("figcaption")).toContainText("DEMO 예시 · 실제 사건 현장 아님");
+    await expect(forYou.locator(".demoEventImage--thumbnail")).toHaveCount(1);
+    for (const img of await forYou.locator("img").all()) {
+      await expect.poll(() => img.evaluate(el => (el as HTMLImageElement).complete && (el as HTMLImageElement).naturalWidth > 0)).toBe(true);
+    }
+    const intro = page.locator(".homeIntro h1");
+    expect(await intro.evaluate(el => getComputedStyle(el).fontSize)).toBe(viewport.width === 390 ? "26px" : "32px");
+    expect(await intro.evaluate(el => getComputedStyle(el).color)).toBe("rgb(23, 63, 115)");
     await expect(lead.locator(".perspectiveLink")).toHaveText(/출처 3개 · 다른 시선/);
     const headline = lead.locator("h3");
     const box = await headline.boundingBox();
@@ -54,10 +62,10 @@ for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844
       await expect(page.locator(".intelligenceRail")).toBeVisible();
       expect(await page.locator(".railPanel").first().evaluate(el => getComputedStyle(el).borderRadius)).toBe("0px");
     }
-    await mkdir(".noah/editorial-screenshots", { recursive: true });
+    await mkdir(".noah/demo-screenshots", { recursive: true });
     await page.mouse.move(0, 0);
-    await page.screenshot({ path: `.noah/editorial-screenshots/home-${viewport.width}.png` });
-    await page.screenshot({ path: `.noah/editorial-screenshots/home-${viewport.width}-full.png`, fullPage: true });
+    await page.screenshot({ path: `.noah/demo-screenshots/home-${viewport.width}.png` });
+    await page.screenshot({ path: `.noah/demo-screenshots/home-${viewport.width}-full.png`, fullPage: true });
 
     // Keep editorial presentation coupled to the original preference controls.
     const id = await lead.getAttribute("data-event-id");
@@ -87,3 +95,13 @@ for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844
     expect(errors).toEqual([]);
   });
 }
+
+test("unavailable demo images leave readable headlines and controls", async ({ page }) => {
+  await page.route("**/_next/image?**", route => route.abort());
+  await personalize(page);
+  const lead = page.locator(".eventFeedItem--lead");
+  await expect(lead.locator(".demoEventImage")).toHaveCount(0);
+  await expect(lead.locator("h3")).toBeVisible();
+  await lead.locator(".saveButton").click();
+  await expect(lead.locator(".saveButton")).toHaveAttribute("aria-pressed", "true");
+});

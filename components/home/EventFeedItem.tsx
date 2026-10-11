@@ -11,6 +11,8 @@ import {
 import { Icon } from "./Icon";
 import { LeadEventImage } from "./LeadEventImage";
 import type { EditorialImage } from "@/lib/home/editorial-image";
+import { DemoEventImage } from "./DemoEventImage";
+import type { DemoImage } from "@/lib/home/demo-images";
 export function EventFeedItem({
   event,
   rank,
@@ -21,6 +23,8 @@ export function EventFeedItem({
   onTopics,
   variant = "medium",
   image,
+  demoImage,
+  mode,
 }: {
   event: PublicEvent;
   rank: number;
@@ -31,6 +35,8 @@ export function EventFeedItem({
   onTopics: (event: PublicEvent, more: boolean) => void;
   variant?: "lead" | "medium" | "compact";
   image?: EditorialImage;
+  demoImage?: DemoImage;
+  mode: "mock" | "live";
 }) {
   const saved = prefs.saved.includes(event.id);
   const topics = matchedTopics(event, prefs.enabled ? prefs.topics : []);
@@ -49,11 +55,17 @@ export function EventFeedItem({
           </time>
           {event.isMock && <span className="demoTag">DEMO</span>}
         </div>
+        {variant === "medium" && demoImage && (
+          <DemoEventImage key={demoImage.src} event={event} image={demoImage} mode={mode} thumbnail />
+        )}
         <h3>
           <Link href={`/event/${event.id}`}>{event.representativeTitle}</Link>
         </h3>
         {variant === "lead" && image && (
           <LeadEventImage key={image.src} event={event} image={image} />
+        )}
+        {variant === "lead" && !image && demoImage && (
+          <DemoEventImage key={demoImage.src} event={event} image={demoImage} mode={mode} />
         )}
         <p className="eventSummary">{event.analysis.headlineSummary}</p>
         {variant === "lead" && (

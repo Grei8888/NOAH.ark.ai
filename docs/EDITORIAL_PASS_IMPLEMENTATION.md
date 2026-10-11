@@ -1,5 +1,9 @@
 # Magazine Editorial Pass — PR #8
 
+This records the original typography-only pass. The subsequent
+[photo demo update](EDITORIAL_DEMO_IMPLEMENTATION.md) supersedes its Home title
+sizes, default Mock imagery and validation counts; the Live image gate is unchanged.
+
 Continues `codex/personalized-home-v1` using PR #5's Brand v3, Home UX v1,
 Magazine Editorial Pass v1 and the [ChatGPT review](https://github.com/Grei8888/NOAH.ark.ai/pull/8#issuecomment-6109495777).
 
