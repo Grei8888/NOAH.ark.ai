@@ -1,4 +1,3 @@
-import 'server-only';
 import { unstable_cache } from 'next/cache';
 import { RSSProvider } from '@/lib/news/providers';
 import { normalizeUrl } from '@/lib/news/normalize';
