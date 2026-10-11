@@ -1,0 +1,55 @@
+name: NOAH ARK beta tester distribution
+
+on:
+  push:
+    branches:
+      - chatgpt/noah-beta-tester-kit
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beta-tester-kit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Tester page + existing application regression checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEWS_PROVIDER: mock
+      AI_PROVIDER: mock
+      DB_MODE: local
+      DATABASE_URL: postgresql://invalid:invalid@127.0.0.1:5433/never_connect
+      LOCAL_DATABASE_URL: file:.noah/beta-tester-ci.db
+      NOAH_LIVE_LINKS_V1: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10"
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Create isolated synthetic dataset
+        run: pnpm setup:mock
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Unit and integration regression tests
+        run: pnpm test
+      - name: Production-mode build
+        run: pnpm build
+      - name: Tester page and existing HTTP route checks
+        run: pnpm test:http
+      - name: Never deploy or contact paid providers
+        run: echo "CI only; source changes undergo production release review separately."
