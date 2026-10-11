@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "NOAH Intelligence",
+  title: "NOAH ARK",
   description: "Only What Matters. 정보의 홍수에서 반드시 알아야 할 변화만 선별합니다."
 };
 
