@@ -1855,3 +1855,47 @@ section[id] {
   .sourceVisualLink { width: 74px; }
   .sourceNewsItem h3 { font-size: 14px; }
 }
+
+
+/* Today topics — local-only, no personalization API or AI request. */
+.todayInterestPanel {
+  margin: 24px 0 12px;
+  padding: 19px 0 17px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.todayInterestHeading { display: flex; justify-content: space-between; gap: 14px; align-items: center; }
+.todayInterestHeading h2 { font-size: 14px; font-weight: 750; letter-spacing: -.2px; color: var(--navy); }
+.todayInterestHeading p { margin-top: 4px; font-size: 11px; color: var(--slate); line-height: 1.5; }
+.todayInterestReset {
+  color: var(--navy);
+  font-size: 11px;
+  white-space: nowrap;
+  text-underline-offset: 3px;
+  text-decoration: underline;
+  min-height: 44px;
+}
+.todayInterestChips { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 14px; }
+.todayInterestChips button {
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid #d6dfe9;
+  border-radius: 999px;
+  min-height: 41px;
+  padding: 9px 14px;
+  background: #f8fafb;
+  color: var(--navy);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  transition: background .16s, border-color .16s;
+}
+.todayInterestChips button[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: white; }
+.todayInterestChips button:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.todayInterestNote { color: var(--slate); font-size: 10px; line-height: 1.7; margin-top: 11px; }
+@media (max-width: 767px) {
+  .todayInterestPanel { margin: 18px 0 8px; padding: 16px 0 14px; }
+  .todayInterestHeading h2 { font-size: 13px; }
+  .todayInterestHeading p { font-size: 10px; }
+  .todayInterestChips { gap: 6px; margin-top: 12px; }
+  .todayInterestChips button { min-height: 44px; padding: 9px 12px; font-size: 11px; }
+}

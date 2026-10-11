@@ -5,6 +5,7 @@ on:
     branches:
       - chatgpt/noah-safe-visual-cards
       - chatgpt/noah-card-ratio-refine
+      - chatgpt/noah-today-interests-v1
   workflow_dispatch:
 
 permissions:
@@ -84,6 +85,7 @@ jobs:
             if (!html.includes("sourceVisualLink") || !html.includes("noahCardImage--cover") || !html.includes("noahCardImageArt")) throw Error("Safe NOAH cover missing");
             if (html.includes("noahCardImage--photo")) throw Error("Unreviewed publisher photo was displayed");
             if (!html.includes("https://www.mss.go.kr/")) throw Error("Real official source not linked");
+            if (!html.includes("오늘의 관심사") || !html.includes("AI·기술") || !html.includes("정책·제도")) throw Error("Daily interest quick filters missing from server-rendered Home");
             console.log("PASS: official source cards render NOAH-owned SVG cover with links, not scraped photos");
           '
       - if: always()
