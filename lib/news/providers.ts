@@ -75,8 +75,10 @@ export class RSSProvider implements NewsProvider {
                 const publishedAt = new Date(a.pubDate ?? a.published ?? '');
                 if (!Number.isFinite(publishedAt.getTime()) || publishedAt < p.from || publishedAt >= p.to)
                     continue;
-                const description = (a.description ?? '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 500);
-                const canonical = normalizeUrl(a.link);
+                const description = (a.description ?? '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 500);
+                // The parser intentionally disables arbitrary XML entities; decode only standard
+                // escaped ampersands required for valid original-article query URLs.
+                const canonical = normalizeUrl(a.link.replace(/&amp;/gi, '&'));
                 // An official feed is trusted only for links on its own origin.
                 const sourceType = new URL(canonical).hostname === url.hostname ? feed.sourceType : 'NEWS_MEDIA';
                 articles.push({ provider: this.name, sourceName: feed.name, sourceDomain: new URL(canonical).hostname, sourceType, title: a.title, description, contentSnippet: '', url: canonical, publishedAt, language: 'ko', country: 'KR', queryGroup: 'OTHER', rawPayload: { feed: feed.url } });
