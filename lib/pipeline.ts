@@ -23,10 +23,15 @@ export async function runPipeline(type: PipelineType = 'full', date = latestArkD
     const mode = runtimeMode();
     // A source-only beta may collect real article metadata without an AI key,
     // but may NEVER create analyzed Events or a published Ark from that data.
-    if (!mode.isMock && process.env.AI_PROVIDER === 'off' && type !== 'collect')
+    const sourceOnly = !mode.isMock && process.env.AI_PROVIDER === 'off';
+    if (sourceOnly && type !== 'collect')
         throw new Error('Source-only mode permits collect only; live Event analysis is disabled');
     const articleMode = mode.isMock ? { provider: 'mock' } : { provider: { not: 'mock' } };
-    const period = type === 'breaking' ? { from: new Date(now.getTime() - 24 * 3600000), to: now } : arkPeriod(date);
+    // The Ark is a 07:00 KST editorial edition; unscheduled source discovery isn't.
+    // Collect a rolling 14 days, so Friday/weekend and before-07:00 periods don't hide fresh links.
+    const period = sourceOnly && type === 'collect'
+        ? { from: new Date(now.getTime() - 14 * 86400000), to: now }
+        : type === 'breaking' ? { from: new Date(now.getTime() - 24 * 3600000), to: now } : arkPeriod(date);
     if (period.to > now)
         throw new Error('Cannot publish an unfinished collection period');
     const owner = randomUUID();
@@ -72,7 +77,10 @@ export async function runPipeline(type: PipelineType = 'full', date = latestArkD
                         try {
                             if (raw.publishedAt < period.from || raw.publishedAt >= period.to)
                                 continue;
-                            const article = normalizeArticle({ ...raw, queryGroup: query.group === 'ALL' ? raw.queryGroup : query.group });
+                            // Source-only mode persists factual citation metadata only. Do not
+                            // retain body extracts, images or feed descriptions without rights review.
+                            const minimal = sourceOnly ? { ...raw, description: '', contentSnippet: '', imageUrl: undefined } : raw;
+                            const article = normalizeArticle({ ...minimal, queryGroup: query.group === 'ALL' ? raw.queryGroup : query.group });
                             if (seen.has(article.ingestionKey))
                                 continue;
                             seen.add(article.ingestionKey);
