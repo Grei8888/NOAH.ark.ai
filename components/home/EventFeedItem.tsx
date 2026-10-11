@@ -9,6 +9,8 @@ import {
   type Preferences,
 } from "@/lib/home/model";
 import { Icon } from "./Icon";
+import { LeadEventImage } from "./LeadEventImage";
+import type { EditorialImage } from "@/lib/home/editorial-image";
 export function EventFeedItem({
   event,
   rank,
@@ -17,6 +19,8 @@ export function EventFeedItem({
   onSave,
   onHide,
   onTopics,
+  variant = "medium",
+  image,
 }: {
   event: PublicEvent;
   rank: number;
@@ -25,11 +29,16 @@ export function EventFeedItem({
   onSave: (id: string) => void;
   onHide: (id: string) => void;
   onTopics: (event: PublicEvent, more: boolean) => void;
+  variant?: "lead" | "medium" | "compact";
+  image?: EditorialImage;
 }) {
   const saved = prefs.saved.includes(event.id);
   const topics = matchedTopics(event, prefs.enabled ? prefs.topics : []);
   return (
-    <article className="eventFeedItem" data-event-id={event.id}>
+    <article
+      className={`eventFeedItem eventFeedItem--${variant}`}
+      data-event-id={event.id}
+    >
       <div className="eventRank">{String(rank).padStart(2, "0")}</div>
       <div className="eventBody">
         <div className="eventMeta">
@@ -43,12 +52,27 @@ export function EventFeedItem({
         <h3>
           <Link href={`/event/${event.id}`}>{event.representativeTitle}</Link>
         </h3>
+        {variant === "lead" && image && (
+          <LeadEventImage key={image.src} event={event} image={image} />
+        )}
         <p className="eventSummary">{event.analysis.headlineSummary}</p>
+        {variant === "lead" && (
+          <p className="leadRecommendation">
+            <strong>
+              {topics.length ? "나에게 중요한 이유" : "오늘 알아야 할 이유"}
+            </strong>
+            <span>{recommendationReason(event, prefs)}</span>
+          </p>
+        )}
         <details className="recommendationReason">
           <summary>
-            <span className="reasonMarker">↳</span>
-            {topics.length ? "나에게 중요한 이유" : "오늘 알아야 할 이유"}
-            <span className="whyLabel">왜 추천했나요?</span>
+            <span className="reasonMarker" aria-hidden="true"><Icon name="arrow" /></span>
+            {variant === "lead"
+              ? "왜 추천했나요?"
+              : topics.length ? "나에게 중요한 이유" : "오늘 알아야 할 이유"}
+            {variant !== "lead" && (
+              <span className="whyLabel">왜 추천했나요?</span>
+            )}
           </summary>
           <p>
             {recommendationReason(event, prefs)}. {topics.length ? "공개된 Event 제목·요약·분류에 선택한 주제가 포함되어 있습니다." : "개인화와 별개로 공개 중요도 순위를 사용했습니다."} 의미 기반 AI 개인화는 아직 연결되지 않았습니다.

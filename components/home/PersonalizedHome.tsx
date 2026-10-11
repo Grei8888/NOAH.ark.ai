@@ -114,12 +114,15 @@ export function PersonalizedHome({
       true,
     );
   }
-  function feed(events: PublicEvent[]) {
+  function feed(events: PublicEvent[], editorial = false) {
     return events.map((event, i) => (
       <EventFeedItem
         key={event.id}
         event={event}
         rank={i + 1}
+        variant={
+          editorial ? (i === 0 ? "lead" : i < 3 ? "medium" : "compact") : "compact"
+        }
         now={now}
         prefs={prefs}
         onSave={save}
@@ -133,6 +136,7 @@ export function PersonalizedHome({
     subtitle: string,
     events: PublicEvent[],
     empty: string,
+    editorial = false,
   ) {
     return (
       <section className="feedSection">
@@ -143,7 +147,7 @@ export function PersonalizedHome({
           </div>
           <span>{events.length} EVENTS</span>
         </div>
-        {events.length ? feed(events) : <p className="emptyState">{empty}</p>}
+        {events.length ? feed(events, editorial) : <p className="emptyState">{empty}</p>}
       </section>
     );
   }
@@ -343,6 +347,7 @@ export function PersonalizedHome({
               "선택한 관심분야에서 중요한 변화",
               selected.forYou,
               "선택한 관심분야에 해당하는 Event가 아직 없습니다. 공개 주요 변화를 확인하거나 관심사를 편집하세요.",
+              true,
             )}
           {section(
             "MUST KNOW",

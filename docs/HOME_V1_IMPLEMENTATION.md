@@ -26,17 +26,18 @@ Shared Importance and legacy personal 65/35 arithmetic remain distinct.
 ## Verification
 
 - Typecheck: pass.
-- Unit/integration: **35/35**, four suites (including profile separation, opt-out, weak-match no-fill, hide, radar source gate, malformed local storage).
+- Unit/integration: **39/39**, five suites (including profile separation, opt-out, weak-match no-fill, hide, radar source gate, malformed local storage and editorial image clearance).
 - Lint: pass, no warnings/errors.
-- Optimized Next build: pass. Four generated-Prisma tracing warnings remain.
+- Optimized Next build: pass. Five Prisma/runtime dynamic-filesystem tracing warnings remain.
 - Actual Mock setup/pipeline: 32 input documents → 2 duplicates → 10 Events → 8 published items.
 - Production-server HTTP suite: **7/7 passed** (mock Home/detail/destinations, admin/origin/cron boundaries and live-mode read isolation). APIRequestContext only, no browser installed.
-- The HTTP suite starts test servers in one process tree because individual execution sessions isolate loopback networking.
+- The HTTP suite starts and stops its own test servers in one process tree.
+- Editorial browser suite: **3/3 passed** using existing Chromium at 1440px desktop and 390px mobile. See [editorial pass report and screenshots](EDITORIAL_PASS_IMPLEMENTATION.md).
 - Next's streaming not-found response can return HTTP 200 with not-found UI/noindex. This is documented framework behavior; no unpublished data is exposed.
 
 ## Known limitations and review gates
 
-1. **Desktop and ~390px screenshots / browser layout checks are pending.** Supported `$control-browser` is absent. Sites SKILL.md requires: “If `$control-browser` is unavailable, skip browser QA: do not start a preview server, install a browser, or improvise another browser-control path.” HTTP test servers are only for request/response validation. No visual acceptance claim is made for above-fold placement, Korean font rendering or tap interactions.
+1. **Desktop and 390px Chromium checks and screenshots are complete for the Magazine Editorial Pass.** Lead headline placement, visual variants, navigation, preference actions and keyboard disclosure were checked. Safari and physical-device checks remain unrun; screenshots are synthetic demo coverage.
 2. Consumer authentication, cross-device preferences/history and server-side per-user scoring remain unimplemented; the screen explicitly identifies browser-only state. Saved view shows saved items in the current edition; earlier saved IDs remain stored but historical library UI is deferred.
 3. No verified divergent perspective extraction exists. The affordance shows **source count**, and detail explicitly says source count is not perspective count. Excerpts are attributed; no ideological labels or fabricated disagreement.
 4. Approved logo artwork has no production vector master in the repository. A temporary typographic lockup is used; no invented logo master replaces the approved reference.
