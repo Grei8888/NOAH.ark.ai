@@ -1564,3 +1564,140 @@ section[id] {
 .eventFeedItem:not(.eventFeedItem--lead) h3 { -webkit-line-clamp: 2; }
 .eventFeedItem h3:focus-within { display: block; overflow: visible; }
 .feedbackNotice { position: sticky; top: 12px; z-index: 15; }
+
+
+/* NOAH ARK public beta: verifiable government-source desk; A-layout unchanged. */
+.sourceHealth {
+  border-left: 2px solid var(--gold);
+  padding: 10px 14px;
+  margin: 0 0 24px;
+  color: #6b5263;
+  background: #faf8f3;
+  font-size: 12px;
+}
+.sourceToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 17px 0 4px;
+}
+.sourceSearch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 12px;
+  min-width: 220px;
+  flex: 1 1 240px;
+  max-width: 390px;
+}
+.sourceSearch svg { width: 16px; height: 16px; color: var(--slate); }
+.sourceSearch input {
+  border: 0;
+  background: transparent;
+  min-width: 0;
+  width: 100%;
+  padding: 11px 0;
+  outline: none;
+  font-size: 12px;
+}
+.sourceSearch:focus-within { outline: 2px solid var(--gold); outline-offset: 2px; }
+.sourceFilters { display: flex; flex-wrap: wrap; gap: 6px; }
+.sourceFilters button {
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 7px 13px;
+  min-height: 36px;
+  font-size: 11px;
+  color: var(--slate);
+}
+.sourceFilters button[aria-pressed="true"] {
+  border-color: var(--navy-soft);
+  background: var(--navy-soft);
+  color: var(--white);
+}
+.sourceNewsItem {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 16px;
+  padding: 24px 0 20px;
+  border-bottom: 1px solid var(--border);
+}
+.sourceNewsItem .eventRank {
+  color: #8290a2;
+  font-size: 18px;
+  line-height: 1.4;
+  font-family: Georgia, serif;
+}
+.sourceNewsBody { min-width: 0; }
+.sourceNewsItem h3 {
+  margin: 9px 0 12px;
+  color: var(--navy);
+  font-size: 20px;
+  line-height: 1.52;
+  letter-spacing: -0.45px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+}
+.sourceNewsItem h3 a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.sourceNewsActions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.sourceNewsActions > a,
+.sourceNewsActions > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--slate);
+  font-size: 11px;
+  min-height: 42px;
+  padding: 5px 2px;
+}
+.sourceNewsActions > a { color: var(--navy); font-weight: 650; margin-right: auto; }
+.sourceNewsActions > a svg { width: 14px; height: 14px; }
+.sourceNewsActions button[aria-pressed="true"] { color: var(--navy); font-weight: 700; }
+.sourceNewsActions button:hover,
+.sourceNewsActions > a:hover { color: var(--intro-navy); }
+.sourceMoreLink {
+  display: block;
+  text-align: center;
+  padding: 20px;
+  font-weight: 650;
+  border-bottom: 1px solid var(--border);
+}
+.sourceDisclaimer {
+  font-size: 10px;
+  line-height: 1.9;
+  color: var(--slate);
+  border-top: 1px solid var(--border);
+  margin: 12px 0 34px;
+  padding-top: 20px;
+}
+.sourceRailFoot { margin-top: 20px; }
+.sourcePreferences {
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+}
+.sourcePreferences p { font-size: 11px; color: var(--slate); margin-bottom: 12px; }
+.sourceSettings h2 { margin: 30px 0 16px; font-size: 20px; }
+.sourceSettings p { margin: 14px 0; font-size: 13px; line-height: 1.9; color: var(--slate); }
+.sourceRestore {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 16px;
+  margin: 16px 0;
+}
+@media(max-width: 767px) {
+  .sourceToolbar { align-items: stretch; padding-top: 12px; gap: 10px; }
+  .sourceSearch { min-width: 0; flex-basis: 100%; max-width: none; }
+  .sourceFilters { width: 100%; }
+  .sourceFilters button { font-size: 10px; }
+  .sourceNewsItem { grid-template-columns: 24px minmax(0, 1fr); gap: 11px; padding: 20px 0; }
+  .sourceNewsItem h3 { font-size: 17px; line-height: 1.58; }
+  .sourceNewsItem .eventRank { font-size: 16px; }
+  .sourceNewsActions > a, .sourceNewsActions > button { font-size: 10px; }
+  .sourceDisclaimer { margin-bottom: 75px; }
+  .sourceHealth { font-size: 11px; }
+}
