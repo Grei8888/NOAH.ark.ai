@@ -45,7 +45,28 @@ export class NewsAPIProvider implements NewsProvider {
         return data.articles.filter(a => a.title !== '[Removed]').map(a => ({ provider: this.name, sourceName: a.source.name ?? 'Unknown', sourceDomain: new URL(a.url).hostname, sourceType: 'NEWS_MEDIA', author: a.author ?? undefined, title: a.title, description: (a.description ?? '').slice(0, 500), contentSnippet: '', url: normalizeUrl(a.url), publishedAt: new Date(a.publishedAt), language: p.language ?? 'ko', country: p.region ?? 'KR', queryGroup: 'OTHER', rawPayload: { source: a.source.name ?? 'Unknown' } }));
     }
 }
-const FeedEntry = z.object({ title: z.union([z.string(), z.number()]).transform(String), link: z.string(), pubDate: z.string().optional(), published: z.string().optional(), description: z.string().optional() }).passthrough();
+// Official Korean feeds sometimes publish compact YYYYMMDDHHmmss (KST) instead of RFC822.
+// fast-xml-parser may interpret these digit-only fields as numbers.
+const FeedDate = z.union([z.string(), z.number()]).transform(String);
+export function parseRSSDate(value: string | number | undefined): Date | null {
+    if (value === undefined) return null;
+    const raw = String(value).trim();
+    if (/^\\d{14}$/.test(raw)) {
+        const year = Number(raw.slice(0, 4));
+        const month = Number(raw.slice(4, 6));
+        const day = Number(raw.slice(6, 8));
+        const hour = Number(raw.slice(8, 10));
+        const minute = Number(raw.slice(10, 12));
+        const second = Number(raw.slice(12, 14));
+        const local = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+        if (local.getUTCFullYear() !== year || local.getUTCMonth() + 1 !== month || local.getUTCDate() !== day ||
+            local.getUTCHours() !== hour || local.getUTCMinutes() !== minute || local.getUTCSeconds() !== second) return null;
+        return new Date(local.getTime() - 9 * 60 * 60 * 1000); // Asia/Seoul fixed UTC+09
+    }
+    const date = new Date(raw);
+    return Number.isFinite(date.getTime()) ? date : null;
+}
+const FeedEntry = z.object({ title: z.union([z.string(), z.number()]).transform(String), link: z.string(), pubDate: FeedDate.optional(), published: FeedDate.optional(), description: z.string().optional() }).passthrough();
 export class RSSProvider implements NewsProvider {
     name = 'rss';
     constructor(private feeds: {
@@ -72,8 +93,8 @@ export class RSSProvider implements NewsProvider {
                 if (!result.success)
                     continue;
                 const a = result.data;
-                const publishedAt = new Date(a.pubDate ?? a.published ?? '');
-                if (!Number.isFinite(publishedAt.getTime()) || publishedAt < p.from || publishedAt >= p.to)
+                const publishedAt = parseRSSDate(a.pubDate ?? a.published);
+                if (!publishedAt || publishedAt < p.from || publishedAt >= p.to)
                     continue;
                 const description = (a.description ?? '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 500);
                 // The parser intentionally disables arbitrary XML entities; decode only standard
