@@ -1756,3 +1756,101 @@ section[id] {
   .betaMission p { font-size: 11px; }
   .betaFeedback { margin-bottom: 26px; }
 }
+
+
+/* Rights-safe article cards — subtle NOAH-owned geometry, never external RSS photos. */
+.sourceNewsItem {
+  grid-template-columns: 28px 124px minmax(0,1fr);
+  align-items: start;
+  gap: 13px;
+}
+.sourceVisualLink {
+  display: block;
+  position: relative;
+  width: 124px;
+  height: 94px;
+  overflow: hidden;
+  border-radius: 7px;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px #dfe5eb;
+}
+.sourceVisualLink:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.noahCardImage {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background: #eef2f5;
+  color: #536a83;
+}
+.noahCardImage--cover[data-theme="startup"] { background: #eef2f5; }
+.noahCardImage--cover[data-theme="funding"] { background: #f0f2f2; }
+.noahCardImage--cover[data-theme="technology"] { background: #ebf0f5; }
+.noahCardImage--cover[data-theme="export"] { background: #f0f2f5; }
+.noahCardImage--cover[data-theme="policy"] { background: #f3f4f4; }
+.noahCardImage--cover[data-theme="announcement"] { background: #f1f3f5; }
+.noahCardImageEyebrow {
+  position: absolute;
+  top: 9px;
+  left: 10px;
+  z-index: 1;
+  color: #56708a;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+}
+.noahCardImageArt {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  fill: none;
+}
+.noahCoverFrame { stroke: #cfd7df; stroke-width: .7; opacity: .58; }
+.noahCoverWaveBack { stroke: #becbd7; stroke-width: 9; opacity: .5; stroke-linecap: round; }
+.noahCoverWave { stroke: #496783; stroke-width: 4.5; opacity: .72; stroke-linecap: round; }
+.noahCoverDetail { stroke: #6a7e91; stroke-width: 2; opacity: .72; stroke-linecap: round; stroke-linejoin: round; }
+.noahCoverGold { fill: #b49a60; opacity: .92; stroke: none; }
+.noahCardImageTag {
+  position: absolute;
+  left: 11px;
+  bottom: 10px;
+  color: #314962;
+  font-size: 8px;
+  letter-spacing: 1.2px;
+  font-weight: 700;
+}
+.sourceVisualLink:hover .noahCoverWave { stroke: #244c77; opacity: .9; }
+.noahCardImage--photo img { display: block; object-fit: cover; }
+.noahCardImageCredit {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  padding: 2px 4px;
+  background: #0b1f3bcc;
+  color: white;
+  font-size: 7px;
+  letter-spacing: .6px;
+}
+@media (min-width: 768px) and (max-width: 1240px) {
+  .sourceNewsItem { grid-template-columns: 22px 106px minmax(0,1fr); gap: 10px; }
+  .sourceVisualLink { width: 106px; height: 82px; }
+  .sourceNewsItem h3 { font-size: 17px; }
+}
+@media (max-width: 767px) {
+  .sourceNewsItem { grid-template-columns: 19px 86px minmax(0,1fr); gap: 8px; padding: 19px 0; }
+  .sourceVisualLink { width: 86px; height: 77px; border-radius: 6px; }
+  .sourceNewsItem .eventRank { font-size: 14px; }
+  .sourceNewsItem h3 { font-size: 15px; line-height: 1.48; letter-spacing: -.3px; margin: 7px 0 9px; }
+  .sourceNewsItem .eventMeta { font-size: 9px; gap: 3px; }
+  .sourceNewsActions { gap: 6px 10px; }
+  .sourceNewsActions > a, .sourceNewsActions > button { min-height: 44px; }
+  .noahCardImageEyebrow { left: 7px; top: 8px; font-size: 6px; letter-spacing: .7px; }
+  .noahCardImageTag { left: 7px; bottom: 7px; font-size: 7px; letter-spacing: .6px; }
+}
+@media (max-width: 359px) {
+  .sourceNewsItem { grid-template-columns: 16px 74px minmax(0,1fr); gap: 7px; }
+  .sourceVisualLink { width: 74px; height: 72px; }
+  .sourceNewsItem h3 { font-size: 14px; }
+}
