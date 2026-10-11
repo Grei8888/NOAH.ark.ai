@@ -33,11 +33,18 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
   const [filter, setFilter] = useState<SourceKind>(view === "startup" ? "notice" : "all");
 
   useEffect(() => {
-    setSaved(storedStrings(SAVED_KEY));
-    setHidden(storedStrings(HIDDEN_KEY));
-    const preferred = storedStrings(INTEREST_KEY).filter(s => s === "notice" || s === "press");
-    if (localStorage.getItem(INTEREST_KEY) !== null) setInterests(preferred);
-    setReady(true);
+    // Read browser-only preferences after hydration. Deferred callback avoids
+    // cascading synchronous state updates from React effects.
+    let active = true;
+    queueMicrotask(() => {
+      if (!active) return;
+      setSaved(storedStrings(SAVED_KEY));
+      setHidden(storedStrings(HIDDEN_KEY));
+      const preferred = storedStrings(INTEREST_KEY).filter(s => s === "notice" || s === "press");
+      if (localStorage.getItem(INTEREST_KEY) !== null) setInterests(preferred);
+      setReady(true);
+    });
+    return () => { active = false; };
   }, []);
   function changeSaved(url: string) {
     const next = saved.includes(url) ? saved.filter(s => s !== url) : [...saved, url].slice(-200);
