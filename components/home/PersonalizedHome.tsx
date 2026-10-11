@@ -332,6 +332,14 @@ export function PersonalizedHome({
       )}
       {view === "home" && (
         <>
+          {edition.mode === "live" && (
+            <div className="coldStart" role="note">
+              <span>AI 분석과 별도로, 수집된 자료의 출처와 원문 링크를 확인할 수 있습니다.</span>
+              <Link href="/sources">
+                원문 탐색 <Icon name="arrow" />
+              </Link>
+            </div>
+          )}
           {!hasProfile && (
             <div className="coldStart">
               <span>

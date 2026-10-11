@@ -1,0 +1,28 @@
+name: RSS read-only smoke
+on:
+  push:
+    branches:
+      - chatgpt/noah-source-discovery
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-sources:
+    name: Check official RSS transport and parser (no storage)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10"
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Read actual government RSS feeds without ingestion
+        run: node --import tsx scripts/rss-smoke.ts

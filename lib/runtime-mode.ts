@@ -4,6 +4,8 @@ export function runtimeMode() {
   if (!['mock', 'newsapi', 'rss', 'government'].includes(provider)) throw new Error('Configure NEWS_PROVIDER explicitly');
   const isMock = provider === 'mock';
   const ai = process.env.AI_PROVIDER ?? (isMock ? 'mock' : '');
-  if (isMock ? ai !== 'mock' : ai !== 'openai') throw new Error('News and analysis modes must agree');
+  // 'off' permits attributed live RSS collection without pretending analysis exists.
+  // The pipeline explicitly disallows processing and publishing in this mode.
+  if (isMock ? ai !== 'mock' : !['openai', 'off'].includes(ai)) throw new Error('News and analysis modes must agree');
   return { provider, isMock };
 }

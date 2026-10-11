@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - chatgpt/noah-free-beta-readiness
+      - chatgpt/noah-source-discovery
   pull_request:
     branches:
       - main

@@ -21,6 +21,10 @@ export class PipelineBusyError extends Error {
 }
 export async function runPipeline(type: PipelineType = 'full', date = latestArkDate(), now = new Date()) {
     const mode = runtimeMode();
+    // A source-only beta may collect real article metadata without an AI key,
+    // but may NEVER create analyzed Events or a published Ark from that data.
+    if (!mode.isMock && process.env.AI_PROVIDER === 'off' && type !== 'collect')
+        throw new Error('Source-only mode permits collect only; live Event analysis is disabled');
     const articleMode = mode.isMock ? { provider: 'mock' } : { provider: { not: 'mock' } };
     const period = type === 'breaking' ? { from: new Date(now.getTime() - 24 * 3600000), to: now } : arkPeriod(date);
     if (period.to > now)
