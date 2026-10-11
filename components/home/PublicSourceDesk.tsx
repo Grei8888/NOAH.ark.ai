@@ -6,11 +6,13 @@ import { AppShell, type HomeView } from "@/components/home/AppShell";
 import { Icon } from "@/components/home/Icon";
 import { SourceCardVisual } from "@/components/home/SourceCardVisual";
 import type { OfficialFeedSnapshot, OfficialSourceLink } from "@/lib/news/public-official-sources";
+import { TODAY_TOPICS, matchesTodayTopic, restoreTodayTopics, todayKstDate, type TodayTopic } from "@/lib/news/daily-interests";
 
 type SourceKind = "all" | "notice" | "press";
 const SAVED_KEY = "noah:official-saved:v1";
 const HIDDEN_KEY = "noah:official-hidden:v1";
 const INTEREST_KEY = "noah:official-interests:v1";
+const TODAY_KEY = "noah:today-topics:v1";
 const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
   timeZone: "Asia/Seoul", month: "short", day: "numeric",
   hour: "2-digit", minute: "2-digit", hourCycle: "h23",
@@ -29,6 +31,7 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
   const [saved, setSaved] = useState<string[]>([]);
   const [hidden, setHidden] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>(["notice", "press"]);
+  const [todayTopics, setTodayTopics] = useState<TodayTopic[]>([]);
   const [ready, setReady] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<SourceKind>(view === "startup" ? "notice" : "all");
@@ -43,6 +46,7 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
       setHidden(storedStrings(HIDDEN_KEY));
       const preferred = storedStrings(INTEREST_KEY).filter(s => s === "notice" || s === "press");
       if (localStorage.getItem(INTEREST_KEY) !== null) setInterests(preferred);
+      setTodayTopics(restoreTodayTopics(localStorage.getItem(TODAY_KEY), todayKstDate()));
       setReady(true);
     });
     return () => { active = false; };
@@ -67,14 +71,25 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
     try { localStorage.setItem(INTEREST_KEY, JSON.stringify(next)); } catch { /* private browsers */ }
   }
 
+  function toggleTodayTopic(topic: TodayTopic) {
+    const next = todayTopics.includes(topic) ? todayTopics.filter(t => t !== topic) : [...todayTopics, topic];
+    setTodayTopics(next);
+    try { localStorage.setItem(TODAY_KEY, JSON.stringify({ date: todayKstDate(), topics: next })); } catch { /* private mode */ }
+  }
+  function clearTodayTopics() {
+    setTodayTopics([]);
+    try { localStorage.removeItem(TODAY_KEY); } catch { /* private mode */ }
+  }
+
   const currentKind: SourceKind = view === "startup" ? "notice" : filter;
   const filtered = useMemo(() => snapshot.items.filter(s => {
     if (view === "saved" && !saved.includes(s.url)) return false;
     if (view === "my" && !interests.includes(s.kind)) return false;
     if (view !== "saved" && hidden.includes(s.url)) return false;
     if (currentKind !== "all" && s.kind !== currentKind) return false;
+    if (view !== "saved" && todayTopics.length && !todayTopics.some(t => matchesTodayTopic(s.title, t))) return false;
     return !query.trim() || (s.title + s.sourceName).toLocaleLowerCase("ko-KR").includes(query.trim().toLocaleLowerCase("ko-KR"));
-  }), [snapshot.items, saved, hidden, interests, currentKind, query, view]);
+  }), [snapshot.items, saved, hidden, interests, todayTopics, currentKind, query, view]);
 
   const showControls = view !== "settings";
   const title = view === "saved" ? "내가 저장한 자료" : view === "my" ? "내 관심 분야" :
@@ -94,7 +109,7 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
           <div className="signalRow"><span>최근 14일 자료</span><strong>{snapshot.items.length}</strong></div>
           <div className="signalRow"><span>응답한 RSS</span><strong>{snapshot.availableFeeds}/{snapshot.totalFeeds}</strong></div>
           <div className="signalRow"><span>AI 호출</span><strong>0</strong></div>
-          <p className="sourceRailFoot">중소벤처기업부의 RSS 원문만 표시합니다. 최신순은 중요도 평가나 개인화 추천을 의미하지 않습니다.</p>
+          <p className="sourceRailFoot">중소벤처기업부의 RSS 원문만 표시합니다. 오늘의 관심사는 제목 키워드 필터이며, AI 추천이나 중요도 평가가 아닙니다.</p>
         </section>
         <section className="railPanel">
           <div className="railEyebrow">NEXT PHASE</div>
@@ -120,12 +135,34 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
       {snapshot.availableFeeds < snapshot.totalFeeds && (
         <p className="sourceHealth" role="status">일부 자료원의 연결이 원활하지 않습니다. 표시 가능한 원문만 제공하며 가상 자료로 대체하지 않습니다.</p>
       )}
+      {(view === "home" || view === "discover" || view === "startup" || view === "my") && (
+        <section className="todayInterestPanel" aria-label="오늘의 관심사 선택">
+          <div className="todayInterestHeading">
+            <div>
+              <h2>오늘의 관심사</h2>
+              <p>하루에도 여러 번 바꿀 수 있습니다. 제목 키워드 기반 · 추가 AI 사용 없음</p>
+            </div>
+            {todayTopics.length > 0 && <button className="todayInterestReset" type="button" onClick={clearTodayTopics}>전체 보기</button>}
+          </div>
+          <div className="todayInterestChips">
+            {TODAY_TOPICS.map(topic => (
+              <button type="button" key={topic.id} aria-pressed={todayTopics.includes(topic.id)} onClick={() => toggleTodayTopic(topic.id)}>
+                <span aria-hidden="true">{todayTopics.includes(topic.id) ? "✓ " : ""}</span>{topic.label}
+              </button>
+            ))}
+          </div>
+          <p className="todayInterestNote" aria-live="polite">
+            {todayTopics.length ? `${todayTopics.length}개 관심사 선택 · 해당 주제 중 하나라도 일치하면 표시합니다.` : "전체 주제 표시 · 선택하면 현재 목록에서 바로 선별됩니다."}
+            {" "}설정은 한국시간 기준 다음 날 다시 방문할 때 초기화됩니다.
+          </p>
+        </section>
+      )}
       {view === "settings" ? (
         <section className="sourceSettings">
           <h2>서비스 운영 원칙</h2>
           <p>NOAH ARK는 실제 근거를 먼저 확인합니다. 현재 제공하는 기능은 중소벤처기업부의 공식 RSS에 게시된 제목·발행시각·출처·원문 링크를 보여주는 것입니다.</p>
           <p>기사 본문과 사진은 재게시하지 않습니다. 원문 내용을 확인하고 제도 적용 여부를 판단할 때는 기관의 원래 페이지를 참고하세요.</p>
-          <p>저장·숨김 및 관심 분야 설정은 사용하는 브라우저에만 기록됩니다. 회원 가입, 유료 API, 개인 정보 수집 및 AI 분석은 사용하지 않습니다.</p>
+          <p>저장·숨김 및 관심 분야 설정은 사용하는 브라우저에만 기록됩니다. 오늘의 관심사는 한국시간 기준 해당 날짜에만 유지되고, 추가 API 요청이나 AI 분석을 사용하지 않습니다.</p>
           <button type="button" className="sourceRestore" onClick={restore}>숨김 항목 모두 복원</button>
           <Link className="textLink" href="/">첫 화면으로 돌아가기 →</Link>
         </section>
@@ -164,7 +201,7 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
             {view === "saved" && !ready ? (
               <p className="emptyState">이 브라우저에 저장된 자료를 확인하는 중입니다.</p>
             ) : filtered.length === 0 ? (
-              <p className="emptyState">{view === "saved" ? "아직 저장한 자료가 없습니다. 홈에서 자료를 저장해 보세요." : query ? "검색어와 일치하는 원문이 없습니다." : "표시할 공식 자료가 없습니다. 잠시 후 다시 확인해 주세요."}</p>
+              <p className="emptyState">{view === "saved" ? "아직 저장한 자료가 없습니다. 홈에서 자료를 저장해 보세요." : query ? "검색어와 일치하는 원문이 없습니다." : todayTopics.length ? "선택한 관심사와 일치하는 제목이 없습니다. 다른 주제를 선택하거나 '전체 보기'를 눌러 주세요." : "표시할 공식 자료가 없습니다. 잠시 후 다시 확인해 주세요."}</p>
             ) : filtered.slice(0, view === "home" ? 14 : 40).map((s: OfficialSourceLink, i: number) => (
               <article className="sourceNewsItem" key={s.url}>
                 <div className="eventRank">{String(i + 1).padStart(2, "0")}</div>
