@@ -1,0 +1,75 @@
+name: NOAH source-only live integration
+
+# Disposable CI database only. Never Neon, Vercel, migrations on production,
+# paid AI, publication or scheduled ingestion.
+on:
+  push:
+    branches:
+      - chatgpt/noah-source-live-integration
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: noah-source-integration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  end-to-end:
+    name: Real government RSS → temporary PostgreSQL → original-links HTML
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: noah_source_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d noah_source_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/noah_source_ci?schema=public
+      DB_MODE: postgres
+      NEWS_PROVIDER: government
+      AI_PROVIDER: "off"
+      SOURCE_LINKS_ENABLED: "true"
+      RSS_FEEDS: "https://mss.go.kr/rss/smba/board/310.do,https://mss.go.kr/rss/smba/board/86.do"
+      OFFICIAL_RSS_FEEDS: "https://mss.go.kr/rss/smba/board/310.do,https://mss.go.kr/rss/smba/board/86.do"
+      APP_URL: http://127.0.0.1:3104
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10"
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - name: Install locked dependencies and generate Prisma clients
+        run: pnpm install --frozen-lockfile
+      - name: Migrate isolated disposable Postgres 17
+        run: pnpm exec prisma migrate deploy --schema prisma/schema.prisma
+      - name: Build genuine live source-only Next.js server
+        run: pnpm build
+      - name: Start local HTTP server (no public deployment)
+        run: |
+          node node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3104 >/tmp/noah-source-next.log 2>&1 &
+          echo $! > /tmp/noah-next.pid
+      - name: Fetch actual feeds, insert safe metadata and check HTML
+        run: node --import tsx scripts/verify-source-only-e2e.ts
+      - name: Ensure test runtime only
+        if: always()
+        run: |
+          if test -f /tmp/noah-next.pid; then kill "$(cat /tmp/noah-next.pid)" || true; fi
+          echo "Temporary PostgreSQL container; no Neon credentials, Vercel deployment, scheduler or AI billing."
