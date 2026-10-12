@@ -70,14 +70,17 @@ export function curateOfficialSources(
   return items;
 }
 
-// Server-side, official publisher feeds only. Never copy body, descriptions or photographs.
-// Cached to avoid hammering ministry servers on each visitor request (30-minute refresh).
-const cachedSnapshot = unstable_cache(async (): Promise<OfficialFeedSnapshot> => {
+// Only cite official links. Never proxy or republish publisher photos or body.
+// Manual refresh uses its own 2-minute shared server cache; it does NOT trigger
+// expensive AI or bypass the default 30-minute published-source cache.
+async function fetchOfficialSnapshot(): Promise<OfficialFeedSnapshot> {
   const now = new Date();
   const from = new Date(now.getTime() - 14 * 86400000);
   const until = new Date(now.getTime() + 60_000);
   const results = await Promise.allSettled(FEEDS.map(async feed => {
-    const provider = new RSSProvider([{ url: feed.url, name: feed.name, sourceType: 'GOVERNMENT' }]);
+    // Ministry upstream can stall. Each feed has a 6-second upper bound and
+    // both feeds are fetched concurrently to keep server-rendered pages responsive.
+    const provider = new RSSProvider([{ url: feed.url, name: feed.name, sourceType: 'GOVERNMENT' }], 6000);
     const articles = await provider.fetchArticles({ from, to: until, query: '' });
     return articles.filter(a => a.sourceType === 'GOVERNMENT').map(a => ({
       title: a.title,
@@ -90,17 +93,37 @@ const cachedSnapshot = unstable_cache(async (): Promise<OfficialFeedSnapshot> =>
   const rows = results.flatMap(result => result.status === 'fulfilled' ? result.value : []);
   return {
     items: curateOfficialSources(rows, now),
-    retrievedAt: now.toISOString(),
-    availableFeeds: results.filter(r => r.status === 'fulfilled').length,
+    // This records an actual completed request attempt, never an article update time.
+    retrievedAt: new Date().toISOString(),
+    availableFeeds: results.filter(result => result.status === 'fulfilled').length,
     totalFeeds: FEEDS.length,
   };
-}, ['noah-real-ministry-rss-v1'], { revalidate: 1800 });
+}
+
+function emptySnapshot(): OfficialFeedSnapshot {
+  return { items: [], retrievedAt: '', availableFeeds: 0, totalFeeds: FEEDS.length };
+}
+
+const cachedSnapshot = unstable_cache(
+  fetchOfficialSnapshot,
+  ['noah-real-ministry-rss-v2'],
+  { revalidate: 1800 },
+);
+
+// Shared server-side rate limit for manually checking publisher RSS.
+// This does not guarantee instant publishing by the original institution.
+const cachedManualRefresh = unstable_cache(
+  fetchOfficialSnapshot,
+  ['noah-real-ministry-rss-manual-refresh-v1'],
+  { revalidate: 120 },
+);
 
 export async function getOfficialSourceSnapshot(): Promise<OfficialFeedSnapshot> {
-  if (!publicSourceMode()) return { items: [], retrievedAt: new Date().toISOString(), availableFeeds: 0, totalFeeds: FEEDS.length };
-  try {
-    return await cachedSnapshot();
-  } catch {
-    return { items: [], retrievedAt: new Date().toISOString(), availableFeeds: 0, totalFeeds: FEEDS.length };
-  }
+  if (!publicSourceMode()) return emptySnapshot();
+  try { return await cachedSnapshot(); } catch { return emptySnapshot(); }
+}
+
+export async function getManualOfficialSourceSnapshot(): Promise<OfficialFeedSnapshot> {
+  if (!publicSourceMode()) return emptySnapshot();
+  try { return await cachedManualRefresh(); } catch { return emptySnapshot(); }
 }

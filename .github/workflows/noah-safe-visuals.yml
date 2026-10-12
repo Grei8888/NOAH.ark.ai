@@ -6,6 +6,7 @@ on:
       - chatgpt/noah-safe-visual-cards
       - chatgpt/noah-card-ratio-refine
       - chatgpt/noah-today-interests-v1
+      - chatgpt/noah-manual-source-refresh-v1
   workflow_dispatch:
 
 permissions:
@@ -86,7 +87,18 @@ jobs:
             if (html.includes("noahCardImage--photo")) throw Error("Unreviewed publisher photo was displayed");
             if (!html.includes("https://www.mss.go.kr/")) throw Error("Real official source not linked");
             if (!html.includes("오늘의 관심사") || !html.includes("AI·기술") || !html.includes("정책·제도")) throw Error("Daily interest quick filters missing from server-rendered Home");
+            if (!html.includes("최신 자료 확인") || !html.includes("sourceRefreshButton")) throw Error("Manual refresh control missing");
             console.log("PASS: official source cards render NOAH-owned SVG cover with links, not scraped photos");
+          '
+      - name: Check read-only manual refresh API and controlled failure
+        run: |
+          node --input-type=module -e '
+            const r=await fetch("http://127.0.0.1:3110/api/sources/refresh");
+            if (![200,503].includes(r.status)) throw Error("Refresh API must return attributed sources or honest upstream outage, got "+r.status);
+            const data=await r.json();
+            if(r.status===200 && (!Array.isArray(data.items)||data.availableFeeds<1||!data.retrievedAt)) throw Error("Refresh response missing verified source information");
+            if(r.status===503 && !data.error) throw Error("Upstream outage was not marked");
+            console.log("PASS manual refresh endpoint: "+r.status);
           '
       - if: always()
         run: |

@@ -38,6 +38,12 @@ export function Icon({ name, style }: { name: string; style?: CSSProperties }) {
       </>
     ),
     arrow: <path d="M4 12h16m-6-6 6 6-6 6" />,
+    refresh: (
+      <>
+        <path d="M20 11a8 8 0 1 0 1.5 5" />
+        <path d="M20 4v7h-7" />
+      </>
+    ),
     layers: (
       <>
         <path d="m12 3 10 5-10 5L2 8Zm-10 9 10 5 10-5M2 16l10 5 10-5" />
