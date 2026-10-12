@@ -30,8 +30,8 @@ export const MEDIA_SOURCE_CANDIDATES = [
   },
   {
     id: "hani", publisher: "한겨레", family: "general-newspaper", sourceClass: "NEWS_MEDIA",
-    rssUrl: "https://www.hani.co.kr/rss/", referenceUrl: "https://www.hani.co.kr/",
-    feedVerification: "third-party-reported", permissionStatus: "not-cleared", publicEnabled: false,
+    rssUrl: null, referenceUrl: "https://www.hani.co.kr/",
+    feedVerification: "not-confirmed", permissionStatus: "not-cleared", publicEnabled: false,
   },
   {
     id: "khan", publisher: "경향신문", family: "general-newspaper", sourceClass: "NEWS_MEDIA",
@@ -65,8 +65,8 @@ export const MEDIA_SOURCE_CANDIDATES = [
   },
   {
     id: "yna", publisher: "연합뉴스", family: "wire", sourceClass: "NEWS_MEDIA",
-    rssUrl: "https://www.yna.co.kr/rss/news.xml", referenceUrl: "https://www.yna.co.kr/",
-    feedVerification: "third-party-reported", permissionStatus: "not-cleared", publicEnabled: false,
+    rssUrl: null, referenceUrl: "https://www.yna.co.kr/",
+    feedVerification: "not-confirmed", permissionStatus: "not-cleared", publicEnabled: false,
   },
 ] as const satisfies readonly MediaSourceCandidate[];
 
