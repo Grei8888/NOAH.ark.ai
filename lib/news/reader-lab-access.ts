@@ -1,23 +1,50 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 
-/** The reading lab is a CLOSED experiment. Never works on the production alias. */
+function inviteDigests(): string[] | null {
+  const raw = process.env.NOAH_READER_LAB_INVITE_HASHES?.trim();
+  if (!raw) return null;
+  const hashes = raw.split(",").map(s => s.trim().toLowerCase());
+  if (hashes.length < 1 || hashes.length > 10 ||
+      hashes.some(s => !/^[0-9a-f]{64}$/.test(s)) ||
+      new Set(hashes).size !== hashes.length) return [];
+  return hashes;
+}
+
+/** Same real model in 10-user preview and later rollout, but costly access disabled by default. */
 export function readerLabConfigured(): boolean {
-  const access = process.env.NOAH_READER_LAB_ACCESS_TOKEN ?? "";
   const preview = process.env.VERCEL_ENV === "preview";
-  const localDev = process.env.NODE_ENV !== "production" && !process.env.VERCEL_ENV;
+  const local = process.env.NODE_ENV !== "production" && !process.env.VERCEL_ENV;
+  const hashes = inviteDigests();
+  const invitationsConfigured = hashes !== null && hashes.length > 0;
+  const legacyLocalOnly = local &&
+    (process.env.NOAH_READER_LAB_ACCESS_TOKEN ?? "").length >= 32;
   return process.env.NOAH_READER_LAB_ENABLED === "true" &&
-    (preview || localDev) &&
-    access.length >= 32 &&
+    (preview || local) &&
+    (invitationsConfigured || legacyLocalOnly) &&
     !!process.env.OPENAI_API_KEY?.trim();
 }
 
-export function validReaderLabAccess(value: string | null): boolean {
-  if (!readerLabConfigured() || !value) return false;
+/** Returns stable non-identifying invite ID; preview always requires individual invite codes. */
+export function readerLabInviteId(value: string | null): string | null {
+  if (!readerLabConfigured() || !value || value.length < 32 || value.length > 256) return null;
+  const hash = createHash("sha256").update(value).digest();
+  const hashes = inviteDigests();
+  if (hashes !== null) {
+    let accepted = false;
+    for (const expected of hashes) {
+      // Uniform comparison work across all 10 invite slots.
+      accepted = timingSafeEqual(hash, Buffer.from(expected, "hex")) || accepted;
+    }
+    return accepted ? hash.toString("hex") : null;
+  }
   const expected = process.env.NOAH_READER_LAB_ACCESS_TOKEN!;
-  // Uniform length, avoid string early-exit comparisons.
-  const left = createHash("sha256").update(value).digest();
-  const right = createHash("sha256").update(expected).digest();
-  return timingSafeEqual(left, right);
+  return timingSafeEqual(hash, createHash("sha256").update(expected).digest())
+    ? hash.toString("hex")
+    : null;
+}
+
+export function validReaderLabAccess(value: string | null): boolean {
+  return readerLabInviteId(value) !== null;
 }
 
 export function outputTextFromOpenAI(payload: unknown): string | null {
