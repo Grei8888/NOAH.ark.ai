@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { POST } from "@/app/api/lab/reader/route";
@@ -8,7 +9,7 @@ import {
   outputTextFromOpenAI, readerLabConfigured, validReaderLabAccess,
 } from "@/lib/news/reader-lab-access";
 
-const keys = ["NOAH_READER_LAB_ENABLED", "NOAH_READER_LAB_ACCESS_TOKEN", "OPENAI_API_KEY", "VERCEL_ENV"];
+const keys = ["NOAH_READER_LAB_ENABLED", "NOAH_READER_LAB_ACCESS_TOKEN", "NOAH_READER_LAB_INVITE_HASHES", "OPENAI_API_KEY", "VERCEL_ENV"];
 const originals = Object.fromEntries(keys.map(key => [key, process.env[key]]));
 const token = "z".repeat(40);
 const request = (access = token, origin = "http://localhost:3000") => new NextRequest(
@@ -22,6 +23,7 @@ const request = (access = token, origin = "http://localhost:3000") => new NextRe
 beforeEach(() => {
   process.env.NOAH_READER_LAB_ENABLED = "true";
   process.env.NOAH_READER_LAB_ACCESS_TOKEN = token;
+  process.env.NOAH_READER_LAB_INVITE_HASHES = createHash("sha256").update(token).digest("hex");
   process.env.OPENAI_API_KEY = "sk-test-not-a-real-key";
   process.env.VERCEL_ENV = "preview";
 });
@@ -62,7 +64,19 @@ describe("actual AI Reader prototype safety gates", () => {
     expect((await POST(request("wrong"))).status).toBe(401);
     expect((await POST(request(token, "https://malicious.example"))).status).toBe(403);
     expect(remote).not.toHaveBeenCalled();
-    process.env.NOAH_READER_LAB_ACCESS_TOKEN = "123";
+    process.env.NOAH_READER_LAB_INVITE_HASHES = "not-a-valid-invite-hash";
+    expect(readerLabConfigured()).toBe(false);
+  });
+  it("accepts a maximum of ten distinct hashed invitations and no shared preview code", () => {
+    const hashes = Array.from({ length: 10 }, (_, i) =>
+      createHash("sha256").update("invitation-" + i + "-".repeat(40)).digest("hex"));
+    process.env.NOAH_READER_LAB_INVITE_HASHES = hashes.join(",");
+    expect(readerLabConfigured()).toBe(true);
+    expect(validReaderLabAccess("invitation-9-" + "-".repeat(40))).toBe(true);
+    expect(validReaderLabAccess(token)).toBe(false);
+    process.env.NOAH_READER_LAB_INVITE_HASHES = [...hashes, hashes[0]].join(",");
+    expect(readerLabConfigured()).toBe(false);
+    process.env.NOAH_READER_LAB_INVITE_HASHES = [...hashes, createHash("sha256").update("11th-".repeat(9)).digest("hex")].join(",");
     expect(readerLabConfigured()).toBe(false);
   });
   it("parses only real Responses API output and rejects empty responses", () => {
