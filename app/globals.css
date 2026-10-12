@@ -1954,3 +1954,58 @@ section[id] {
   .sourceFreshnessText { flex: 1 1 205px; font-size: 10px; }
   .sourceRefreshButton { padding: 9px 12px; font-size: 10px; }
 }
+
+
+/* NOAH — minimal Google Forms-linked recurring feedback portal. */
+.betaFeedbackQuick {
+  margin: 28px 0 42px;
+  border-top: 2px solid var(--navy);
+  padding-top: 25px;
+  max-width: 620px;
+}
+.betaFeedbackQuickLead,
+.betaFeedbackShortcut {
+  color: var(--slate);
+  font-size: 13px;
+  line-height: 1.9;
+}
+.betaFeedbackQuick > label {
+  display: block;
+  margin: 22px 0 8px;
+  color: var(--navy);
+  font-size: 12px;
+  font-weight: 700;
+}
+.betaFeedbackQuick > label > span { margin-left: 6px; color: #8492a3; font-size: 10px; font-weight: 400; }
+.betaFeedbackQuick > input,
+.betaFeedbackQuick > select,
+.betaFeedbackQuick > textarea {
+  width: 100%;
+  border: 1px solid #cdd7e3;
+  border-radius: 7px;
+  background: white;
+  color: var(--navy);
+  padding: 13px 14px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.betaFeedbackQuick > select { min-height: 48px; }
+.betaFeedbackQuick > textarea { resize: vertical; min-height: 130px; }
+.betaFeedbackQuick > input:focus-visible,
+.betaFeedbackQuick > select:focus-visible,
+.betaFeedbackQuick > textarea:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.betaInputHint { color: var(--slate); font-size: 10px; margin-top: 6px; line-height: 1.7; }
+.betaFeedbackSubmit { margin-top: 22px; min-height: 49px; border: 0; }
+.betaFeedbackSubmit:disabled { opacity: .55; cursor: not-allowed; }
+.betaFeedbackSetupNote { border: 1px solid var(--border); border-radius: 7px; padding: 22px; background: #f8fafc; }
+.betaFeedbackSetupNote > strong { font-size: 14px; color: var(--navy); }
+.betaFeedbackSetupNote > p { margin: 10px 0 18px; font-size: 12px; line-height: 1.8; color: var(--slate); }
+@media (max-width: 767px) {
+  .betaFeedbackQuick { padding-top: 18px; margin-top: 21px; }
+  .betaFeedbackQuickLead, .betaFeedbackShortcut { font-size: 12px; }
+  .betaFeedbackSubmit { display: flex; width: 100%; }
+}
