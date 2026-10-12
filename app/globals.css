@@ -1899,3 +1899,52 @@ section[id] {
   .todayInterestChips { gap: 6px; margin-top: 12px; }
   .todayInterestChips button { min-height: 44px; padding: 9px 12px; font-size: 11px; }
 }
+
+
+/* On-demand official source check. Quiet, transparent and reachable on mobile. */
+.sourceFreshnessBar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 11px 0 0;
+}
+.sourceFreshnessText {
+  color: var(--slate);
+  font-size: 11px;
+  line-height: 1.65;
+  flex: 1 1 200px;
+}
+.sourceRefreshButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #c8d3df;
+  border-radius: 999px;
+  padding: 9px 13px;
+  min-height: 44px;
+  background: #fff;
+  color: var(--navy);
+  font-size: 11px;
+  line-height: 1.45;
+  font-weight: 650;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.sourceRefreshButton svg { width: 15px; height: 15px; flex: 0 0 auto; }
+.sourceRefreshButton:hover { border-color: var(--navy); background: #f8fafc; }
+.sourceRefreshButton:disabled { opacity: .55; cursor: wait; }
+.sourceRefreshButton:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.sourceRefreshStatus {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--slate);
+  line-height: 1.7;
+}
+@media(max-width:767px) {
+  .sourceFreshnessBar { gap: 4px 10px; }
+  .sourceFreshnessText { flex: 1 1 205px; font-size: 10px; }
+  .sourceRefreshButton { padding: 9px 12px; font-size: 10px; }
+  .sourceRefreshStatus { font-size: 10px; }
+}
