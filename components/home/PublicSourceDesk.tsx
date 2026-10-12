@@ -83,7 +83,11 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
     return () => { active = false; };
   }, []);
   async function refreshSources() {
-    if (refreshing || (lastRefreshTap && Date.now() - lastRefreshTap < MANUAL_WAIT_MS)) return;
+    if (refreshing) return;
+    if (lastRefreshTap && Date.now() - lastRefreshTap < MANUAL_WAIT_MS) {
+      setRefreshStatus("최근 확인했습니다. 잠시 후 다시 시도해 주세요.");
+      return;
+    }
     setRefreshing(true);
     setRefreshStatus("기관의 최신 자료를 확인하고 있습니다.");
     setLastRefreshTap(Date.now());
@@ -205,7 +209,7 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
                 ? `최근 뉴스 확인 ${refreshTime.format(new Date(currentSnapshot.retrievedAt))} · 신청기한은 원문 확인`
                 : "최신 뉴스 확인 지연 · 신청기한은 원문 확인"}
             </span>
-            <button type="button" className="sourceRefreshButton" onClick={refreshSources} disabled={refreshing || (lastRefreshTap > 0 && Date.now() - lastRefreshTap < MANUAL_WAIT_MS)}>
+            <button type="button" className="sourceRefreshButton" onClick={refreshSources} disabled={refreshing}>
               <Icon name="refresh" /> {refreshing ? "확인 중…" : "최신 자료 확인"}
             </button>
           </div>
