@@ -191,14 +191,14 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false }:
       </>
     }>
       <div className="topUtility">
-        <span>NOAH ARK / PUBLIC BETA v0.1</span>
+        <span>NOAH ARK / {readerLabAvailable ? "10-READER PRIVATE BETA" : "PUBLIC BETA v0.1"}</span>
         <span>OFFICIAL SOURCES ONLY</span>
       </div>
       <header className="homeIntro">
         <div className="dateLine"><span>{kstDay}</span><span>ONLY WHAT MATTERS.</span></div>
         <p className="greeting">Your AI News Partner. · 어려운 뉴스를 이해하기 쉽게.</p>
         <h1>{title}</h1>
-        <div className="editionLine"><span className="signalDot" /><span>실제 정부 RSS · 최근 14일 · 최신순</span><span>무료 공개 베타</span></div>
+        <div className="editionLine"><span className="signalDot" /><span>실제 정부 RSS · 최근 14일 · 최신순</span><span>{readerLabAvailable ? "10명 사전검증" : "무료 공개 베타"}</span></div>
         {readerLabAvailable && <div className="readerBetaPrompt"><Link href="/lab/reader">실제 AI 뉴스 독해 도우미 사용하기 →</Link></div>}
       </header>
       <div className="trustNotice" role="note">
