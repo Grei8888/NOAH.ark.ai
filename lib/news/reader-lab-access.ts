@@ -20,8 +20,12 @@ export function readerLabConfigured(): boolean {
     (process.env.NOAH_READER_LAB_ACCESS_TOKEN ?? "").length >= 32;
   return process.env.NOAH_READER_LAB_ENABLED === "true" &&
     (preview || local) &&
-    (invitationsConfigured || legacyLocalOnly) &&
-    !!process.env.OPENAI_API_KEY?.trim();
+    (invitationsConfigured || legacyLocalOnly);
+}
+
+/** UI can be checked with live RSS even before the owner supplies a paid API key. */
+export function readerLabModelReady(): boolean {
+  return readerLabConfigured() && !!process.env.OPENAI_API_KEY?.trim();
 }
 
 /** Returns stable non-identifying invite ID; preview always requires individual invite codes. */
