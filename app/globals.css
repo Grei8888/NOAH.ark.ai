@@ -1954,3 +1954,29 @@ section[id] {
   .sourceFreshnessText { flex: 1 1 205px; font-size: 10px; }
   .sourceRefreshButton { padding: 9px 12px; font-size: 10px; }
 }
+
+/* Low-friction recurring beta feedback: same A-layout, no extra form step. */
+.betaFeedback > .betaNickname {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  min-height: 46px;
+  color: var(--navy);
+  background: white;
+  font: inherit;
+  font-size: 13px;
+}
+.betaFeedback > .betaNickname:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.betaOptionalLabel {
+  color: var(--slate);
+  font-weight: 400;
+  font-size: 10px;
+  margin-left: 6px;
+}
+.betaNicknameHint { color: var(--slate); font-size: 10px; line-height: 1.7; margin: 7px 0 15px; }
+.betaFeedback .betaPrimary:disabled { opacity: .55; cursor: progress; }
