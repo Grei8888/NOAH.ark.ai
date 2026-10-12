@@ -232,7 +232,7 @@ export function BetaTesterKit({ feedbackEnabled = false }: { feedbackEnabled?: b
         </div>
         {status && <p className="betaFeedbackStatus" role="status">{status}</p>}
         <p className="betaPrivacy">{feedbackEnabled
-          ? "보내기 버튼을 누르면 의견이 NOAH ARK의 Google 관리 시트에 저장됩니다. 이메일·실명·전화번호는 필요하지 않으며, 언제든 다시 제출할 수 있습니다. 개인정보나 비밀번호는 입력하지 마세요."
+          ? "보내기 버튼을 누르면 의견이 Google Forms 응답으로 접수되고, 관리 시트에도 자동 정리됩니다. 이메일·실명·전화번호는 필요하지 않으며, 언제든 다시 제출할 수 있습니다. 개인정보나 비밀번호는 입력하지 마세요."
           : "현재 자동 접수 기능을 연결하고 있습니다. 당분간 공유 버튼을 누른 후 카카오톡·문자·이메일 등으로 보내거나 내용을 복사해 전달해 주세요. 이 페이지는 의견을 서버에 자동 저장하지 않습니다."}</p>
       </section>
       <footer className="betaFooter"><span>NOAH ARK · Only What Matters.</span><Link href="/">서비스 홈으로 돌아가기 →</Link></footer>
