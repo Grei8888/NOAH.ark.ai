@@ -17,7 +17,7 @@
 4. Apps Script **프로젝트 설정 → 스크립트 속성**에 `NOAH_FEEDBACK_SECRET`를 추가하고, 추측하기 어려운 무작위 문자열(32자 이상)을 입력한다. **값을 채팅이나 GitHub에 붙여 넣지 않는다.**
 5. **배포 → 새 배포 → 유형: 웹 앱**. '실행 사용자: 나', '액세스 권한: 모든 사용자'를 선택하고 Google의 권한 승인을 완료한다. URL은 `https://script.google.com/macros/s/.../exec` 형태여야 한다.
 6. Vercel 프로젝트 `noah-ark-ai`의 **Settings → Environment Variables**, **Production**에 아래 두 개를 등록한다.
-   - `NOAH_FEEDBACK_SCRIPT_URL`: 4단계에서 복사한 `.../exec` URL
+   - `NOAH_FEEDBACK_SCRIPT_URL`: 5단계에서 복사한 `.../exec` URL
    - `NOAH_FEEDBACK_SCRIPT_SECRET`: 4단계에서 만든 **같은** 무작위 문자열
    두 값은 서버 전용 환경변수이며 `NEXT_PUBLIC_` 접두어를 사용하지 않는다.
 7. 연결된 새 버전을 운영 환경에 **재배포**한다. 환경변수를 저장하는 것만으로 기존 배포의 코드/환경이 자동 갱신되지는 않는다.
