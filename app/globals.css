@@ -2291,3 +2291,13 @@ section[id] {
   .readerLabSourceActions a, .readerLabSourceActions button { flex: 1 1 50%; }
   .readerLabSourceList { max-height: 420px; }
 }
+
+/* Only in a real-source preview with the actual AI backend configured. */
+.readerBetaPrompt { margin-top: 15px; }
+.readerBetaPrompt a {
+  display: inline-flex; align-items: center; min-height: 44px;
+  padding: 10px 16px; border-radius: 7px;
+  background: var(--navy); color: white;
+  font-size: 12px; font-weight: 750; text-decoration: none;
+}
+.readerBetaPrompt a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
