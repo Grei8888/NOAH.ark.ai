@@ -1,0 +1,58 @@
+name: NOAH ARK 10-reader production-parity beta
+
+on:
+  push:
+    branches:
+      - chatgpt/noah-production-parity-beta-v1
+  pull_request:
+    branches:
+      - chatgpt/noah-ai-reading-companion-lab-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: noah-real-parity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compile-and-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEWS_PROVIDER: mock
+      AI_PROVIDER: mock
+      DB_MODE: local
+      DATABASE_URL: postgresql://invalid:invalid@127.0.0.1:5433/never_connect
+      LOCAL_DATABASE_URL: file:.noah/ten-reader-ci.db
+      NOAH_LIVE_LINKS_V1: "false"
+      NOAH_REAL_SOURCE_PREVIEW: "false"
+      NOAH_READER_LAB_ENABLED: "false"
+      SOURCE_LINKS_ENABLED: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10"
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Prepare isolated synthetic DB for tests (not for customer preview)
+        run: pnpm setup:mock
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Unit, access and parity regression tests (real AI endpoint mocked only in CI)
+        run: pnpm test
+      - name: ESLint
+        run: pnpm lint
+      - name: Build release code with payable API hard-off
+        run: pnpm build
+      - name: Existing HTTP isolation and feedback regressions
+        run: pnpm test:http
