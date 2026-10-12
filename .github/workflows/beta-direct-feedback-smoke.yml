@@ -1,0 +1,43 @@
+name: NOAH beta direct feedback inactive-mode smoke
+
+on:
+  push:
+    branches:
+      - chatgpt/noah-public-smoke
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Verify beta form, honest fallback and original news Home
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="https://noah-ark-ai.vercel.app"
+          status=$(curl -LsS --max-time 60 -o /tmp/noah-beta.html -w '%{http_code}' "$root/beta")
+          [[ "$status" == "200" ]] || { echo "FAIL beta HTTP=$status"; exit 1; }
+          grep -q '닉네임' /tmp/noah-beta.html
+          grep -q '전반적인 사용 경험' /tmp/noah-beta.html
+          grep -q '좋았던 점' /tmp/noah-beta.html
+          grep -q '불편하거나 개선할 점' /tmp/noah-beta.html
+          grep -q '피드백 공유하기' /tmp/noah-beta.html
+          grep -q '현재 자동 접수 기능을 연결하고 있습니다' /tmp/noah-beta.html
+          echo "PASS: existing /beta form still available; disabled connector not misrepresented"
+          status=$(curl -LsS --max-time 30 -o /tmp/noah-post.json -w '%{http_code}' \
+            -H 'Origin: https://noah-ark-ai.vercel.app' -H 'Content-Type: application/json' \
+            -X POST --data '{"submissionId":"56be0bfa-6f31-4f73-91c9-92f60ea7fdef","nickname":"smoke","score":"5","liked":"test","problems":""}' \
+            "$root/api/beta/feedback")
+          [[ "$status" == "503" ]] && grep -q '"ok":false' /tmp/noah-post.json || {
+             echo "FAIL: receiver must not fake success before form owner enables it, HTTP=$status"; exit 1;
+          }
+          echo "PASS: unconfigured Google form is explicitly non-operational and never fakes writes"
+          status=$(curl -LsS --max-time 60 -o /tmp/noah-home.html -w '%{http_code}' "$root/")
+          [[ "$status" == "200" ]] && grep -q '오늘의 관심사' /tmp/noah-home.html || {
+             echo "FAIL: source Home regression"; exit 1;
+          }
+          echo "PASS: original Home and beta links still operate"
