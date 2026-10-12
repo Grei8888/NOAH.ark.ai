@@ -13,7 +13,10 @@ test('beta tester invitation and feedback tools are accessible without account',
   expect(html).toContain('모바일 사용성 확인');
   expect(html).toContain('피드백 공유하기');
   expect(html).toContain('내용 복사');
-  expect(html).toContain('이 페이지는 의견을 서버에 자동으로 저장·전송하지 않습니다');
+  expect(html).toContain('현재 자동 접수 기능을 연결하고 있습니다');
+  expect(html).toContain('닉네임');
+  expect(html).toContain('피드백 공유하기');
+  expect(html).toContain('내용 복사');
   expect(html).toContain('name="robots" content="noindex, nofollow"');
   expect(html).not.toContain('가상 Event로 동작을 확인하는 화면');
 });
