@@ -17,9 +17,11 @@ const STORAGE_KEY = "noah:reader-audience:v1";
 export function ReaderAudiencePanel({
   activeTopics,
   onFocusTopic,
+  aiReaderAvailable = false,
 }: {
   activeTopics: readonly TodayTopic[];
   onFocusTopic: (topic: TodayTopic) => void;
+  aiReaderAvailable?: boolean;
 }) {
   const [audience, setAudience] = useState<ReaderAudience | null>(null);
   const [ready, setReady] = useState(false);
@@ -82,7 +84,9 @@ export function ReaderAudiencePanel({
       )}
       <p className="readerAudienceFoot">
         현재는 중소벤처기업부의 공식 원문과 제목 키워드 필터만 제공합니다.
-        AI 용어 설명·배경 이해·비판적 독해·다른 관점 추천은 준비 중입니다.
+        {aiReaderAvailable
+          ? "AI 용어 설명·배경 이해·비판적 독해는 테스트할 수 있습니다. 기사별 관점 비교는 아직 미제공입니다."
+          : "AI 용어 설명·배경 이해·비판적 독해·다른 관점 추천은 준비 중입니다."}
         선택한 읽기 목적은 이 브라우저에만 저장되며 언제든 바꿀 수 있습니다.
       </p>
     </section>
