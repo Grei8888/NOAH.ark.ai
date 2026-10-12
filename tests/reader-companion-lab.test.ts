@@ -45,6 +45,8 @@ describe("actual AI Reader prototype safety gates", () => {
     expect(validateReaderLabInput({ mode: "fake", headline: "", question: "질문이에요" })).toBeNull();
     expect(validateReaderLabInput({ mode: "terms", headline: "", question: "x" })).toBeNull();
     expect(validateReaderLabInput({ mode: "terms", headline: "", question: "x".repeat(381) })).toBeNull();
+    expect(validateReaderLabInput({ mode: "terms", headline: "공".repeat(240), question: "어떤 정책인가요?" })?.headline.length).toBe(240);
+    expect(validateReaderLabInput({ mode: "terms", headline: "공".repeat(241), question: "어떤 정책인가요?" })).toBeNull();
     expect(readerLabUserMessage({ mode: "critical", headline: "제목", question: "어떤 근거가 필요한가요?" })).toContain("contextHeadlineOnly");
   });
   it("fails closed on production even with a real key and test access code", async () => {
