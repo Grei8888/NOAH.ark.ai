@@ -1,4 +1,4 @@
-/** Server-only feedback configuration. Never expose the Apps Script URL or secret to clients. */
+/** Server-only Google Forms receiver configuration. Never expose the script URL or secret to clients. */
 export function googleFeedbackConfigured() {
   return Boolean(feedbackScriptUrl() && process.env.NOAH_FEEDBACK_SCRIPT_SECRET?.trim());
 }
