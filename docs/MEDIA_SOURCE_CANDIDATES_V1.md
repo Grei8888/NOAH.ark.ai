@@ -15,16 +15,38 @@ Rationale: allow the **same real-world Event** to connect official evidence, jou
 | Outlet | Category | RSS source | Endpoint evidence | Public ingestion |
 |---|---|---|---|---|
 | YTN | broadcast | **Unconfirmed official RSS (NO URL)** | https://www.ytn.co.kr/ ; 2026-03 community probe reported earlier endpoints discontinued: https://gist.github.com/JunsikChoi/fe163df1254b5719caa746c0ebca204b | DISABLED |
-| 한겨레 | general newspaper | https://www.hani.co.kr/rss/ | Third-party 2026 feed probe, publisher index not independently verified in this audit: https://github.com/seokhoonj/newswatcher/blob/main/docs/korean-news-rss.md | DISABLED |
+| 한겨레 | general newspaper | **No verified current official endpoint (null)** | Historical/third-party leads exist, but publisher feed endpoint not verified; homepage https://www.hani.co.kr/ | DISABLED |
 | 경향신문 | general newspaper | https://www.khan.co.kr/rss/rssdata/total_news.xml | https://www.khan.co.kr/help/help_rss.html | DISABLED |
 | 조선일보 | general newspaper | https://www.chosun.com/arc/outboundfeeds/rss/?outputType=xml | https://rssplus.chosun.com/ | DISABLED |
 | 동아일보 | general newspaper | https://rss.donga.com/total.xml | https://rss.donga.com/ | DISABLED |
 | 매일경제 | business newspaper | https://www.mk.co.kr/rss/30000001/ | https://www.mk.co.kr/rss | DISABLED |
 | 한국경제 | business newspaper | https://www.hankyung.com/feed/all-news | https://www.hankyung.com/feed | DISABLED |
 | SBS | broadcast | https://news.sbs.co.kr/news/newsflashRssFeed.do?plink=RSSREADER | https://news.sbs.co.kr/news/rss.do | DISABLED |
-| 연합뉴스 | newswire | https://www.yna.co.kr/rss/news.xml | Community probe: https://gist.github.com/JunsikChoi/fe163df1254b5719caa746c0ebca204b ; actual original host and terms pending | DISABLED |
+| 연합뉴스 | newswire | **No verified current official endpoint (null)** | Historical community feed examples not authenticated by current publisher; homepage https://www.yna.co.kr/ | DISABLED |
 
 **Discovery is not a live HTTP smoke test** of every feed. Feed availability can differ by network or change over time, and an RSS page does not grant NOAH a redistribution license.
+
+## Source re-verification — 2026-10-12
+
+**Publisher-issued RSS directory confirmed (endpoint *listed*, not network probed):**
+- 경향신문 https://www.khan.co.kr/help/help_rss.html
+- 조선일보 https://rssplus.chosun.com/
+- 동아일보 https://rss.donga.com/
+- 매일경제 https://www.mk.co.kr/rss
+- 한국경제 https://www.hankyung.com/feed
+- SBS https://news.sbs.co.kr/news/rss.do
+
+**Unverified:** YTN official RSS, current 한겨레 official RSS, current 연합뉴스 official RSS. Their `rssUrl` values are deliberately **null** in the candidate registry. Search results or community snippets are insufficient to assert current official availability. YTN's own published articles explicitly state “무단전재, 재배포 및 AI 데이터 활용 금지” (https://www.ytn.co.kr/_ln/0105_202609161026350887). Seek direct licensing / a documented permission path for any automated public collection/analysis; a known article URL is **not** a reusable RSS license.
+
+**Rights evidence (separate from feed directory discovery):**
+- 경향신문 https://www.khan.co.kr/help/help_digital.html : no redistribution to external service without permission, and no unlicensed AI dataset scraping.
+- 매일경제 https://www.mk.co.kr/mypage/service/faq/all?pageIndex=2 : automated collection/storage/analysis/publication requires authorization; merely citing publisher is not blanket reuse permission.
+- 동아일보 https://rss.donga.com/ : personal noncommercial RSS use, reach `cool@donga.com` for other use.
+- 조선일보 https://rssplus.chosun.com/ : personal-reader framing, `rss@chosun.com` for commercial use.
+- SBS https://news.sbs.co.kr/news/rss.do : personal noncommercial, `newsservice@sbs.co.kr` for commercial usage.
+- 한국경제 https://www.hankyung.com/feed : directory exists, separate public indexing/automated usage and AI-processing permission not established.
+
+**Outcome:** 6 publisher RSS directories found; **0 out of 9** candidates cleared for public automated ingestion or AI analysis. No live publisher RSS retrieval or XML validation claimed; the prior labels 'publisher-listed' mean a published directory was found, **not** a successful GET to the feed. 'Non-commercial beta' is not equivalent to personal RSS use.
 
 ## Rights and journalistic integrity release gates
 
