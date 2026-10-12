@@ -1,0 +1,83 @@
+name: NOAH genuine official-source beta
+
+on:
+  push:
+    branches:
+      - chatgpt/noah-live-public-v01
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: official-source-beta-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code:
+    name: Typecheck, lint and existing unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+      VERCEL_ENV: ""
+      NOAH_LIVE_LINKS_V1: "false"
+      NEWS_PROVIDER: mock
+      AI_PROVIDER: mock
+      DB_MODE: local
+      DATABASE_URL: postgresql://invalid:invalid@127.0.0.1:5433/never_connect
+      LOCAL_DATABASE_URL: file:.noah/live-source-ci.db
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10"
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm setup:mock
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+
+  live:
+    name: Real RSS → public Home (no DB, AI, or deployment)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+      VERCEL_ENV: production
+      NOAH_LIVE_LINKS_V1: "true"
+      NEWS_PROVIDER: government
+      AI_PROVIDER: "off"
+      DB_MODE: postgres
+      DATABASE_URL: postgresql://invalid:invalid@127.0.0.1:5433/never_connect
+      SOURCE_LINKS_ENABLED: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10"
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Start Next.js in isolated source-only production mode
+        run: |
+          node node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3110 >/tmp/noah-public-beta.log 2>&1 &
+          echo $! >/tmp/noah-public-beta.pid
+      - name: Check live government source links in rendered HTML
+        run: node --import tsx scripts/verify-public-source-beta.ts
+      - if: always()
+        name: Stop test server
+        run: |
+          if test -f /tmp/noah-public-beta.pid; then kill "$(cat /tmp/noah-public-beta.pid)" || true; fi
+          echo "Read-only RSS access; never contacted Neon, Vercel, any paid AI provider."

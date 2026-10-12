@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "NOAH Intelligence",
-  description: "Only What Matters. 정보의 홍수에서 반드시 알아야 할 변화만 선별합니다."
+  title: "NOAH ARK",
+  description: "Only What Matters. 정부 공식 RSS의 실제 공고와 보도자료 원문을 확인하는 NOAH ARK 무료 베타."
 };
 
 export default function RootLayout({

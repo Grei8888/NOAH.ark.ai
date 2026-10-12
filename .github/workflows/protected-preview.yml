@@ -1,0 +1,66 @@
+name: NOAH protected preview verification
+
+# CI-only: never deploys or touches Neon, production or paid APIs.
+on:
+  push:
+    branches:
+      - chatgpt/noah-protected-preview
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: noah-protected-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-demo:
+    name: Verify protected mock UI without database access
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+      VERCEL_ENV: preview
+      NOAH_PREVIEW_STATIC_DEMO: "true"
+      NEWS_PROVIDER: mock
+      AI_PROVIDER: mock
+      DB_MODE: postgres
+      DATABASE_URL: postgresql://invalid:invalid@127.0.0.1:5433/never_connect
+      LOCAL_DATABASE_URL: file:.noah/preview-ci.db
+      SOURCE_LINKS_ENABLED: "false"
+      APP_URL: http://127.0.0.1:3105
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10"
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - name: Install locked dependencies and Prisma clients
+        run: pnpm install --frozen-lockfile
+      - name: Seed isolated SQLite only for the existing unit tests
+        run: DB_MODE=local pnpm setup:mock
+      - name: Run unit tests and preview guard checks
+        run: VERCEL_ENV= NOAH_PREVIEW_STATIC_DEMO=false DB_MODE=local pnpm test
+      - name: Check types and lint
+        run: |
+          pnpm typecheck
+          pnpm lint
+      - name: Build Vercel preview candidate
+        run: pnpm build
+      - name: Start local preview server
+        run: |
+          node node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3105 >/tmp/noah-preview-next.log 2>&1 &
+          echo $! >/tmp/noah-preview.pid
+      - name: Verify mock-only Home/detail/navigation/route protections
+        run: node --import tsx scripts/verify-preview-static.ts
+      - name: Stop local server
+        if: always()
+        run: |
+          if test -f /tmp/noah-preview.pid; then kill "$(cat /tmp/noah-preview.pid)" || true; fi
+          echo "Never contacted a database, Neon, Vercel or paid AI."
