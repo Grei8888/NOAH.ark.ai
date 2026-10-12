@@ -49,7 +49,8 @@ describe("one-tap tester feedback receiver", () => {
     vi.stubGlobal("fetch",sent);
     const out = await POST(request(payload));
     expect(out.status).toBe(200);
-    expect(await out.json()).toEqual({ok:true});
+    const responseBody = await out.json();
+    expect(responseBody).toEqual({ok:true});
     const [requestedUrl,init] = sent.mock.calls[0];
     expect(requestedUrl).toBe(script);
     const forwarded = JSON.parse(init.body);
@@ -57,7 +58,7 @@ describe("one-tap tester feedback receiver", () => {
     expect(forwarded.nickname).toBe("노아탐험가");
     expect(forwarded.secret).toBe("server-only-secret");
     expect(forwarded.visitorKey).toHaveLength(24);
-    expect(JSON.stringify(await out.clone().json())).not.toContain("server-only-secret");
+    expect(JSON.stringify(responseBody)).not.toContain("server-only-secret");
   });
   it("never reports a write as successful when Google cannot verify storage", async () => {
     vi.stubEnv("NOAH_FEEDBACK_SCRIPT_URL",script);
