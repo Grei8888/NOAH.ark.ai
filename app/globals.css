@@ -2265,3 +2265,29 @@ section[id] {
   .readerLabModes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .readerLabAsk { width: 100%; }
 }
+
+/* Real-source selection in the 10-reader AI preview; same data path as public RSS. */
+.readerLabSourceList { display: grid; gap: 8px; max-height: 430px; overflow-y: auto; margin: 14px 0 5px; }
+.readerLabSourceItem {
+  display: flex; gap: 14px; justify-content: space-between; align-items: center;
+  min-width: 0; border: 1px solid var(--border);
+  background: #fff; border-radius: 8px; padding: 13px 14px;
+}
+.readerLabSourceItem > div:first-child { flex: 1 1 auto; min-width: 0; }
+.readerLabSourceItem span { display: block; font-size: 10px; color: var(--slate); margin-bottom: 5px; }
+.readerLabSourceItem strong { display: block; font-size: 13px; color: var(--navy); line-height: 1.55; word-break: keep-all; }
+.readerLabSourceActions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+.readerLabSourceActions a, .readerLabSourceActions button {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 44px;
+  border-radius: 6px; padding: 8px 10px; background: #f8fafc;
+  border: 1px solid #c8d3df; font-size: 11px; color: var(--navy); font-weight: 700;
+}
+.readerLabSourceActions button[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
+.readerLabSourceActions :is(a,button):focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.readerLabOptional { color: var(--slate); font-size: 11px; font-weight: 400; }
+@media (max-width:600px) {
+  .readerLabSourceItem { flex-direction: column; align-items: stretch; gap: 10px; }
+  .readerLabSourceActions { justify-content: flex-end; }
+  .readerLabSourceActions a, .readerLabSourceActions button { flex: 1 1 50%; }
+  .readerLabSourceList { max-height: 420px; }
+}
