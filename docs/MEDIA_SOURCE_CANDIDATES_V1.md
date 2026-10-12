@@ -48,6 +48,22 @@ Rationale: allow the **same real-world Event** to connect official evidence, jou
 
 **Outcome:** 6 publisher RSS directories found; **0 out of 9** candidates cleared for public automated ingestion or AI analysis. No live publisher RSS retrieval or XML validation claimed; the prior labels 'publisher-listed' mean a published directory was found, **not** a successful GET to the feed. 'Non-commercial beta' is not equivalent to personal RSS use.
 
+## Link-only rights distinction — 2026-10-12 owner legal review
+
+The publisher-site original **title + link only** model is NOT the same as republishing protected article text or commercially syndicating an RSS feed. Our previous approach of requiring a publisher content license **before any ordinary article hyperlink** was overbroad.
+
+- Korean Copyright Commission FAQ directly says reposting **only the original article title and link** is not a copyright infringement in the described context: https://www.copyright.or.kr/customer-center/faq/list.do?counselfaqno=44187&searchcounselfaqno=44187 .
+- Another KCC FAQ explains that simple/deep hyperlinks to an article's page generally do not amount to copying/transmission of copyrighted prose; reproducing actual article sentences/photos can: https://www.copyright.or.kr/customer-center/faq/list.do?counselfaqno=41608 .
+- Supreme Court 2021-09-09 case 2017도19025 allows liability for knowingly and repeatedly facilitating access to **illicit pirated copies**; use lawful publisher-origin HTTPS URLs, not mirrors: https://www.scourt.go.kr/portal/news/NewsViewAction.work?gubun=6&pageIndex=1&searchOption=&searchWord=&seqnum=2063 .
+- KCC catalogued 2025-01-10 trial judgment 2022가합558462 of **one specific** AI news curation service's links/summaries as non-infringing; never generalize to any copyrighted RSS or article body processing: https://www.copyright.or.kr/information-materials/trend/precedents/view.do?brdctsno=54458 .
+
+**Three separate product paths**
+1. **Manual human-curated source link index**: article title (short and accurate), publisher/source, original canonical link, minimal publication date; no copied body/thumbnail or scraping. **Proceed to technical prototype based on link principles** after checking specific contract/robots/browser design. Do not demand blanket per-publisher full-text license for ordinary direct links.
+2. **Automated RSS-powered public index**: machine retrieval/parsing/frequency/cache and publisher's RSS subscriber/license terms need independent review. Don't enable existing nine RSS candidate records prematurely merely on link-only copyright analysis.
+3. **Article-specific AI reading of article body/text/images**: separate copyright, publisher service terms and AI-use rights assessment. An open link or the user's prior visit does not confer a license to ingest that article into a model.
+
+Editorial and copyright decisions remain distinct; a title+link service can send meaningful referral traffic without reconstructing an entire article. No promises that all RSS access, title snippets, illustrations, summaries, framing or rehosting are lawful under all circumstances.
+
 ## Rights and journalistic integrity release gates
 
 1. **Explicit allowed use** for each media partner: public headline+outbound-link index; metadata cache duration; excerpt/body/photo; automated processing and AI transformation; traffic restrictions and attribution, with documented rights-owner source. Where missing or restrictive, keep public ingestion **off**.
