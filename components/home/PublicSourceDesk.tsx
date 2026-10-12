@@ -174,19 +174,19 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false }:
         <section className="railPanel">
           <div className="railEyebrow">YOUR AI NEWS PARTNER</div>
           <h2>뉴스를 넘어, 이해로.</h2>
-          <p>원문을 직접 읽고 스스로 판단하도록 돕는 AI 뉴스 파트너를 만들고 있습니다. 지금은 정부 공식 자료를 제공하며, AI 독해 도우미는 준비 중입니다.</p>
+          <p>원문을 직접 읽고 스스로 판단하도록 돕는 AI 뉴스 파트너입니다. 현재는 정부 공식 자료를 제공하며, {readerLabAvailable ? "AI 독해 기능을 실제 모델로 시험할 수 있습니다." : "AI 독해 도우미는 준비 중입니다."}</p>
         </section>
         <section className="railPanel">
           <div className="railEyebrow">SOURCE STATUS</div>
           <div className="signalRow"><span>최근 14일 자료</span><strong>{currentSnapshot.items.length}</strong></div>
           <div className="signalRow"><span>응답한 RSS</span><strong>{currentSnapshot.availableFeeds}/{currentSnapshot.totalFeeds}</strong></div>
-          <div className="signalRow"><span>AI 호출</span><strong>0</strong></div>
+          <div className="signalRow"><span>AI 상태</span><strong>{readerLabAvailable ? "실사용 테스트" : "비활성"}</strong></div>
           <p className="sourceRailFoot">중소벤처기업부의 RSS 원문만 표시합니다. 오늘의 관심사는 제목 키워드 필터이며, AI 추천이나 중요도 평가가 아닙니다.</p>
         </section>
         <section className="railPanel">
           <div className="railEyebrow">NEXT PHASE</div>
           <h2>Read. Understand. Decide.</h2>
-          <p>경제용어 설명, 배경지식, 비판적 독해, 다른 관점의 원문 탐색을 후속 단계에서 제공합니다. 두 기사 읽기를 강제하지 않습니다.</p>
+          <p>{readerLabAvailable ? "경제용어 설명·배경지식·비판적 독해를 실제 AI로 시험합니다." : "경제용어 설명과 비판적 독해는 후속 출시 예정입니다."} 검증된 기사 간 관점 비교는 아직 미제공이며, 두 기사 읽기를 강제하지 않습니다.</p>
         </section>
       </>
     }>
@@ -199,6 +199,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false }:
         <p className="greeting">Your AI News Partner. · 어려운 뉴스를 이해하기 쉽게.</p>
         <h1>{title}</h1>
         <div className="editionLine"><span className="signalDot" /><span>실제 정부 RSS · 최근 14일 · 최신순</span><span>무료 공개 베타</span></div>
+        {readerLabAvailable && <div className="readerBetaPrompt"><Link href="/lab/reader">실제 AI 뉴스 독해 도우미 사용하기 →</Link></div>}
       </header>
       <div className="trustNotice" role="note">
         <strong>LIVE SOURCES</strong>
@@ -208,7 +209,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false }:
         <p className="sourceHealth" role="status">일부 자료원의 연결이 원활하지 않습니다. 표시 가능한 원문만 제공하며 가상 자료로 대체하지 않습니다.</p>
       )}
       {(view === "home" || view === "my") && (
-        <ReaderAudiencePanel activeTopics={todayTopics} onFocusTopic={focusReaderTopic} />
+        <ReaderAudiencePanel activeTopics={todayTopics} onFocusTopic={focusReaderTopic} aiReaderAvailable={readerLabAvailable} />
       )}
       {(view === "home" || view === "discover" || view === "startup" || view === "my") && (
         <section className="todayInterestPanel" aria-label="오늘의 관심사 선택">
@@ -255,7 +256,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false }:
           <p>NOAH ARK는 실제 근거를 먼저 확인합니다. 현재 제공하는 기능은 중소벤처기업부의 공식 RSS에 게시된 제목·발행시각·출처·원문 링크를 보여주는 것입니다.</p>
           <p>기사 본문과 사진은 재게시하지 않습니다. 원문 내용을 확인하고 제도 적용 여부를 판단할 때는 기관의 원래 페이지를 참고하세요.</p>
           <p>저장·숨김, 관심 분야 및 선택한 뉴스 읽기 목적은 사용하는 브라우저에만 기록됩니다. 오늘의 관심사는 한국시간 기준 해당 날짜에만 유지되고, 추가 API 요청이나 AI 분석을 사용하지 않습니다.</p>
-          <p>NOAH ARK는 경제를 이해하고 세상을 읽는 AI 뉴스 파트너를 지향합니다. 경제용어 설명·배경 이해·비판적 독해·다른 시각의 원문 추천은 아직 개발 중인 기능입니다.</p>
+          <p>NOAH ARK는 경제를 이해하고 세상을 읽는 AI 뉴스 파트너를 지향합니다. {readerLabAvailable ? "현재 내부 베타에서는 실제 AI 경제용어 설명·배경 이해·비판적 독해를 시험합니다. 검증된 기사 간 관점 비교는 후속 단계입니다." : "경제용어 설명·배경 이해·비판적 독해·다른 시각의 원문 추천은 아직 개발 중인 기능입니다."}</p>
           <button type="button" className="sourceRestore" onClick={restore}>숨김 항목 모두 복원</button>
           <Link className="textLink" href="/">첫 화면으로 돌아가기 →</Link>
         </section>
