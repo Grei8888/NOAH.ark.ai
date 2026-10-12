@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AppShell, type HomeView } from "@/components/home/AppShell";
 import { Icon } from "@/components/home/Icon";
 import { SourceCardVisual } from "@/components/home/SourceCardVisual";
+import { ReaderAudiencePanel } from "@/components/home/ReaderAudiencePanel";
 import type { OfficialFeedSnapshot, OfficialSourceLink } from "@/lib/news/public-official-sources";
 import { TODAY_TOPICS, matchesTodayTopic, restoreTodayTopics, todayKstDate, type TodayTopic } from "@/lib/news/daily-interests";
 
@@ -146,6 +147,12 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
     try { localStorage.removeItem(TODAY_KEY); } catch { /* private mode */ }
   }
 
+  function focusReaderTopic(topic: TodayTopic) {
+    const next: TodayTopic[] = [topic];
+    setTodayTopics(next);
+    try { localStorage.setItem(TODAY_KEY, JSON.stringify({ date: todayKstDate(), topics: next })); } catch { /* private mode */ }
+  }
+
   const currentKind: SourceKind = view === "startup" ? "notice" : filter;
   const filtered = useMemo(() => currentSnapshot.items.filter(s => {
     if (view === "saved" && !saved.includes(s.url)) return false;
@@ -165,9 +172,9 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
     <AppShell view={view} rail={
       <>
         <section className="railPanel">
-          <div className="railEyebrow">SOURCE INTELLIGENCE</div>
-          <h2>원문에서 시작합니다.</h2>
-          <p>지금은 정부 공식 자료를 제공하는 베타 단계입니다. 한 사건으로 묶는 AI 분석과 NOAH Brief는 아직 제공하지 않습니다.</p>
+          <div className="railEyebrow">YOUR AI NEWS PARTNER</div>
+          <h2>뉴스를 넘어, 이해로.</h2>
+          <p>원문을 직접 읽고 스스로 판단하도록 돕는 AI 뉴스 파트너를 만들고 있습니다. 지금은 정부 공식 자료를 제공하며, AI 독해 도우미는 준비 중입니다.</p>
         </section>
         <section className="railPanel">
           <div className="railEyebrow">SOURCE STATUS</div>
@@ -178,8 +185,8 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
         </section>
         <section className="railPanel">
           <div className="railEyebrow">NEXT PHASE</div>
-          <h2>One Event. Multiple Perspectives.</h2>
-          <p>사건 군집화, 서로 다른 시각, 개인화 인텔리전스는 후속 출시 예정입니다.</p>
+          <h2>Read. Understand. Decide.</h2>
+          <p>경제용어 설명, 배경지식, 비판적 독해, 다른 관점의 원문 탐색을 후속 단계에서 제공합니다. 두 기사 읽기를 강제하지 않습니다.</p>
         </section>
       </>
     }>
@@ -189,7 +196,7 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
       </div>
       <header className="homeIntro">
         <div className="dateLine"><span>{kstDay}</span><span>ONLY WHAT MATTERS.</span></div>
-        <p className="greeting">Evidence before interpretation.</p>
+        <p className="greeting">Your AI News Partner. · 어려운 뉴스를 이해하기 쉽게.</p>
         <h1>{title}</h1>
         <div className="editionLine"><span className="signalDot" /><span>실제 정부 RSS · 최근 14일 · 최신순</span><span>무료 공개 베타</span></div>
       </header>
@@ -199,6 +206,9 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
       </div>
       {currentSnapshot.availableFeeds < currentSnapshot.totalFeeds && (
         <p className="sourceHealth" role="status">일부 자료원의 연결이 원활하지 않습니다. 표시 가능한 원문만 제공하며 가상 자료로 대체하지 않습니다.</p>
+      )}
+      {(view === "home" || view === "my") && (
+        <ReaderAudiencePanel activeTopics={todayTopics} onFocusTopic={focusReaderTopic} />
       )}
       {(view === "home" || view === "discover" || view === "startup" || view === "my") && (
         <section className="todayInterestPanel" aria-label="오늘의 관심사 선택">
@@ -244,7 +254,8 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
           <h2>서비스 운영 원칙</h2>
           <p>NOAH ARK는 실제 근거를 먼저 확인합니다. 현재 제공하는 기능은 중소벤처기업부의 공식 RSS에 게시된 제목·발행시각·출처·원문 링크를 보여주는 것입니다.</p>
           <p>기사 본문과 사진은 재게시하지 않습니다. 원문 내용을 확인하고 제도 적용 여부를 판단할 때는 기관의 원래 페이지를 참고하세요.</p>
-          <p>저장·숨김 및 관심 분야 설정은 사용하는 브라우저에만 기록됩니다. 오늘의 관심사는 한국시간 기준 해당 날짜에만 유지되고, 추가 API 요청이나 AI 분석을 사용하지 않습니다.</p>
+          <p>저장·숨김, 관심 분야 및 선택한 뉴스 읽기 목적은 사용하는 브라우저에만 기록됩니다. 오늘의 관심사는 한국시간 기준 해당 날짜에만 유지되고, 추가 API 요청이나 AI 분석을 사용하지 않습니다.</p>
+          <p>NOAH ARK는 경제를 이해하고 세상을 읽는 AI 뉴스 파트너를 지향합니다. 경제용어 설명·배경 이해·비판적 독해·다른 시각의 원문 추천은 아직 개발 중인 기능입니다.</p>
           <button type="button" className="sourceRestore" onClick={restore}>숨김 항목 모두 복원</button>
           <Link className="textLink" href="/">첫 화면으로 돌아가기 →</Link>
         </section>
