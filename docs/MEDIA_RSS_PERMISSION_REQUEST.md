@@ -53,21 +53,26 @@ Use content partnership/licensing contacts, NOT reporter tipline or editorial jo
 
 **Critical publisher condition:** 한국경제 lists 2026 online article reuse prices as high as KRW 200,000 per article for noncommercial corporate usage and KRW 300,000 for commercial corporate usage, exclusive of VAT (see its content-use page). These are **article-content reuse** rates, not a verified fee for metadata-only RSS outbound linking. Explicitly ask for a separate limited **title/date/source/URL** pilot instead of assuming article-level licenses can fit the <KRW 50,000 monthly operations budget.
 
-## Owner editorial partnership concept — READ FIRST, AI SECOND (not yet implemented)
+## Owner editorial partnership concept — OPEN READING COMPANION (not yet implemented)
 
-NOAH ARK aims to reduce polarizing misinformation and encourage trustworthy independent reading. The product should avoid mechanically branding individual stories or publishers as 'left' and 'right', and never provide artificial 50/50 balance between substantiated facts and unsupported rumors.
+**Product owner decision, 2026-10-12:** Reading two source articles is a **recommendation, never a condition for AI access, reading verification, or perspective exploration**. Do not lock the AI companion or request mandatory `읽었음` self-confirmation. The guiding idea is **"read original reporting freely, ask questions any time, get naturally curious about other perspectives."**
 
-1. Display **one Event** and at least two independent, responsibly sourced reports with meaningfully distinct perspectives, where such plural perspectives actually exist. Distinguish factual disputes from interpretation/value disputes; two copied/syndicated articles count as one source.
-2. Before releasing an AI-assisted **comparison / context memo**, guide users to the **original publisher sites** for both reports. The destination is publisher-hosted, with visible citation and no hosted scraped mirror.
-3. A link click or opened tab **cannot prove the article was actually read** because the third-party publisher does not return reading-completion data to NOAH. Show honest wording such as '원문 2곳 열기 + 읽었음을 직접 확인하기', never 'validated reading completion'. Start with user self-acknowledgment and test effectiveness; only a publisher-approved authenticated integration could support stronger verification.
-4. **Rights are independent of the unlock:** granting RSS title + link indexing rights does NOT grant article body ingestion into LLM or derivative article summaries. First phase can show citations and basic *official-source* facts only. Any publisher-article AI summary/comparison needs separate authorization to ingest/process relevant texts, with contract-defined limits (storage, processor, retention, commercial use, re-use, citation).
-5. When there is a single authoritative primary document or one original exclusive report, do not fabricate opposing viewpoints or block access to basic verified information forever. Treat the two-original rule as a **perspective-comparison feature gate**, not an arbitrary ban on news access.
-6. Publisher pilot value proposition: original-site clickthrough, prominently attributed origin, no full-body/photo reproduction, opt-out/revocation process, aggregate outbound click counts reported if the pilot permits measurement. Do not promise numerical traffic lift without measured data. No AI model training on publisher content.
-7. Legal beta disclosure: publicly accessible but presently noncommercial; budget target **<KRW 50,000 / month** (not licensing budget authorization). Ask for free/limited-time experimental metadata-only written approval, do not claim existing license.
+NOAH ARK aims to reduce polarizing misinformation and encourage independently reported, trustworthy journalism. Diversity is not a mandatory left/right 50:50 split for every factual question. Separate verified facts, commentary, unsupported claims, and opinion disputes.
+
+1. **Event landing:** show one developing event; official source where available; directly linked reporting with clearly named publishers. No article text or photos reproduced without permission.
+2. **AI Reading Companion always discoverable:** optional question chips such as **용어 설명 / 배경 이해 / 비판적 독해 / 다른 관점** and open question input. Never require two opens, completion tracking, quiz, timer, or self-certification.
+3. **Soft discovery:** after viewing an original article link, provide a restrained, dismissible nudge: `같은 사건을 다른 시각으로 보도한 기사도 살펴보세요` or `이 주장에는 어떤 근거가 있을까요?`. Alternative links are click-through suggestions, **not compulsory steps or blockers**. No manipulative guilt or indefinite nagging.
+4. **Cross-perspective context:** where genuinely independent, responsibly reported perspectives exist, display related original URLs with publisher and any verified explanatory differences. Two syndicated versions count as one independent reporting source. Don't infer individual story ideology or fabricate rival opinions where none exists.
+5. **Honest reading signals:** link open does not prove reading; do not claim comprehension or completion. Do not collect dwell time/read confirmation for a mandatory gate.
+6. **AI capability rights gates:** metadata-only RSS permission does NOT authorize article body ingestion, AI parsing, retrieval, derivative comparisons or re-summaries. The unrestricted companion may explain **general terms and background knowledge independently of publisher article text**. If the user asks about article-specific claims and there is no separately licensed, user-permitted article context, AI must say the article content has not been examined and offer conceptual questions instead of falsely claiming to have analyzed it.
+7. **Publisher proposition:** original-article visits first, clear attribution, optional exploratory related links, no full-body/photo mirroring, easy content takedown/opt-out, aggregate referrer/click analytics only if appropriate and compliant; never promise proven traffic uplift. Ask separately about limited AI article processing permission.
+8. **Public beta economics:** noncommercial but publicly accessible; target service operating spend <KRW 50,000/month. No publisher-license budget is preapproved.
+
+An Event may have only one high-quality primary source or exclusive original report. Do not gate reading, generic AI knowledge help or source discovery based on count of reports. Prefer quality and evidence over forced numerical balance.
 
 Suggested first call: '뉴스 콘텐츠/RSS를 담당하시는 디지털 서비스 또는 콘텐츠 제휴 담당자 연결 부탁드립니다. 원문을 읽도록 유도하는 비상업 공개 베타의 기사 제목·원문 링크 한정 시범제휴를 제안드리려 합니다. AI 기사 본문 이용은 별도로 허락을 구할 계획입니다.'
 
-## ## Owner's approval checklist
+## Owner's approval checklist
 
 - [ ] Review this draft and sender identity before any outbound communication.
 - [ ] Select first two publishers to approach, and confirm contact details on official pages.
