@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "NOAH ARK",
-  description: "Only What Matters. 정부 공식 RSS의 실제 공고와 보도자료 원문을 확인하는 NOAH ARK 무료 베타."
+  description: "경제를 이해하고 세상을 읽는 AI 뉴스 파트너 NOAH ARK. 현재 무료 공개 베타에서는 정부 공식 RSS 원문과 관심사 필터를 제공합니다. AI 독해 도우미는 준비 중입니다."
 };
 
 export default function RootLayout({
