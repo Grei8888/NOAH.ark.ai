@@ -73,14 +73,14 @@ export class RSSProvider implements NewsProvider {
         url: string;
         name: string;
         sourceType: SourceType;
-    }[]) { }
+    }[], private readonly requestTimeoutMs = 20000) { }
     async fetchArticles(p: FetchParams): Promise<RawArticle[]> {
         const articles: RawArticle[] = [];
         for (const feed of this.feeds) {
             const url = new URL(feed.url);
             if (url.protocol !== 'https:')
                 throw new Error('RSS feeds must use HTTPS');
-            const response = await fetch(url, { signal: AbortSignal.timeout(20000), cache: 'no-store' });
+            const response = await fetch(url, { signal: AbortSignal.timeout(this.requestTimeoutMs), cache: 'no-store' });
             if (!response.ok)
                 throw new Error(`RSS HTTP ${response.status}`);
             const xml = await response.text();
