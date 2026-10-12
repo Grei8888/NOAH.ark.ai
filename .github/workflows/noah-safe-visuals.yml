@@ -7,6 +7,7 @@ on:
       - chatgpt/noah-card-ratio-refine
       - chatgpt/noah-today-interests-v1
       - chatgpt/noah-manual-source-refresh-v1
+      - chatgpt/noah-inline-refresh-feedback
   workflow_dispatch:
 
 permissions:
@@ -89,6 +90,18 @@ jobs:
             if (!html.includes("오늘의 관심사") || !html.includes("AI·기술") || !html.includes("정책·제도")) throw Error("Daily interest quick filters missing from server-rendered Home");
             if (!html.includes("최신 자료 확인") || !html.includes("sourceRefreshButton")) throw Error("Manual refresh control missing");
             console.log("PASS: official source cards render NOAH-owned SVG cover with links, not scraped photos");
+          '
+      - name: Ensure refreshed feedback replaces the timestamp instead of adding a row
+        run: |
+          node --input-type=module -e '
+            const fs=await import("node:fs");
+            const view=fs.readFileSync("components/home/PublicSourceDesk.tsx","utf8");
+            const css=fs.readFileSync("app/globals.css","utf8");
+            if (!view.includes("aria-live=\"polite\"") || !view.includes("refreshStatus?.text ??")) throw Error("Status must appear inline in the timestamp area");
+            if (view.includes("<p className=\"sourceRefreshStatus\"")) throw Error("Redundant second refresh message row returned");
+            if (!view.includes("window.setTimeout(() => setRefreshStatus(null), 3000)")) throw Error("Missing 3-second transient reset");
+            if (!css.includes("prefers-reduced-motion: reduce")) throw Error("Reduce-motion setting not respected");
+            console.log("PASS: same-row 3-second feedback and accessible reduced-motion behavior");
           '
       - name: Check read-only manual refresh API and controlled failure
         run: |
