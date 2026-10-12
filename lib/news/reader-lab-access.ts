@@ -3,8 +3,10 @@ import { createHash, timingSafeEqual } from "node:crypto";
 /** The reading lab is a CLOSED experiment. Never works on the production alias. */
 export function readerLabConfigured(): boolean {
   const access = process.env.NOAH_READER_LAB_ACCESS_TOKEN ?? "";
+  const preview = process.env.VERCEL_ENV === "preview";
+  const localDev = process.env.NODE_ENV !== "production" && !process.env.VERCEL_ENV;
   return process.env.NOAH_READER_LAB_ENABLED === "true" &&
-    process.env.VERCEL_ENV !== "production" &&
+    (preview || localDev) &&
     access.length >= 32 &&
     !!process.env.OPENAI_API_KEY?.trim();
 }
