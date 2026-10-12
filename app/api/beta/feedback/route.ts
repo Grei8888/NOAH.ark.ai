@@ -70,9 +70,15 @@ export async function POST(req: NextRequest) {
     try { response = JSON.parse(text); }
     catch { return json({ok:false,error:"저장 결과를 확인할 수 없습니다. 다시 확인해 주세요."},502); }
     if (response.ok !== true || response.id !== data.submissionId) {
-      return json({ok:false,error: typeof response.error === "string" && response.error === "rate_limit"
-        ? "잠시 후 다시 제출해 주세요."
-        : "접수가 지연되고 있습니다. 잠시 후 다시 시도해 주세요."},503);
+      // Distinguish safe failure classes without revealing Script URL or credentials.
+      const reason = typeof response.error === "string" ? response.error : "";
+      if (reason === "unauthorized_or_not_setup")
+        return json({ok:false,error:"Google 의견 수집 연결 설정을 확인해 주세요.",code:"SETUP_MISMATCH"},503);
+      if (reason === "storage_unavailable")
+        return json({ok:false,error:"Google 설문 저장 단계에서 오류가 발생했습니다.",code:"GOOGLE_SAVE_FAILED"},503);
+      if (reason === "rate_limit")
+        return json({ok:false,error:"잠시 후 다시 제출해 주세요.",code:"RATE_LIMIT"},429);
+      return json({ok:false,error:"접수가 지연되고 있습니다. 잠시 후 다시 시도해 주세요.",code:"RECEIPT_FAILED"},503);
     }
     return json({ok:true},200);
   } catch {
