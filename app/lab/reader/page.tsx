@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { readerLabConfigured } from "@/lib/news/reader-lab-access";
+import { readerLabConfigured, readerLabModelReady } from "@/lib/news/reader-lab-access";
 import { getOfficialSourceSnapshot, publicSourceMode } from "@/lib/news/public-official-sources";
 import { ReaderLab } from "@/components/lab/ReaderLab";
 
@@ -28,6 +28,7 @@ export default async function ReaderLabPage({
       initialSource={selected}
       availableFeeds={snapshot.availableFeeds}
       totalFeeds={snapshot.totalFeeds}
+      modelReady={readerLabModelReady()}
     />
   );
 }
