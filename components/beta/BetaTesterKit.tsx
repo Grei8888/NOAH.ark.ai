@@ -19,7 +19,7 @@ const taskIds = new Set<string>(tasks.map(t => t.id));
 const validChecks = (input: unknown): TaskId[] =>
   Array.isArray(input) ? input.filter((v): v is TaskId => typeof v === "string" && taskIds.has(v)).slice(0, tasks.length) : [];
 
-export function BetaTesterKit() {
+export function BetaTesterKit({ feedbackReady }: { feedbackReady: boolean }) {
   const [checked, setChecked] = useState<TaskId[]>([]);
   const [score, setScore] = useState("");
   const [liked, setLiked] = useState("");
@@ -97,7 +97,7 @@ export function BetaTesterKit() {
           <div className="railEyebrow">TEST STATUS</div>
           <div className="signalRow"><span>테스트 항목</span><strong>{tasks.length}</strong></div>
           <div className="signalRow"><span>완료한 항목</span><strong>{hydrated ? checked.length : "–"}</strong></div>
-          <p>점검표는 사용 중인 브라우저에만 저장됩니다. 의견은 직접 공유하기 전까지 서버로 전송되지 않습니다.</p>
+          <p>점검표는 이 브라우저에만 저장됩니다. 의견은 사용자가 제출하기 전까지 전송되지 않습니다.</p>
         </section>
         <section className="railPanel">
           <div className="railEyebrow">CURRENT RELEASE</div>
@@ -129,6 +129,7 @@ export function BetaTesterKit() {
             실제 서비스 체험하기 <Icon name="arrow" />
           </Link>
           <button type="button" className="betaSecondary" onClick={() => copyText("https://noah-ark-ai.vercel.app/beta", "테스터 초대 링크를 복사했습니다.")}>테스트 링크 복사</button>
+          {feedbackReady && <Link href="/feedback" className="betaSecondary">30초 의견 남기기 <Icon name="arrow" /></Link>}
         </div>
       </section>
       <section className="betaChecklist" aria-label="베타 점검표">
@@ -150,6 +151,14 @@ export function BetaTesterKit() {
           </article>
         ))}
       </section>
+      {feedbackReady ? (
+        <section className="betaFeedback" aria-label="베타테스터 의견">
+          <div className="sectionHeading"><div><h2>YOUR FEEDBACK</h2><p>불편했던 점이나 아이디어를 언제든 알려 주세요.</p></div><span>30 SEC.</span></div>
+          <p className="betaFeedbackShortcut">닉네임만으로 참여할 수 있습니다. 한 번 제출한 뒤에도 새로운 의견을 계속 남길 수 있어요.</p>
+          <Link href="/feedback" className="betaPrimary betaFeedbackSubmit">간단히 의견 남기기 <Icon name="arrow" /></Link>
+          <p className="betaPrivacy">Google Forms에서 최종 제출하면 의견이 수집됩니다. 이메일이나 로그인은 요구하지 않도록 운영합니다.</p>
+        </section>
+      ) : (
       <section className="betaFeedback" aria-label="베타테스터 의견">
         <div className="sectionHeading">
           <div><h2>YOUR FEEDBACK</h2><p>잘된 점과 불편한 점을 편하게 알려 주세요.</p></div>
@@ -175,6 +184,7 @@ export function BetaTesterKit() {
         {status && <p className="betaFeedbackStatus" role="status">{status}</p>}
         <p className="betaPrivacy">이 페이지는 의견을 서버에 자동으로 저장·전송하지 않습니다. 공유 버튼을 누른 후 카카오톡·문자·이메일 등 원하는 앱과 수신자를 선택하거나 복사한 내용을 초대한 사람에게 전달하세요. 민감한 개인정보는 입력하지 마세요.</p>
       </section>
+      )}
       <footer className="betaFooter"><span>NOAH ARK · Only What Matters.</span><Link href="/">서비스 홈으로 돌아가기 →</Link></footer>
     </AppShell>
   );

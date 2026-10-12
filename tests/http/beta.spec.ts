@@ -25,3 +25,15 @@ test('beta tester route does not replace production Home', async ({request}) => 
   expect(html).not.toContain('TEST CHECKLIST');
   expect(html).toContain('NOAH');
 });
+
+
+test('feedback landing stays honest before a real Google Form is configured', async ({request}) => {
+  const response = await request.get('/feedback');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('의견 남기기');
+  expect(html).toContain('의견 수집 양식을 연결하고 있습니다.');
+  expect(html).toContain('기존 의견 공유 방식 이용하기');
+  expect(html).not.toContain('Google 양식에서 제출 완료하기');
+  expect(html).toContain('name="robots" content="noindex, nofollow"');
+});
