@@ -1,6 +1,7 @@
 import { getEdition } from "@/lib/data";
 import { getOfficialSourceSnapshot, publicSourceMode } from "@/lib/news/public-official-sources";
 import { PublicSourceDesk } from "@/components/home/PublicSourceDesk";
+import { readerLabConfigured } from "@/lib/news/reader-lab-access";
 import { PersonalizedHome } from "@/components/home/PersonalizedHome";
 import type { HomeView } from "@/components/home/AppShell";
 export const dynamic = "force-dynamic";
@@ -20,7 +21,7 @@ export default async function Home({
   ].includes(view ?? "")
     ? (view as HomeView)
     : "home";
-  if (publicSourceMode()) return <PublicSourceDesk snapshot={await getOfficialSourceSnapshot()} view={validView} />;
+  if (publicSourceMode()) return <PublicSourceDesk snapshot={await getOfficialSourceSnapshot()} view={validView} readerLabAvailable={readerLabConfigured()} />;
   return (
     <PersonalizedHome
       edition={await getEdition()}
