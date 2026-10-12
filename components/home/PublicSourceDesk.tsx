@@ -53,7 +53,7 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
   const [todayTopics, setTodayTopics] = useState<TodayTopic[]>([]);
   const [currentSnapshot, setCurrentSnapshot] = useState(snapshot);
   const [refreshing, setRefreshing] = useState(false);
-  const [refreshStatus, setRefreshStatus] = useState("");
+  const [refreshStatus, setRefreshStatus] = useState<{ text: string; persistent: boolean } | null>(null);
   const [lastRefreshTap, setLastRefreshTap] = useState(0);
   const [ready, setReady] = useState(false);
   const [query, setQuery] = useState("");
@@ -82,14 +82,20 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
     });
     return () => { active = false; };
   }, []);
+  useEffect(() => {
+    if (!refreshStatus || refreshStatus.persistent) return;
+    const timer = window.setTimeout(() => setRefreshStatus(null), 3000);
+    return () => window.clearTimeout(timer);
+  }, [refreshStatus]);
+
   async function refreshSources() {
     if (refreshing) return;
     if (lastRefreshTap && Date.now() - lastRefreshTap < MANUAL_WAIT_MS) {
-      setRefreshStatus("최근 확인했습니다. 잠시 후 다시 시도해 주세요.");
+      setRefreshStatus({ text: "방금 확인했습니다. 잠시 후 다시 확인할 수 있습니다.", persistent: false });
       return;
     }
     setRefreshing(true);
-    setRefreshStatus("기관의 최신 자료를 확인하고 있습니다.");
+    setRefreshStatus({ text: "기관의 최신 자료를 확인하는 중입니다.", persistent: true });
     setLastRefreshTap(Date.now());
     try {
       const response = await fetch("/api/sources/refresh", { cache: "no-store", signal: AbortSignal.timeout(10000) });
@@ -97,14 +103,14 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
       const data: unknown = await response.json();
       if (!isOfficialRefresh(data)) throw new Error("Unexpected source data");
       if (data.items.length === 0) {
-        setRefreshStatus("기관에 접속했지만 최근 14일 자료가 없습니다. 잠시 후 다시 확인해 주세요.");
+        setRefreshStatus({ text: "기관을 확인했지만 최근 14일 자료가 없습니다.", persistent: true });
       } else {
         setCurrentSnapshot(data);
         try { sessionStorage.setItem(RECENT_REFRESH_KEY, JSON.stringify(data)); } catch { /* private session */ }
-        setRefreshStatus(`최근 뉴스 확인 ${refreshTime.format(new Date(data.retrievedAt))} · ${data.items.length}건 확인`);
+        setRefreshStatus({ text: `최신 자료 ${data.items.length}건을 확인했습니다.`, persistent: false });
       }
     } catch {
-      setRefreshStatus("현재 기관 자료를 확인할 수 없습니다. 기존 목록을 유지합니다. 잠시 후 다시 시도해 주세요.");
+      setRefreshStatus({ text: "기관 연결이 원활하지 않습니다. 기존 목록을 유지합니다.", persistent: true });
     } finally {
       setRefreshing(false);
     }
@@ -204,16 +210,22 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
             {todayTopics.length > 0 && <button className="todayInterestReset" type="button" onClick={clearTodayTopics}>전체 보기</button>}
           </div>
           <div className="sourceFreshnessBar">
-            <span className="sourceFreshnessText">
-              {currentSnapshot.availableFeeds > 0 && currentSnapshot.retrievedAt
-                ? `최근 뉴스 확인 ${refreshTime.format(new Date(currentSnapshot.retrievedAt))} · 신청기한은 원문 확인`
-                : "최신 뉴스 확인 지연 · 신청기한은 원문 확인"}
+            <span className="sourceFreshnessText" aria-live="polite" aria-atomic="true">
+              <span
+                key={refreshStatus?.text ?? "normal"}
+                className={refreshStatus ? "sourceFreshnessMessage" : "sourceFreshnessDefault"}
+              >
+                {refreshStatus?.text ?? (
+                  currentSnapshot.availableFeeds > 0 && currentSnapshot.retrievedAt
+                    ? `최근 뉴스 확인 ${refreshTime.format(new Date(currentSnapshot.retrievedAt))} · 신청기한은 원문 확인`
+                    : "최신 뉴스 확인 지연 · 신청기한은 원문 확인"
+                )}
+              </span>
             </span>
             <button type="button" className="sourceRefreshButton" onClick={refreshSources} disabled={refreshing}>
               <Icon name="refresh" /> {refreshing ? "확인 중…" : "최신 자료 확인"}
             </button>
           </div>
-          {refreshStatus && <p className="sourceRefreshStatus" role="status">{refreshStatus}</p>}
           <div className="todayInterestChips">
             {TODAY_TOPICS.map(topic => (
               <button type="button" key={topic.id} aria-pressed={todayTopics.includes(topic.id)} onClick={() => toggleTodayTopic(topic.id)}>
