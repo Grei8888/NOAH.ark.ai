@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/home/AppShell";
 import { Icon } from "@/components/home/Icon";
 
 const TASK_STORAGE_KEY = "noah:beta-tester-checklist:v1";
+const NICKNAME_KEY = "noah:beta-tester-nickname:v1";
 const tasks = [
   { id: "original", title: "실제 원문 확인", description: "Home에서 공고 한 건을 선택하고 정부기관 원문이 열리는지 확인하세요.", href: "/", label: "Home 열기" },
   { id: "search", title: "검색과 분류", description: "Discover에서 키워드를 검색하고 사업공고·보도자료 필터를 바꿔 보세요.", href: "/?view=discover", label: "Discover 열기" },
@@ -19,8 +20,11 @@ const taskIds = new Set<string>(tasks.map(t => t.id));
 const validChecks = (input: unknown): TaskId[] =>
   Array.isArray(input) ? input.filter((v): v is TaskId => typeof v === "string" && taskIds.has(v)).slice(0, tasks.length) : [];
 
-export function BetaTesterKit() {
+export function BetaTesterKit({ feedbackEnabled = false }: { feedbackEnabled?: boolean }) {
   const [checked, setChecked] = useState<TaskId[]>([]);
+  const [nickname, setNickname] = useState("");
+  const [sending, setSending] = useState(false);
+  const pendingId = useRef<string | null>(null);
   const [score, setScore] = useState("");
   const [liked, setLiked] = useState("");
   const [problems, setProblems] = useState("");
@@ -33,6 +37,8 @@ export function BetaTesterKit() {
       if (!active) return;
       try { setChecked(validChecks(JSON.parse(localStorage.getItem(TASK_STORAGE_KEY) ?? "[]"))); }
       catch { setChecked([]); }
+      try { setNickname((localStorage.getItem(NICKNAME_KEY) || "").slice(0, 40)); }
+      catch { /* Browsers may block storage */ }
       setHydrated(true);
     });
     return () => { active = false; };
@@ -45,10 +51,21 @@ export function BetaTesterKit() {
     catch { /* local preferences are optional */ }
   }
 
+  function changeNickname(value: string) {
+    const next = value.slice(0, 40);
+    setNickname(next);
+    pendingId.current = null;
+    try {
+      if (next.trim()) localStorage.setItem(NICKNAME_KEY, next);
+      else localStorage.removeItem(NICKNAME_KEY);
+    } catch { /* Storage is optional */ }
+  }
+
   function feedbackText() {
     return [
       "NOAH ARK 베타테스트 의견",
       "서비스: https://noah-ark-ai.vercel.app",
+      "닉네임: " + (nickname.trim() || "익명"),
       "확인한 항목: " + (checked.length ? tasks.filter(t => checked.includes(t.id)).map(t => t.title).join(", ") : "미선택"),
       "사용 경험 점수: " + (score ? score + "/5" : "응답 없음"),
       "좋았던 점: " + (liked.trim() || "응답 없음"),
@@ -65,6 +82,38 @@ export function BetaTesterKit() {
       setStatus("자동 복사를 사용할 수 없습니다. 표시된 내용을 길게 눌러 복사해 주세요.");
       window.prompt("내용을 복사하세요", value);
     }
+  }
+
+  async function submitFeedback() {
+    if (sending) return;
+    if (!score && !liked.trim() && !problems.trim()) {
+      setStatus("점수를 선택하거나 한 줄 이상 의견을 남겨 주세요.");
+      return;
+    }
+    setSending(true);
+    setStatus("");
+    const submissionId = pendingId.current || crypto.randomUUID();
+    pendingId.current = submissionId;
+    try {
+      const result = await fetch("/api/beta/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ submissionId, nickname: nickname.trim(), score, liked: liked.trim(), problems: problems.trim() }),
+        cache: "no-store",
+        signal: AbortSignal.timeout(12000),
+      });
+      const payload: unknown = await result.json();
+      if (!result.ok || !payload || typeof payload !== "object" || !("ok" in payload) || payload.ok !== true) {
+        throw new Error(payload && typeof payload === "object" && "error" in payload && typeof payload.error === "string"
+          ? payload.error : "지금은 접수할 수 없습니다. 잠시 후 다시 시도해 주세요.");
+      }
+      setStatus("의견이 접수됐습니다. 감사합니다! 새로운 의견도 언제든 남길 수 있어요.");
+      setScore(""); setLiked(""); setProblems("");
+      pendingId.current = null;
+    } catch (error) {
+      setStatus(error instanceof Error && !["Failed to fetch","The operation was aborted."].includes(error.message)
+        ? error.message : "연결에 문제가 있습니다. 작성한 내용은 그대로 남아 있습니다.");
+    } finally { setSending(false); }
   }
 
   async function shareFeedback() {
@@ -97,7 +146,7 @@ export function BetaTesterKit() {
           <div className="railEyebrow">TEST STATUS</div>
           <div className="signalRow"><span>테스트 항목</span><strong>{tasks.length}</strong></div>
           <div className="signalRow"><span>완료한 항목</span><strong>{hydrated ? checked.length : "–"}</strong></div>
-          <p>점검표는 사용 중인 브라우저에만 저장됩니다. 의견은 직접 공유하기 전까지 서버로 전송되지 않습니다.</p>
+          <p>점검표는 사용 중인 브라우저에만 저장됩니다. 의견은 제출 버튼을 누르기 전까지 전송되지 않습니다.</p>
         </section>
         <section className="railPanel">
           <div className="railEyebrow">CURRENT RELEASE</div>
@@ -155,8 +204,11 @@ export function BetaTesterKit() {
           <div><h2>YOUR FEEDBACK</h2><p>잘된 점과 불편한 점을 편하게 알려 주세요.</p></div>
           <span>OPTIONAL</span>
         </div>
+        <label htmlFor="beta-nickname">닉네임 <span className="betaOptionalLabel">선택</span></label>
+        <input id="beta-nickname" className="betaNickname" autoComplete="nickname" maxLength={40} value={nickname} onChange={e => changeNickname(e.target.value)} placeholder="예: 노아탐험가 (익명도 가능)" />
+        <p className="betaNicknameHint">닉네임만 이 기기에 기억합니다. 여러 번 편하게 의견을 남겨 주세요.</p>
         <label htmlFor="beta-score">전반적인 사용 경험</label>
-        <select id="beta-score" value={score} onChange={e => setScore(e.target.value)}>
+        <select id="beta-score" value={score} onChange={e => { setScore(e.target.value); pendingId.current = null; }}>
           <option value="">선택하지 않음</option>
           <option value="5">5점 — 매우 편리함</option>
           <option value="4">4점 — 편리함</option>
@@ -165,15 +217,23 @@ export function BetaTesterKit() {
           <option value="1">1점 — 매우 불편함</option>
         </select>
         <label htmlFor="beta-liked">좋았던 점</label>
-        <textarea id="beta-liked" rows={3} maxLength={1500} value={liked} onChange={e => setLiked(e.target.value)} placeholder="계속 사용하고 싶은 기능이나 인상적인 점" />
+        <textarea id="beta-liked" rows={3} maxLength={1500} value={liked} onChange={e => { setLiked(e.target.value); pendingId.current = null; }} placeholder="계속 사용하고 싶은 기능이나 인상적인 점" />
         <label htmlFor="beta-problems">불편하거나 개선할 점</label>
-        <textarea id="beta-problems" rows={4} maxLength={1500} value={problems} onChange={e => setProblems(e.target.value)} placeholder="오류, 화면 잘림, 찾기 어려운 정보, 제안 등" />
+        <textarea id="beta-problems" rows={4} maxLength={1500} value={problems} onChange={e => { setProblems(e.target.value); pendingId.current = null; }} placeholder="오류, 화면 잘림, 찾기 어려운 정보, 제안 등" />
         <div className="betaWelcomeActions">
-          <button type="button" className="betaPrimary" onClick={shareFeedback}>피드백 공유하기 <Icon name="arrow" /></button>
+          {feedbackEnabled ? (
+            <button type="button" className="betaPrimary" onClick={submitFeedback} disabled={sending}>
+              {sending ? "접수 중…" : "피드백 보내기"} {!sending && <Icon name="arrow" />}
+            </button>
+          ) : (
+            <button type="button" className="betaPrimary" onClick={shareFeedback}>피드백 공유하기 <Icon name="arrow" /></button>
+          )}
           <button type="button" className="betaSecondary" onClick={() => copyText(feedbackText(), "피드백이 복사됐습니다. 초대한 사람에게 전달해 주세요.")}>내용 복사</button>
         </div>
         {status && <p className="betaFeedbackStatus" role="status">{status}</p>}
-        <p className="betaPrivacy">이 페이지는 의견을 서버에 자동으로 저장·전송하지 않습니다. 공유 버튼을 누른 후 카카오톡·문자·이메일 등 원하는 앱과 수신자를 선택하거나 복사한 내용을 초대한 사람에게 전달하세요. 민감한 개인정보는 입력하지 마세요.</p>
+        <p className="betaPrivacy">{feedbackEnabled
+          ? "보내기 버튼을 누르면 의견이 Google Forms 응답으로 접수되고, 관리 시트에도 자동 정리됩니다. 이메일·실명·전화번호는 필요하지 않으며, 언제든 다시 제출할 수 있습니다. 개인정보나 비밀번호는 입력하지 마세요."
+          : "현재 자동 접수 기능을 연결하고 있습니다. 당분간 공유 버튼을 누른 후 카카오톡·문자·이메일 등으로 보내거나 내용을 복사해 전달해 주세요. 이 페이지는 의견을 서버에 자동 저장하지 않습니다."}</p>
       </section>
       <footer className="betaFooter"><span>NOAH ARK · Only What Matters.</span><Link href="/">서비스 홈으로 돌아가기 →</Link></footer>
     </AppShell>

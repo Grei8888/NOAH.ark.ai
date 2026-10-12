@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { BetaTesterKit } from "@/components/beta/BetaTesterKit";
+import { googleFeedbackConfigured } from "@/lib/beta/feedback-settings";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "베타테스터 초대 | NOAH ARK",
@@ -8,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function BetaPage() {
-  return <BetaTesterKit />;
+  return <BetaTesterKit feedbackEnabled={googleFeedbackConfigured()} />;
 }

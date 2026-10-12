@@ -8,6 +8,7 @@ on:
       - chatgpt/noah-today-interests-v1
       - chatgpt/noah-manual-source-refresh-v1
       - chatgpt/noah-inline-refresh-feedback
+      - chatgpt/noah-beta-feedback-sheet-direct
   workflow_dispatch:
 
 permissions:
