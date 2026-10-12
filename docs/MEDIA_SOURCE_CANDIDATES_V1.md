@@ -1,0 +1,77 @@
+# NOAH ARK — Diverse media & expert-source intake (candidate-only, 2026-10-12)
+
+## Product information architecture (approved concept; NOT deployed)
+
+Use four **source-class** filters: `전체 | 기사 | 정책소식 | 정보원 소식`.
+- **기사**: publisher-reported articles, with publisher name and original HTTPS link. Includes broadcasters, newspapers, business press and newswires.
+- **정책소식**: official agency announcements, notices and primary records. Government press releases must retain honest metadata; don't relabel them as newsroom reporting.
+- **정보원 소식**: opted-in/rights-reviewed domain expert blogs, practitioners, think-tank or researcher posts, each labeled as **commentary/experience** rather than authoritative facts.
+- **전체**: combined filtered view. Topic (경제, AI, 창업, 부동산, 법률…) is a second independent dimension; source class is never the topic.
+
+Rationale: allow the **same real-world Event** to connect official evidence, journalistic reporting and expert interpretation without reproducing copyrighted articles. Do not place publisher-level 'progressive'/'conservative' truth labels on individual stories, fabricate viewpoint symmetry, or count syndicated duplicates as independent reporting. Editorial source diversity and accuracy/corrections should be assessed separately.
+
+## Nine Korean publisher intake candidates
+
+| Outlet | Category | RSS source | Endpoint evidence | Public ingestion |
+|---|---|---|---|---|
+| YTN | broadcast | **Unconfirmed official RSS (NO URL)** | https://www.ytn.co.kr/ ; 2026-03 community probe reported earlier endpoints discontinued: https://gist.github.com/JunsikChoi/fe163df1254b5719caa746c0ebca204b | DISABLED |
+| 한겨레 | general newspaper | **No verified current official endpoint (null)** | Historical/third-party leads exist, but publisher feed endpoint not verified; homepage https://www.hani.co.kr/ | DISABLED |
+| 경향신문 | general newspaper | https://www.khan.co.kr/rss/rssdata/total_news.xml | https://www.khan.co.kr/help/help_rss.html | DISABLED |
+| 조선일보 | general newspaper | https://www.chosun.com/arc/outboundfeeds/rss/?outputType=xml | https://rssplus.chosun.com/ | DISABLED |
+| 동아일보 | general newspaper | https://rss.donga.com/total.xml | https://rss.donga.com/ | DISABLED |
+| 매일경제 | business newspaper | https://www.mk.co.kr/rss/30000001/ | https://www.mk.co.kr/rss | DISABLED |
+| 한국경제 | business newspaper | https://www.hankyung.com/feed/all-news | https://www.hankyung.com/feed | DISABLED |
+| SBS | broadcast | https://news.sbs.co.kr/news/newsflashRssFeed.do?plink=RSSREADER | https://news.sbs.co.kr/news/rss.do | DISABLED |
+| 연합뉴스 | newswire | **No verified current official endpoint (null)** | Historical community feed examples not authenticated by current publisher; homepage https://www.yna.co.kr/ | DISABLED |
+
+**Discovery is not a live HTTP smoke test** of every feed. Feed availability can differ by network or change over time, and an RSS page does not grant NOAH a redistribution license.
+
+## Source re-verification — 2026-10-12
+
+**Publisher-issued RSS directory confirmed (endpoint *listed*, not network probed):**
+- 경향신문 https://www.khan.co.kr/help/help_rss.html
+- 조선일보 https://rssplus.chosun.com/
+- 동아일보 https://rss.donga.com/
+- 매일경제 https://www.mk.co.kr/rss
+- 한국경제 https://www.hankyung.com/feed
+- SBS https://news.sbs.co.kr/news/rss.do
+
+**Unverified:** YTN official RSS, current 한겨레 official RSS, current 연합뉴스 official RSS. Their `rssUrl` values are deliberately **null** in the candidate registry. Search results or community snippets are insufficient to assert current official availability. YTN's own published articles explicitly state “무단전재, 재배포 및 AI 데이터 활용 금지” (https://www.ytn.co.kr/_ln/0105_202609161026350887). Seek direct licensing / a documented permission path for any automated public collection/analysis; a known article URL is **not** a reusable RSS license.
+
+**Rights evidence (separate from feed directory discovery):**
+- 경향신문 https://www.khan.co.kr/help/help_digital.html : no redistribution to external service without permission, and no unlicensed AI dataset scraping.
+- 매일경제 https://www.mk.co.kr/mypage/service/faq/all?pageIndex=2 : automated collection/storage/analysis/publication requires authorization; merely citing publisher is not blanket reuse permission.
+- 동아일보 https://rss.donga.com/ : personal noncommercial RSS use, reach `cool@donga.com` for other use.
+- 조선일보 https://rssplus.chosun.com/ : personal-reader framing, `rss@chosun.com` for commercial use.
+- SBS https://news.sbs.co.kr/news/rss.do : personal noncommercial, `newsservice@sbs.co.kr` for commercial usage.
+- 한국경제 https://www.hankyung.com/feed : directory exists, separate public indexing/automated usage and AI-processing permission not established.
+
+**Outcome:** 6 publisher RSS directories found; **0 out of 9** candidates cleared for public automated ingestion or AI analysis. No live publisher RSS retrieval or XML validation claimed; the prior labels 'publisher-listed' mean a published directory was found, **not** a successful GET to the feed. 'Non-commercial beta' is not equivalent to personal RSS use.
+
+## Link-only rights distinction — 2026-10-12 owner legal review
+
+The publisher-site original **title + link only** model is NOT the same as republishing protected article text or commercially syndicating an RSS feed. Our previous approach of requiring a publisher content license **before any ordinary article hyperlink** was overbroad.
+
+- Korean Copyright Commission FAQ directly says reposting **only the original article title and link** is not a copyright infringement in the described context: https://www.copyright.or.kr/customer-center/faq/list.do?counselfaqno=44187&searchcounselfaqno=44187 .
+- Another KCC FAQ explains that simple/deep hyperlinks to an article's page generally do not amount to copying/transmission of copyrighted prose; reproducing actual article sentences/photos can: https://www.copyright.or.kr/customer-center/faq/list.do?counselfaqno=41608 .
+- Supreme Court 2021-09-09 case 2017도19025 allows liability for knowingly and repeatedly facilitating access to **illicit pirated copies**; use lawful publisher-origin HTTPS URLs, not mirrors: https://www.scourt.go.kr/portal/news/NewsViewAction.work?gubun=6&pageIndex=1&searchOption=&searchWord=&seqnum=2063 .
+- KCC catalogued 2025-01-10 trial judgment 2022가합558462 of **one specific** AI news curation service's links/summaries as non-infringing; never generalize to any copyrighted RSS or article body processing: https://www.copyright.or.kr/information-materials/trend/precedents/view.do?brdctsno=54458 .
+
+**Three separate product paths**
+1. **Manual human-curated source link index**: article title (short and accurate), publisher/source, original canonical link, minimal publication date; no copied body/thumbnail or scraping. **Proceed to technical prototype based on link principles** after checking specific contract/robots/browser design. Do not demand blanket per-publisher full-text license for ordinary direct links.
+2. **Automated RSS-powered public index**: machine retrieval/parsing/frequency/cache and publisher's RSS subscriber/license terms need independent review. Don't enable existing nine RSS candidate records prematurely merely on link-only copyright analysis.
+3. **Article-specific AI reading of article body/text/images**: separate copyright, publisher service terms and AI-use rights assessment. An open link or the user's prior visit does not confer a license to ingest that article into a model.
+
+Editorial and copyright decisions remain distinct; a title+link service can send meaningful referral traffic without reconstructing an entire article. No promises that all RSS access, title snippets, illustrations, summaries, framing or rehosting are lawful under all circumstances.
+
+## Rights and journalistic integrity release gates
+
+1. **Explicit allowed use** for each media partner: public headline+outbound-link index; metadata cache duration; excerpt/body/photo; automated processing and AI transformation; traffic restrictions and attribution, with documented rights-owner source. Where missing or restrictive, keep public ingestion **off**.
+2. Korean publishers' documented examples: 경향 RSS says **personal subscriptions only** and redistribution requires prior permission; 조선 RSS says RSS personal reader use and directs commercial-use inquiries to rss@chosun.com; 동아 RSS says personal noncommercial use and public/commercial use requires contact at cool@donga.com; SBS RSS is personal noncommercial and points inquiries to newsservice@sbs.co.kr. Never presume a public beta is a private RSS reader.
+3. Initial features: no full article scraping or photos; source name, original canonical HTTPS link, publishedAt, legal evidence; fail-closed if upstream errors, content policy unclear or publisher blocks automated requests.
+4. **No YTN fake endpoint or unapproved Google News proxy**: find current official feed or seek approved API/licensing alternative. Newspaper coverage from reputable opposing editorial traditions is for independent comparison, not strict partisan quotas.
+5. Source ingestion architecture must be additive: current `OfficialFeedKind=notice|press`, `validMinistryLink`, two-feed manual-refresh validation and hard 40-link cap are **government-only**. Do not broaden host checks or reuse government feed labels as media categories without tests.
+6. Rights-cleared media and approved expert-source registry can later drive `NEWS_MEDIA` and `EXPERT_COMMENTARY` source classes, independent of topic and the Event model. No paid AI, production RSS enablement, Neon writes, Mock leakage, Vercel deploy or cost upgrade in this candidate-only change.
+7. Keep working Home Option A, beta feedback to linked Google Sheet, KST, under KRW 50,000/month, and production pinned until #24 review/owner approval.
+
+See #24 stabilization, #26 media-source planning. Implementation file: `lib/news/media-source-candidates.ts`; all nine entries deliberately have `publicEnabled:false`. `tests/media-source-candidates.test.ts` guards against accidental activation.
