@@ -35,21 +35,39 @@ NOAH ARK는 정부 정책자료와 언론사의 원문 정보를 분리해 보�
 NOAH ARK 개발팀
 https://noah-ark-ai.vercel.app/
 
-## Confirmed publisher contact channels and evidence
+## Confirmed media contacts (owner outreach; verified 2026-10-12, not contacted)
 
-| Outlet | Contact | Official source |
-|---|---|---|
-| 조선일보 | rss@chosun.com | https://rssplus.chosun.com/ |
-| 동아일보 | cool@donga.com | https://rss.donga.com/ |
-| SBS | newsservice@sbs.co.kr | https://news.sbs.co.kr/news/rss.do |
-| 경향신문 | contents@khan.co.kr (AI/data usage inquiry), publisher service form | https://www.khan.co.kr/help/help_digital.html and https://www.khan.co.kr/help/help_email.html |
-| 매일경제 | moon.chaerin@mkinternet.com (copyright/content license inquiry listed in FAQ; verify recipient before sending) | https://www.mk.co.kr/mypage/service/faq/all?pageIndex=2 |
-| 한국경제 | publisher's 제휴 / 콘텐츠구입 links; email unverified | https://www.hankyung.com/feed |
-| YTN | publisher's 사업 제휴 / 뉴스·프로그램 공급 links; email unverified | https://www.ytn.co.kr/ |
-| 한겨레 | rights contact unverified | https://www.hani.co.kr/ |
-| 연합뉴스 | rights contact unverified | https://www.yna.co.kr/ |
+Use content partnership/licensing contacts, NOT reporter tipline or editorial journalists. Website changes are possible; reconfirm before sending.
 
-## Owner's approval checklist
+| Publisher | Route | Exact published authority | Stage |
+|---|---|---|---|
+| YTN | **YTN 디지털서비스팀**, supply contact **02-2160-7411**, **batuhy@ytn.co.kr**; digital business partnership **02-398-7410**; main **02-398-8000** | https://www.ytn.co.kr/business/supply_1.php and https://www.ytn.co.kr/business/partnership_1.php | Direct outreach possible, none sent |
+| 경향신문 | contents@khan.co.kr; +82-2-3701-1114 | https://company.khan.co.kr/en and https://company.khan.co.kr/business/partnership and https://www.khan.co.kr/help/help_digital.html | Direct outreach possible, none sent |
+| 조선일보 | rss@chosun.com; official RSS inquiry form | https://rssplus.chosun.com/ | Direct outreach possible, none sent |
+| 동아일보 | **동아닷컴 콘텐츠사업** 02-360-0367 / cool@donga.com | https://faq.donga.com/ and https://www.donga.com/company?m=termsofuse | Direct outreach possible, none sent |
+| 매일경제 | 제휴 02-2000-5433, 저작권 02-2000-5429; 02-2000-2114 general editorial | https://www.mk.co.kr/mypage/service/contact | Direct outreach possible, none sent |
+| 한국경제 | **한경닷컴 사업제휴** 02-3277-9960 / cst1211@hankyung.com; content use **copyright@hankyung.com** | https://company.hankyung.com/dotcom/partnership/business/ and https://company.hankyung.com/dotcom/partnership/contents/ | Direct outreach possible, none sent |
+| SBS | newsservice@sbs.co.kr | https://news.sbs.co.kr/news/rss.do | Direct outreach possible, none sent |
+| 한겨레 | General/customer routing **1566-9595**; ask for 디지털 콘텐츠 제휴·저작권/사업담당; dedicated content license email **not yet verified** | https://notice.hani.co.kr/ | Call transfer needed, none sent |
+| 연합뉴스 | **콘텐츠 이용·저작권** 02-398-3804 / hello@yna.co.kr; 프리미엄뉴스 계약/이용 **02-398-3655** | https://www.yna.co.kr/amp/view/AKR20260911000100011 and https://www.premiumnews.co.kr/ | Direct outreach possible, none sent |
+
+**Critical publisher condition:** 한국경제 lists 2026 online article reuse prices as high as KRW 200,000 per article for noncommercial corporate usage and KRW 300,000 for commercial corporate usage, exclusive of VAT (see its content-use page). These are **article-content reuse** rates, not a verified fee for metadata-only RSS outbound linking. Explicitly ask for a separate limited **title/date/source/URL** pilot instead of assuming article-level licenses can fit the <KRW 50,000 monthly operations budget.
+
+## Owner editorial partnership concept — READ FIRST, AI SECOND (not yet implemented)
+
+NOAH ARK aims to reduce polarizing misinformation and encourage trustworthy independent reading. The product should avoid mechanically branding individual stories or publishers as 'left' and 'right', and never provide artificial 50/50 balance between substantiated facts and unsupported rumors.
+
+1. Display **one Event** and at least two independent, responsibly sourced reports with meaningfully distinct perspectives, where such plural perspectives actually exist. Distinguish factual disputes from interpretation/value disputes; two copied/syndicated articles count as one source.
+2. Before releasing an AI-assisted **comparison / context memo**, guide users to the **original publisher sites** for both reports. The destination is publisher-hosted, with visible citation and no hosted scraped mirror.
+3. A link click or opened tab **cannot prove the article was actually read** because the third-party publisher does not return reading-completion data to NOAH. Show honest wording such as '원문 2곳 열기 + 읽었음을 직접 확인하기', never 'validated reading completion'. Start with user self-acknowledgment and test effectiveness; only a publisher-approved authenticated integration could support stronger verification.
+4. **Rights are independent of the unlock:** granting RSS title + link indexing rights does NOT grant article body ingestion into LLM or derivative article summaries. First phase can show citations and basic *official-source* facts only. Any publisher-article AI summary/comparison needs separate authorization to ingest/process relevant texts, with contract-defined limits (storage, processor, retention, commercial use, re-use, citation).
+5. When there is a single authoritative primary document or one original exclusive report, do not fabricate opposing viewpoints or block access to basic verified information forever. Treat the two-original rule as a **perspective-comparison feature gate**, not an arbitrary ban on news access.
+6. Publisher pilot value proposition: original-site clickthrough, prominently attributed origin, no full-body/photo reproduction, opt-out/revocation process, aggregate outbound click counts reported if the pilot permits measurement. Do not promise numerical traffic lift without measured data. No AI model training on publisher content.
+7. Legal beta disclosure: publicly accessible but presently noncommercial; budget target **<KRW 50,000 / month** (not licensing budget authorization). Ask for free/limited-time experimental metadata-only written approval, do not claim existing license.
+
+Suggested first call: '뉴스 콘텐츠/RSS를 담당하시는 디지털 서비스 또는 콘텐츠 제휴 담당자 연결 부탁드립니다. 원문을 읽도록 유도하는 비상업 공개 베타의 기사 제목·원문 링크 한정 시범제휴를 제안드리려 합니다. AI 기사 본문 이용은 별도로 허락을 구할 계획입니다.'
+
+## ## Owner's approval checklist
 
 - [ ] Review this draft and sender identity before any outbound communication.
 - [ ] Select first two publishers to approach, and confirm contact details on official pages.
