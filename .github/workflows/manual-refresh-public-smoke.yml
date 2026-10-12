@@ -1,0 +1,53 @@
+name: NOAH real source refresh — public HTTP smoke
+
+on:
+  push:
+    branches:
+      - chatgpt/noah-public-smoke
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Check operational Home and protected manual update path
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="https://noah-ark-ai.vercel.app"
+          for attempt in 1 2 3; do
+            status=$(curl -LsS --retry 2 --retry-all-errors --max-time 90 -o /tmp/noah-home.html -w '%{http_code}' "$root/" || true)
+            if [[ "$status" == "200" ]] &&
+              grep -q 'sourceRefreshButton' /tmp/noah-home.html &&
+              grep -q '최신 자료 확인' /tmp/noah-home.html &&
+              grep -q '오늘의 관심사' /tmp/noah-home.html; then
+              echo "PASS: production Home contains refresh UI"
+              break
+            fi
+            echo "Attempt $attempt: HTTP $status or old production revision"
+            if [[ "$attempt" == 3 ]]; then exit 1; fi
+            sleep 9
+          done
+          t0=$(date +%s)
+          status=$(curl -LsS --max-time 15 -o /tmp/noah-refresh.json -w '%{http_code}' "$root/api/sources/refresh")
+          duration=$(($(date +%s)-t0))
+          [[ "$duration" -le 15 ]] || { echo "FAIL: manual update too slow ($duration sec)"; exit 1; }
+          if [[ "$status" == "200" ]]; then
+            grep -q '"items":\[' /tmp/noah-refresh.json || { echo "FAIL: invalid source response"; exit 1; }
+            grep -q '"retrievedAt":' /tmp/noah-refresh.json || { echo "FAIL: no actual checked time"; exit 1; }
+            echo "PASS: manual update returned source metadata within $duration sec"
+          elif [[ "$status" == "503" ]]; then
+            grep -q '"error":' /tmp/noah-refresh.json || { echo "FAIL: failed refresh lacked honest error"; exit 1; }
+            echo "PASS: upstream currently unreachable, honest 503 delivered within $duration sec"
+          else
+            echo "FAIL manual refresh endpoint HTTP $status"; exit 1
+          fi
+          teststatus=$(curl -LsS --max-time 25 -o /tmp/noah-beta.html -w '%{http_code}' "$root/beta")
+          [[ "$teststatus" == "200" ]] && grep -q '베타테스트에 초대합니다' /tmp/noah-beta.html || { echo "FAIL: beta invite regression"; exit 1; }
+          status=$(curl -LsS --max-time 25 -o /tmp/noah-ark.json -w '%{http_code}' "$root/api/ark")
+          [[ "$status" == "200" ]] && grep -q '"mode":"live"' /tmp/noah-ark.json && grep -q '"items":\[\]' /tmp/noah-ark.json || { echo "FAIL: false AI Event"; exit 1; }
+          echo "PASS: tester link preserved and no synthetic Events introduced"
