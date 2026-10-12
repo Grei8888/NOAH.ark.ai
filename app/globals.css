@@ -1867,6 +1867,14 @@ section[id] {
 .todayInterestHeading { display: flex; justify-content: space-between; gap: 14px; align-items: center; }
 .todayInterestHeading h2 { font-size: 14px; font-weight: 750; letter-spacing: -.2px; color: var(--navy); }
 .todayInterestHeading p { margin-top: 4px; font-size: 11px; color: var(--slate); line-height: 1.5; }
+.sourceFreshnessNotice {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--slate);
+  line-height: 1.55;
+  text-wrap: balance;
+  word-break: keep-all;
+}
 .todayInterestReset {
   color: var(--navy);
   font-size: 11px;

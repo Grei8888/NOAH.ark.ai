@@ -144,6 +144,7 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
             </div>
             {todayTopics.length > 0 && <button className="todayInterestReset" type="button" onClick={clearTodayTopics}>전체 보기</button>}
           </div>
+          <p className="sourceFreshnessNotice">베타 목표: 30분마다 최신 정보를 수집합니다. 실시간 변동 가능성이 있으므로 최신 내용은 원문에서 확인하세요.</p>
           <div className="todayInterestChips">
             {TODAY_TOPICS.map(topic => (
               <button type="button" key={topic.id} aria-pressed={todayTopics.includes(topic.id)} onClick={() => toggleTodayTopic(topic.id)}>
