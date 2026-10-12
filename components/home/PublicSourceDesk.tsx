@@ -13,6 +13,25 @@ const SAVED_KEY = "noah:official-saved:v1";
 const HIDDEN_KEY = "noah:official-hidden:v1";
 const INTEREST_KEY = "noah:official-interests:v1";
 const TODAY_KEY = "noah:today-topics:v1";
+const RECENT_REFRESH_KEY = "noah:manual-source-refresh:v1";
+const MANUAL_WAIT_MS = 120000;
+const refreshTime = new Intl.DateTimeFormat("ko-KR", {
+  timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+});
+function isOfficialRefresh(value: unknown): value is OfficialFeedSnapshot {
+  if (!value || typeof value !== "object") return false;
+  const o = value as Partial<OfficialFeedSnapshot>;
+  if (!Array.isArray(o.items) || typeof o.retrievedAt !== "string" || !Number.isFinite(new Date(o.retrievedAt).getTime()) ||
+      typeof o.availableFeeds !== "number" || !Number.isInteger(o.availableFeeds) || o.availableFeeds < 1 || o.availableFeeds > 2 ||
+      o.totalFeeds !== 2 || o.items.length > 40) return false;
+  return o.items.every(item => {
+    if (!item || typeof item !== "object" || typeof item.url !== "string" || typeof item.title !== "string" ||
+      typeof item.sourceName !== "string" || typeof item.publishedAt !== "string" ||
+      !["notice", "press"].includes(item.kind) || !Number.isFinite(new Date(item.publishedAt).getTime())) return false;
+    try { const u = new URL(item.url); return u.protocol === "https:" && ["mss.go.kr", "www.mss.go.kr"].includes(u.hostname); }
+    catch { return false; }
+  });
+}
 const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
   timeZone: "Asia/Seoul", month: "short", day: "numeric",
   hour: "2-digit", minute: "2-digit", hourCycle: "h23",
@@ -32,6 +51,10 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
   const [hidden, setHidden] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>(["notice", "press"]);
   const [todayTopics, setTodayTopics] = useState<TodayTopic[]>([]);
+  const [currentSnapshot, setCurrentSnapshot] = useState(snapshot);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshStatus, setRefreshStatus] = useState("");
+  const [lastRefreshTap, setLastRefreshTap] = useState(0);
   const [ready, setReady] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<SourceKind>(view === "startup" ? "notice" : "all");
@@ -47,10 +70,42 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
       const preferred = storedStrings(INTEREST_KEY).filter(s => s === "notice" || s === "press");
       if (localStorage.getItem(INTEREST_KEY) !== null) setInterests(preferred);
       setTodayTopics(restoreTodayTopics(localStorage.getItem(TODAY_KEY), todayKstDate()));
+      try {
+        const stored: unknown = JSON.parse(sessionStorage.getItem(RECENT_REFRESH_KEY) ?? "null");
+        if (isOfficialRefresh(stored)) {
+          const checked = new Date(stored.retrievedAt).getTime();
+          const previous = new Date(snapshot.retrievedAt).getTime();
+          if (Date.now() - checked < 10 * 60000 && (!Number.isFinite(previous) || checked > previous)) setCurrentSnapshot(stored);
+        }
+      } catch { /* private session */ }
       setReady(true);
     });
     return () => { active = false; };
   }, []);
+  async function refreshSources() {
+    if (refreshing || (lastRefreshTap && Date.now() - lastRefreshTap < MANUAL_WAIT_MS)) return;
+    setRefreshing(true);
+    setRefreshStatus("기관의 최신 자료를 확인하고 있습니다.");
+    setLastRefreshTap(Date.now());
+    try {
+      const response = await fetch("/api/sources/refresh", { cache: "no-store", signal: AbortSignal.timeout(10000) });
+      if (!response.ok) throw new Error("RSS refresh unavailable");
+      const data: unknown = await response.json();
+      if (!isOfficialRefresh(data)) throw new Error("Unexpected source data");
+      if (data.items.length === 0) {
+        setRefreshStatus("기관에 접속했지만 최근 14일 자료가 없습니다. 잠시 후 다시 확인해 주세요.");
+      } else {
+        setCurrentSnapshot(data);
+        try { sessionStorage.setItem(RECENT_REFRESH_KEY, JSON.stringify(data)); } catch { /* private session */ }
+        setRefreshStatus(`최근 뉴스 확인 ${refreshTime.format(new Date(data.retrievedAt))} · ${data.items.length}건 확인`);
+      }
+    } catch {
+      setRefreshStatus("현재 기관 자료를 확인할 수 없습니다. 기존 목록을 유지합니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
   function changeSaved(url: string) {
     const next = saved.includes(url) ? saved.filter(s => s !== url) : [...saved, url].slice(-200);
     setSaved(next);
@@ -82,14 +137,14 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
   }
 
   const currentKind: SourceKind = view === "startup" ? "notice" : filter;
-  const filtered = useMemo(() => snapshot.items.filter(s => {
+  const filtered = useMemo(() => currentSnapshot.items.filter(s => {
     if (view === "saved" && !saved.includes(s.url)) return false;
     if (view === "my" && !interests.includes(s.kind)) return false;
     if (view !== "saved" && hidden.includes(s.url)) return false;
     if (currentKind !== "all" && s.kind !== currentKind) return false;
     if (view !== "saved" && todayTopics.length && !todayTopics.some(t => matchesTodayTopic(s.title, t))) return false;
     return !query.trim() || (s.title + s.sourceName).toLocaleLowerCase("ko-KR").includes(query.trim().toLocaleLowerCase("ko-KR"));
-  }), [snapshot.items, saved, hidden, interests, todayTopics, currentKind, query, view]);
+  }), [currentSnapshot.items, saved, hidden, interests, todayTopics, currentKind, query, view]);
 
   const showControls = view !== "settings";
   const title = view === "saved" ? "내가 저장한 자료" : view === "my" ? "내 관심 분야" :
@@ -106,8 +161,8 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
         </section>
         <section className="railPanel">
           <div className="railEyebrow">SOURCE STATUS</div>
-          <div className="signalRow"><span>최근 14일 자료</span><strong>{snapshot.items.length}</strong></div>
-          <div className="signalRow"><span>응답한 RSS</span><strong>{snapshot.availableFeeds}/{snapshot.totalFeeds}</strong></div>
+          <div className="signalRow"><span>최근 14일 자료</span><strong>{currentSnapshot.items.length}</strong></div>
+          <div className="signalRow"><span>응답한 RSS</span><strong>{currentSnapshot.availableFeeds}/{currentSnapshot.totalFeeds}</strong></div>
           <div className="signalRow"><span>AI 호출</span><strong>0</strong></div>
           <p className="sourceRailFoot">중소벤처기업부의 RSS 원문만 표시합니다. 오늘의 관심사는 제목 키워드 필터이며, AI 추천이나 중요도 평가가 아닙니다.</p>
         </section>
@@ -132,7 +187,7 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
         <strong>LIVE SOURCES</strong>
         <span>아래는 실제 기관의 공고·보도자료 원문 링크입니다. AI 분석, 중요도 선정 또는 정책 시행 확정 판단이 아닙니다.</span>
       </div>
-      {snapshot.availableFeeds < snapshot.totalFeeds && (
+      {currentSnapshot.availableFeeds < currentSnapshot.totalFeeds && (
         <p className="sourceHealth" role="status">일부 자료원의 연결이 원활하지 않습니다. 표시 가능한 원문만 제공하며 가상 자료로 대체하지 않습니다.</p>
       )}
       {(view === "home" || view === "discover" || view === "startup" || view === "my") && (
@@ -140,10 +195,21 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
           <div className="todayInterestHeading">
             <div>
               <h2>오늘의 관심사</h2>
-              <p>하루에도 여러 번 바꿀 수 있습니다. 제목 키워드 기반 · 추가 AI 사용 없음</p>
+              <p>관심사는 언제든 변경할 수 있습니다.</p>
             </div>
             {todayTopics.length > 0 && <button className="todayInterestReset" type="button" onClick={clearTodayTopics}>전체 보기</button>}
           </div>
+          <div className="sourceFreshnessBar">
+            <span className="sourceFreshnessText">
+              {currentSnapshot.availableFeeds > 0 && currentSnapshot.retrievedAt
+                ? `최근 뉴스 확인 ${refreshTime.format(new Date(currentSnapshot.retrievedAt))} · 신청기한은 원문 확인`
+                : "최신 뉴스 확인 지연 · 신청기한은 원문 확인"}
+            </span>
+            <button type="button" className="sourceRefreshButton" onClick={refreshSources} disabled={refreshing || (lastRefreshTap > 0 && Date.now() - lastRefreshTap < MANUAL_WAIT_MS)}>
+              <Icon name="refresh" /> {refreshing ? "확인 중…" : "최신 자료 확인"}
+            </button>
+          </div>
+          {refreshStatus && <p className="sourceRefreshStatus" role="status">{refreshStatus}</p>}
           <div className="todayInterestChips">
             {TODAY_TOPICS.map(topic => (
               <button type="button" key={topic.id} aria-pressed={todayTopics.includes(topic.id)} onClick={() => toggleTodayTopic(topic.id)}>
