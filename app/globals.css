@@ -2094,3 +2094,174 @@ section[id] {
   .readerAudienceSelected { align-items: flex-start; }
   .readerAudienceSelected button { width: 100%; }
 }
+
+/* Private NOAH AI Reading Companion lab; not mounted in production. */
+.readerLabPage {
+  max-width: 780px;
+  padding: 44px 24px 80px;
+  margin: auto;
+  font-family: inherit;
+  color: var(--navy);
+}
+.readerLabHeader { margin-bottom: 28px; }
+.readerLabHome {
+  display: inline-block;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 850;
+  letter-spacing: 2px;
+  color: var(--intro-navy);
+}
+.readerLabHeader > span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--slate);
+  font-size: 10px;
+  letter-spacing: 1.3px;
+  font-weight: 700;
+}
+.readerLabHeader h1 {
+  font-size: clamp(25px, 4vw, 36px);
+  color: var(--intro-navy);
+  font-weight: 750;
+  line-height: 1.35;
+  letter-spacing: -1.1px;
+  word-break: keep-all;
+}
+.readerLabHeader > p {
+  margin-top: 13px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--slate);
+  word-break: keep-all;
+}
+.readerLabBox, .readerLabAnswer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 16px;
+}
+.readerLabBox h2, .readerLabAnswer h2 {
+  font-size: 16px;
+  color: var(--intro-navy);
+  margin-bottom: 15px;
+}
+.readerLabBox > p:not(.readerLabNotice) {
+  color: var(--slate);
+  font-size: 12px;
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+.readerLabBox label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  margin: 14px 0 7px;
+}
+.readerLabBox label span {
+  color: var(--slate);
+  font-size: 10px;
+  font-weight: 400;
+}
+.readerLabBox input, .readerLabBox textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border-radius: 6px;
+  border: 1px solid #c8d3df;
+  color: var(--navy);
+  background: white;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.55;
+  resize: vertical;
+}
+.readerLabBox input:focus-visible,
+.readerLabBox textarea:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.readerLabOriginal {
+  display: inline-block;
+  color: var(--intro-navy);
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  margin: 12px 0 0;
+}
+.readerLabNotice {
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--slate);
+  margin-top: 14px;
+}
+.readerLabModes {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  margin: 12px 0 20px;
+}
+.readerLabModes button {
+  min-height: 46px;
+  padding: 10px 7px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #fff;
+  color: var(--navy);
+  border: 1px solid #cbd5e1;
+}
+.readerLabModes button[aria-pressed="true"] {
+  border-color: var(--navy);
+  background: var(--navy);
+  color: white;
+}
+.readerLabModes button:focus-visible, .readerLabAsk:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+.readerLabAsk {
+  display: block;
+  border-radius: 8px;
+  min-height: 48px;
+  background: var(--navy);
+  color: white;
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 18px;
+}
+.readerLabAsk:disabled { opacity: .55; cursor: not-allowed; }
+.readerLabAnswer {
+  border-color: #b9cad9;
+  background: #fff;
+}
+.readerLabAnswerText {
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+.readerLabAfter {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  margin-top: 17px;
+  color: var(--slate);
+  font-size: 12px;
+}
+.readerLabFooter {
+  margin-top: 28px;
+  color: var(--slate);
+  font-size: 10px;
+  letter-spacing: .5px;
+}
+@media (max-width: 600px) {
+  .readerLabPage { padding: 25px 14px 90px; }
+  .readerLabBox, .readerLabAnswer { padding: 18px 15px; }
+  .readerLabHeader > p { font-size: 12px; }
+  .readerLabModes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .readerLabAsk { width: 100%; }
+}
