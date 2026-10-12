@@ -47,7 +47,7 @@ function sourceLabel(kind: SourceKind) {
   return kind === "notice" ? "사업공고" : kind === "press" ? "보도자료" : "모든 자료";
 }
 
-export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSnapshot; view: HomeView }) {
+export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false }: { snapshot: OfficialFeedSnapshot; view: HomeView; readerLabAvailable?: boolean }) {
   const [saved, setSaved] = useState<string[]>([]);
   const [hidden, setHidden] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>(["notice", "press"]);
@@ -309,6 +309,7 @@ export function PublicSourceDesk({ snapshot, view }: { snapshot: OfficialFeedSna
                   <h3><a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a></h3>
                   <div className="sourceNewsActions">
                     <a href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.title + " 원문 열기"}>원문 보기 <Icon name="arrow" /></a>
+                    {readerLabAvailable && <Link href={`/lab/reader?source=${encodeURIComponent(s.url)}`} aria-label={s.title + " AI 독해 도우미에서 질문하기"}>AI로 이해하기 ↗</Link>}
                     <button type="button" onClick={() => changeSaved(s.url)} aria-pressed={saved.includes(s.url)}>{saved.includes(s.url) ? "저장됨 ✓" : "저장"}</button>
                     {view !== "saved" && <button type="button" onClick={() => hide(s.url)} aria-label={s.title + " 숨기기"}>숨기기</button>}
                   </div>
