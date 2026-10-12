@@ -20,7 +20,7 @@ export function validateReaderLabInput(value: unknown): ReaderLabInput | null {
       typeof row.headline !== "string" || typeof row.question !== "string") return null;
   const headline = row.headline.trim();
   const question = row.question.trim();
-  if (headline.length > 180 || question.length < 4 || question.length > 380 ||
+  if (headline.length > 240 || question.length < 4 || question.length > 380 ||
       /[\u0000-\u001F\u007F]/.test(headline + question)) return null;
   return { mode: row.mode as ReaderMode, headline, question };
 }
