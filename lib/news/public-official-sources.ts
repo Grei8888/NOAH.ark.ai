@@ -24,11 +24,19 @@ const FEEDS = [
   { kind: 'press', name: '중소벤처기업부 · 보도자료', url: 'https://mss.go.kr/rss/smba/board/86.do' },
 ] as const;
 
+/**
+ * Identical real-source collector in production and in explicit internal preview.
+ * Preview must be opted in and never falls back to synthetic mock records.
+ */
 export function publicSourceMode(): boolean {
-  return process.env.NOAH_LIVE_LINKS_V1 === 'true' &&
+  const production = process.env.VERCEL_ENV === 'production' &&
+    process.env.NOAH_LIVE_LINKS_V1 === 'true';
+  const internalPreview = process.env.NOAH_REAL_SOURCE_PREVIEW === 'true' &&
+    (process.env.VERCEL_ENV === 'preview' ||
+      (process.env.NODE_ENV !== 'production' && !process.env.VERCEL_ENV));
+  return (production || internalPreview) &&
     process.env.NEWS_PROVIDER === 'government' &&
-    process.env.AI_PROVIDER === 'off' &&
-    process.env.VERCEL_ENV === 'production';
+    process.env.AI_PROVIDER === 'off';
 }
 
 export function validMinistryLink(input: string): string | null {
