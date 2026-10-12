@@ -175,6 +175,12 @@ export function ReaderLab({
         </a>
         <p className="readerLabNotice">외부 뉴스 검색 페이지로 이동합니다. 검색 결과에 서로 다른 관점이 반드시 포함된다고 보장하지 않습니다.</p>
       </section>
+      <section className="readerLabBox" aria-label="실사용 의견 공유">
+        <h2>05 · 테스트 의견 남기기</h2>
+        <p>실제 AI 답변이 이해에 도움이 되었는지, 잘못되거나 불편한 점은 무엇인지 알려주세요. 초대 코드는 의견에 입력하지 마세요.</p>
+        <a className="readerLabOriginal" href="https://noah-ark-ai.vercel.app/beta"
+          target="_blank" rel="noopener noreferrer">기존 NOAH ARK 의견 수집 창에서 피드백 제출 ↗</a>
+      </section>
       <footer className="readerLabFooter">NOAH ARK — ONLY WHAT MATTERS. · 동일한 실제 RSS 및 AI API · 정식 출시 전 검증</footer>
     </main>
   );
