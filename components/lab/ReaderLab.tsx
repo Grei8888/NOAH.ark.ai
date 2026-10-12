@@ -16,12 +16,13 @@ function originalLink(value: string): string | null {
 }
 
 export function ReaderLab({
-  sources, initialSource, availableFeeds, totalFeeds,
+  sources, initialSource, availableFeeds, totalFeeds, modelReady,
 }: {
   sources: OfficialSourceLink[];
   initialSource?: OfficialSourceLink;
   availableFeeds: number;
   totalFeeds: number;
+  modelReady: boolean;
 }) {
   const [accessCode, setAccessCode] = useState("");
   const [headline, setHeadline] = useState(initialSource?.title ?? "");
@@ -85,7 +86,7 @@ export function ReaderLab({
     <main className="readerLabPage">
       <header className="readerLabHeader">
         <Link className="readerLabHome" href="/">NOAH ARK</Link>
-        <span>10명 실사용 베타 · 실제 정부 RSS + 실제 AI 모델</span>
+        <span>10명 실사용 베타 · 실제 정부 RSS · {modelReady ? "AI 연결됨" : "AI 연결 준비 중"}</span>
         <h1>경제를 이해하고, 세상을 읽는 AI 뉴스 파트너.</h1>
         <p>신문 기사를 대신 요약하지 않습니다. 원문을 자유롭게 읽고, 이해가 어려울 때 AI에게 질문해 보세요.</p>
       </header>
@@ -139,6 +140,7 @@ export function ReaderLab({
       <section className="readerLabBox" aria-labelledby="lab-ai-title">
         <h2 id="lab-ai-title">03 · NOAH AI에게 질문하기</h2>
         <p>기사를 하나도 열지 않아도 질문할 수 있습니다. 다른 관점의 원문 탐색도 강제조건이 아닙니다.</p>
+        {!modelReady && <p role="status" className="readerLabNotice">현재 실제 뉴스 탐색과 질문 화면은 확인할 수 있지만, 유료 AI API 키가 연결되지 않아 답변은 제공되지 않습니다. 담당자가 API 키와 사용 한도를 설정한 뒤 활성화됩니다.</p>}
         <div className="readerLabModes" role="group" aria-label="AI 이해 도우미 모드">
           {READER_MODES.map(item => (
             <button type="button" key={item.id} aria-pressed={mode === item.id}
@@ -154,8 +156,8 @@ export function ReaderLab({
           value={accessCode} onChange={event => setAccessCode(event.target.value)}
           placeholder="테스트용 접근 코드" />
         <button type="button" className="readerLabAsk"
-          disabled={busy || question.trim().length < 4 || accessCode.length < 32}
-          onClick={ask}>{busy ? "실제 AI 답변을 기다리는 중…" : "AI에게 질문하기 →"}</button>
+          disabled={!modelReady || busy || question.trim().length < 4 || accessCode.length < 32}
+          onClick={ask}>{!modelReady ? "AI 모델 연결 대기 중" : busy ? "실제 AI 답변을 기다리는 중…" : "AI에게 질문하기 →"}</button>
         <p className="readerLabNotice">실제 AI API 호출이 발생합니다. 초대 코드마다 1시간 6회, 24시간 20회 요청을 목표로 제한합니다. 서버가 여러 대일 경우 합산 한도는 아니며, API 프로젝트의 별도 지출 관리가 필요합니다.</p>
       </section>
 
