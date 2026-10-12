@@ -1936,15 +1936,21 @@ section[id] {
 .sourceRefreshButton:hover { border-color: var(--navy); background: #f8fafc; }
 .sourceRefreshButton:disabled { opacity: .55; cursor: wait; }
 .sourceRefreshButton:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
-.sourceRefreshStatus {
-  margin-top: 8px;
-  font-size: 11px;
-  color: var(--slate);
-  line-height: 1.7;
+/* The status temporarily replaces the checked-at label, never adds a row. */
+.sourceFreshnessMessage, .sourceFreshnessDefault {
+  display: inline-block;
+  animation: sourceFeedbackAppear 180ms ease-out both;
+}
+.sourceFreshnessMessage { color: #73849a; }
+@keyframes sourceFeedbackAppear {
+  from { opacity: .35; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sourceFreshnessMessage, .sourceFreshnessDefault { animation: none; }
 }
 @media(max-width:767px) {
   .sourceFreshnessBar { gap: 4px 10px; }
   .sourceFreshnessText { flex: 1 1 205px; font-size: 10px; }
   .sourceRefreshButton { padding: 9px 12px; font-size: 10px; }
-  .sourceRefreshStatus { font-size: 10px; }
 }
