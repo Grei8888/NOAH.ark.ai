@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readerLabConfigured, readerLabInviteId, outputTextFromOpenAI } from "@/lib/news/reader-lab-access";
-import { readerLabInstructions, readerLabUserMessage, validateReaderLabInput } from "@/lib/news/reader-companion";
+import { readerLabConfigured, readerLabInviteId } from "@/lib/news/reader-lab-access";
+import { validateReaderLabInput } from "@/lib/news/reader-companion";
+import { answerReadingQuestion } from "@/lib/news/reading-companion-service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -53,34 +54,13 @@ export async function POST(request: NextRequest) {
   active.add(inviteId);
 
   try {
-    const response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: process.env.NOAH_READER_LAB_MODEL || "gpt-4.1-mini",
-        instructions: readerLabInstructions(),
-        input: readerLabUserMessage(data),
-        max_output_tokens: 550,
-        store: false,
-      }),
-      cache: "no-store",
-      signal: AbortSignal.timeout(14000),
-    });
-    if (!response.ok) {
-      // Do not leak provider headers/errors, keys or user input.
-      return result({ error: response.status === 429
-        ? "AI 서비스 요청 한도에 도달했습니다."
-        : "AI 연결에 문제가 있습니다. 테스트 API 설정을 확인해 주세요." }, 503);
+    const output = await answerReadingQuestion(data);
+    if (!output.ok) {
+      if (output.reason === "provider_limit") return result({ error: "AI 서비스 요청 한도에 도달했습니다." }, 503);
+      if (output.reason === "empty") return result({ error: "AI가 답변을 반환하지 않았습니다. 다시 시도해 주세요." }, 502);
+      return result({ error: "AI 연결에 문제가 있습니다. 잠시 뒤 다시 시도해 주세요." }, 503);
     }
-    const payload: unknown = await response.json();
-    const answer = outputTextFromOpenAI(payload);
-    if (!answer) return result({ error: "AI가 답변을 반환하지 않았습니다. 다시 시도해 주세요." }, 502);
-    return result({ answer, mode: data.mode, note: "기사 본문을 읽지 않은 일반 배경·비판적 독해 보조 답변입니다." }, 200);
-  } catch {
-    return result({ error: "AI 응답이 지연되고 있습니다. 잠시 뒤 다시 시도해 주세요." }, 503);
+    return result({ answer: output.answer, mode: data.mode, note: "기사 본문을 읽지 않은 일반 배경·비판적 독해 보조 답변입니다." }, 200);
   } finally {
     active.delete(inviteId);
   }
