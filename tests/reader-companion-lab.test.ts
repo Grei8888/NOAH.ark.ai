@@ -72,7 +72,7 @@ describe("actual AI Reader prototype safety gates", () => {
       createHash("sha256").update("invitation-" + i + "-".repeat(40)).digest("hex"));
     process.env.NOAH_READER_LAB_INVITE_HASHES = hashes.join(",");
     expect(readerLabConfigured()).toBe(true);
-    expect(validReaderLabAccess("invitation-9-" + "-".repeat(40))).toBe(true);
+    expect(validReaderLabAccess("invitation-9" + "-".repeat(40))).toBe(true);
     expect(validReaderLabAccess(token)).toBe(false);
     process.env.NOAH_READER_LAB_INVITE_HASHES = [...hashes, hashes[0]].join(",");
     expect(readerLabConfigured()).toBe(false);
