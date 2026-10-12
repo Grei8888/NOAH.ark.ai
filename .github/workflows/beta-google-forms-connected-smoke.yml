@@ -1,0 +1,58 @@
+name: NOAH Beta Google Forms end-to-end receipt
+on:
+  push:
+    branches:
+      - chatgpt/noah-public-smoke
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Check beta submit UI and submit one synthetic integration receipt
+        env:
+          BASE: https://noah-ark-ai.vercel.app
+        shell: bash
+        run: |
+          set -euo pipefail
+          code=$(curl -LsS --max-time 45 -o /tmp/noah-beta.html -w '%{http_code}' "$BASE/beta")
+          test "$code" = "200" || { echo "FAIL: beta page status=$code"; exit 1; }
+          grep -q '피드백 보내기' /tmp/noah-beta.html || { echo "FAIL: direct Google feedback not enabled"; exit 1; }
+          grep -q '닉네임' /tmp/noah-beta.html || { echo "FAIL: nickname input missing"; exit 1; }
+          echo "PASS: production shows direct feedback form"
+          python3 - <<'PY'
+          import json,uuid
+          with open('/tmp/noah-test-feedback.json','w',encoding='utf-8') as f:
+              json.dump({
+                  'submissionId':str(uuid.uuid4()),
+                  'nickname':'연동시험',
+                  'score':'5',
+                  'liked':'NOAH Google Forms 연동 시험 접수입니다.',
+                  'problems':'자동 검증용 데이터이며 실제 테스터 의견이 아닙니다.'
+              },f,ensure_ascii=False)
+          PY
+          status=$(curl -LsS --max-time 18 -w '%{http_code}' -o /tmp/noah-api-feedback.json \
+            -H "Origin: $BASE" -H 'Content-Type: application/json' \
+            --data-binary @/tmp/noah-test-feedback.json "$BASE/api/beta/feedback")
+          if [[ "$status" != "200" ]]; then
+            echo "FAIL: Google submission not confirmed, API HTTP=$status"
+            python3 - <<'PY'
+          import json
+          try:
+              v=json.load(open('/tmp/noah-api-feedback.json',encoding='utf-8'))
+              print('Safe API error:',v.get('error','none'))
+          except Exception: print('API response invalid')
+          PY
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/noah-api-feedback.json',encoding='utf-8'))
+          if d.get('ok') is not True: raise SystemExit('FAIL: no confirmed Google receipt')
+          print('PASS: Google Forms receiver acknowledged test entry')
+          PY
+          code=$(curl -LsS --max-time 30 -o /dev/null -w '%{http_code}' "$BASE/")
+          test "$code" = "200" || { echo "FAIL: Home degraded"; exit 1; }
+          echo "PASS: original Home preserved"
