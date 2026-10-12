@@ -125,7 +125,7 @@ export function ReaderLab({
       <section className="readerLabBox" aria-labelledby="lab-source-title">
         <h2 id="lab-source-title">02 · 뉴스 맥락과 원문 링크</h2>
         <label htmlFor="lab-title">기사 제목 또는 관심 주제 <span>(선택)</span></label>
-        <input id="lab-title" value={headline} maxLength={180}
+        <input id="lab-title" value={headline} maxLength={240}
           onChange={event => setHeadline(event.target.value)}
           placeholder="예: 기준금리 인하와 소상공인 대출" />
         <label htmlFor="lab-url">원문 링크 <span>(선택 · AI에 전달하지 않음)</span></label>
