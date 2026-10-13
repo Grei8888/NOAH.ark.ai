@@ -5,6 +5,7 @@ import Link from "next/link";
 import { READER_MODES, type ReaderMode } from "@/lib/news/reader-companion";
 import { readerWordTokens, termExplanationQuestion } from "@/lib/news/reader-word-selection";
 import type { OfficialSourceLink } from "@/lib/news/public-official-sources";
+import type { NewsSearchItem } from "@/lib/news/news-search-contract";
 
 type LabResponse = { answer?: string; error?: string; note?: string };
 type SelectedWord = { key: string; word: string };
@@ -18,17 +19,18 @@ function originalLink(value: string): string | null {
 }
 
 export function ReaderLab({
-  sources, initialSource, availableFeeds, totalFeeds, modelReady,
+  sources, initialSource, initialNews, availableFeeds, totalFeeds, modelReady,
 }: {
   sources: OfficialSourceLink[];
   initialSource?: OfficialSourceLink;
+  initialNews?: NewsSearchItem;
   availableFeeds: number;
   totalFeeds: number;
   modelReady: boolean;
 }) {
   const [accessCode, setAccessCode] = useState("");
-  const [headline, setHeadline] = useState(initialSource?.title ?? "");
-  const [url, setUrl] = useState(initialSource?.url ?? "");
+  const [headline, setHeadline] = useState(initialNews?.title ?? initialSource?.title ?? "");
+  const [url, setUrl] = useState(initialNews?.url ?? initialSource?.url ?? "");
   const [sourceQuery, setSourceQuery] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [selectedWord, setSelectedWord] = useState<SelectedWord | null>(null);
@@ -248,7 +250,7 @@ export function ReaderLab({
 
           {headline && (
             <div className="readerSelectedHeadline">
-              <span>지금 읽는 기사 · 제목에서 모르는 단어를 눌러보세요</span>
+              <span>{initialNews && url === initialNews.url ? `언론사 기사 · ${initialNews.sourceName} · 제목에서 모르는 단어를 눌러보세요` : "지금 읽는 공식자료 · 제목에서 모르는 단어를 눌러보세요"}</span>
               <div className="readerWordSurface">{words(headline, "title")}</div>
             </div>
           )}
@@ -260,7 +262,7 @@ export function ReaderLab({
             ) : (
               <div className="readerIframeEmpty">
                 <strong>원문을 선택해 주세요</strong>
-                <p>실제 정부 RSS의 기사 제목을 선택하면 원문을 이 공간에서 불러옵니다.</p>
+                <p>{link ? "언론사 원문은 외부 사이트의 표시 제한 때문에 새 창에서 읽어야 합니다. NOAH는 제목을 기반으로 독해를 돕습니다." : "실제 정부 RSS의 제목을 선택하면 원문을 이 공간에서 불러옵니다."}</p>
                 {link && <a href={link} target="_blank" rel="noopener noreferrer">선택한 사이트에서 원문 열기 ↗</a>}
               </div>
             )}

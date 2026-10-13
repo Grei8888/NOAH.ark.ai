@@ -6,6 +6,7 @@ import { AppShell, type HomeView } from "@/components/home/AppShell";
 import { Icon } from "@/components/home/Icon";
 import { SourceCardVisual } from "@/components/home/SourceCardVisual";
 import { ReaderAudiencePanel } from "@/components/home/ReaderAudiencePanel";
+import { NewsDiscoveryPanel } from "@/components/home/NewsDiscoveryPanel";
 import type { OfficialFeedSnapshot, OfficialSourceLink } from "@/lib/news/public-official-sources";
 import { TODAY_TOPICS, matchesTodayTopic, restoreTodayTopics, todayKstDate, type TodayTopic } from "@/lib/news/daily-interests";
 
@@ -47,7 +48,7 @@ function sourceLabel(kind: SourceKind) {
   return kind === "notice" ? "사업공고" : kind === "press" ? "보도자료" : "모든 자료";
 }
 
-export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, readerModelReady = false }: { snapshot: OfficialFeedSnapshot; view: HomeView; readerLabAvailable?: boolean; readerModelReady?: boolean }) {
+export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, readerModelReady = false, newsSearchEnabled = false }: { snapshot: OfficialFeedSnapshot; view: HomeView; readerLabAvailable?: boolean; readerModelReady?: boolean; newsSearchEnabled?: boolean }) {
   const [saved, setSaved] = useState<string[]>([]);
   const [hidden, setHidden] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>(["notice", "press"]);
@@ -174,14 +175,14 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
         <section className="railPanel">
           <div className="railEyebrow">YOUR AI NEWS PARTNER</div>
           <h2>뉴스를 넘어, 이해로.</h2>
-          <p>원문을 직접 읽고 스스로 판단하도록 돕는 AI 뉴스 파트너입니다. 현재는 정부 공식 자료를 제공하며, {readerModelReady ? "실제 AI 독해 기능을 시험할 수 있습니다." : readerLabAvailable ? "AI 독해 화면은 확인할 수 있으며 실제 답변은 API 연결 대기 중입니다." : "AI 독해 도우미는 준비 중입니다."}</p>
+          <p>원문을 직접 읽고 스스로 판단하도록 돕는 AI 뉴스 파트너입니다. 현재는 정부 공식자료와 {newsSearchEnabled ? "검색 기반 언론사 기사" : "공식자료 탐색"}를 제공하며, {readerModelReady ? "실제 AI 독해 기능을 시험할 수 있습니다." : readerLabAvailable ? "AI 독해 화면은 확인할 수 있으며 실제 답변은 API 연결 대기 중입니다." : "AI 독해 도우미는 준비 중입니다."}</p>
         </section>
         <section className="railPanel">
           <div className="railEyebrow">SOURCE STATUS</div>
           <div className="signalRow"><span>최근 14일 자료</span><strong>{currentSnapshot.items.length}</strong></div>
           <div className="signalRow"><span>응답한 RSS</span><strong>{currentSnapshot.availableFeeds}/{currentSnapshot.totalFeeds}</strong></div>
           <div className="signalRow"><span>AI 상태</span><strong>{readerModelReady ? "실사용 테스트" : readerLabAvailable ? "모델 연결 대기" : "비활성"}</strong></div>
-          <p className="sourceRailFoot">중소벤처기업부의 RSS 원문만 표시합니다. 오늘의 관심사는 제목 키워드 필터이며, AI 추천이나 중요도 평가가 아닙니다.</p>
+          <p className="sourceRailFoot">정부 공식자료는 중소벤처기업부 RSS를 이용합니다. {newsSearchEnabled ? "언론사 기사는 검색 API에서 별도로 가져옵니다." : "언론사 검색 기능은 연결 준비 중입니다."} 키워드 선택은 AI 추천·중요도 평가가 아닙니다.</p>
         </section>
         <section className="railPanel">
           <div className="railEyebrow">NEXT PHASE</div>
@@ -192,18 +193,18 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
     }>
       <div className="topUtility">
         <span>NOAH ARK / {readerLabAvailable ? "10-READER PRIVATE BETA" : "PUBLIC BETA v0.1"}</span>
-        <span>OFFICIAL SOURCES ONLY</span>
+        <span>{newsSearchEnabled ? "PUBLISHER LINKS + OFFICIAL SOURCES" : "OFFICIAL SOURCES ONLY"}</span>
       </div>
       <header className="homeIntro">
         <div className="dateLine"><span>{kstDay}</span><span>ONLY WHAT MATTERS.</span></div>
         <p className="greeting">Your AI News Partner. · 어려운 뉴스를 이해하기 쉽게.</p>
         <h1>{title}</h1>
-        <div className="editionLine"><span className="signalDot" /><span>실제 정부 RSS · 최근 14일 · 최신순</span><span>{readerLabAvailable ? "10명 사전검증" : "무료 공개 베타"}</span></div>
+        <div className="editionLine"><span className="signalDot" /><span>{newsSearchEnabled ? "언론사 기사 검색 + 정부 공식자료" : "실제 정부 RSS · 최근 14일 · 최신순"}</span><span>{readerLabAvailable ? "10명 사전검증" : "무료 공개 베타"}</span></div>
         {readerLabAvailable && <div className="readerBetaPrompt"><Link href="/lab/reader">실제 AI 뉴스 독해 도우미 사용하기 →</Link></div>}
       </header>
       <div className="trustNotice" role="note">
         <strong>LIVE SOURCES</strong>
-        <span>아래는 실제 기관의 공고·보도자료 원문 링크입니다. AI 분석, 중요도 선정 또는 정책 시행 확정 판단이 아닙니다.</span>
+        <span>{newsSearchEnabled ? "아래 언론사 기사는 검색 API에서 가져온 원문 링크이고, 정부 공고·보도자료는 공식 RSS에서 가져옵니다." : "아래는 실제 기관의 공고·보도자료 원문 링크입니다."} AI 중요도 선정이나 정책 시행 확정 판단은 아닙니다.</span>
       </div>
       {currentSnapshot.availableFeeds < currentSnapshot.totalFeeds && (
         <p className="sourceHealth" role="status">일부 자료원의 연결이 원활하지 않습니다. 표시 가능한 원문만 제공하며 가상 자료로 대체하지 않습니다.</p>
@@ -253,9 +254,9 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
       {view === "settings" ? (
         <section className="sourceSettings">
           <h2>서비스 운영 원칙</h2>
-          <p>NOAH ARK는 실제 근거를 먼저 확인합니다. 현재 제공하는 기능은 중소벤처기업부의 공식 RSS에 게시된 제목·발행시각·출처·원문 링크를 보여주는 것입니다.</p>
+          <p>NOAH ARK는 실제 근거를 먼저 확인합니다. 정부자료는 중소벤처기업부 공식 RSS의 제목·출처·원문 링크를 보여줍니다. {newsSearchEnabled ? "언론사 기사는 SerpApi의 Google News 검색 결과에 제공된 제목·언론사명·원문 링크만 표시합니다." : "언론사 뉴스 검색 API는 별도로 연결할 예정입니다."}</p>
           <p>기사 본문과 사진은 재게시하지 않습니다. 원문 내용을 확인하고 제도 적용 여부를 판단할 때는 기관의 원래 페이지를 참고하세요.</p>
-          <p>저장·숨김, 관심 분야 및 선택한 뉴스 읽기 목적은 사용하는 브라우저에만 기록됩니다. 오늘의 관심사는 한국시간 기준 해당 날짜에만 유지되고, 추가 API 요청이나 AI 분석을 사용하지 않습니다.</p>
+          <p>정부 공식자료의 저장·숨김, 관심 분야 및 읽기 목적은 사용하는 브라우저에만 기록됩니다. 오늘의 관심사는 한국시간 기준 해당 날짜에만 유지됩니다. {newsSearchEnabled ? "뉴스 탐색에서는 고정된 주제별 검색 API를 공유 캐시로 사용하며 검색어를 매번 API에 전송하지 않습니다." : "뉴스 검색 API가 아직 연결되지 않았습니다."}</p>
           <p>NOAH ARK는 경제를 이해하고 세상을 읽는 AI 뉴스 파트너를 지향합니다. {readerModelReady ? "현재 내부 베타에서 실제 AI 용어 설명·배경 이해·비판적 독해를 시험합니다." : readerLabAvailable ? "AI 질문 화면을 시험할 수 있지만 실제 모델은 아직 연결 전입니다." : "경제용어 설명·배경 이해·비판적 독해·다른 시각의 원문 추천은 아직 개발 중인 기능입니다."} 검증된 기사 간 관점 비교는 후속 단계입니다.</p>
           <button type="button" className="sourceRestore" onClick={restore}>숨김 항목 모두 복원</button>
           <Link className="textLink" href="/">첫 화면으로 돌아가기 →</Link>
@@ -287,9 +288,12 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
               </div>}
             </div>
           )}
+          {(view === "home" || view === "discover" || view === "startup") && (
+            <NewsDiscoveryPanel readerLabAvailable={readerLabAvailable} enabled={newsSearchEnabled} />
+          )}
           <section className="feedSection" aria-label="공식 자료 목록">
             <div className="sectionHeading">
-              <div><h2>ORIGINAL SOURCES</h2><p>원문을 열어 내용과 적용 조건을 직접 확인하세요.</p></div>
+              <div><h2>POLICY · 정부 공식자료</h2><p>출처: 중소벤처기업부 공식 RSS · 공고·보도자료는 원문에서 확인하세요.</p></div>
               <span>{ready || view !== "saved" ? filtered.length : "—"} LINKS</span>
             </div>
             {view === "saved" && !ready ? (
@@ -319,7 +323,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
             ))}
             {view === "home" && filtered.length > 14 && <Link className="sourceMoreLink" href="/?view=discover">원문 자료 더 보기 →</Link>}
           </section>
-          <p className="sourceDisclaimer">출처: 중소벤처기업부 공식 RSS. 보도자료·공고의 제목은 원문 그대로 제공하며, 본문과 이미지는 복제하지 않습니다. 자료의 시행 여부·신청 자격·기한은 반드시 해당 기관에서 확인하세요.</p>
+          <p className="sourceDisclaimer"><strong>정부 공식자료 출처:</strong> 중소벤처기업부 RSS(사업공고·보도자료). {newsSearchEnabled && <><strong>언론 기사 출처:</strong> 각 카드에 표시된 개별 언론사 · 검색 경로: SerpApi / Google News. </>}제목과 원문 링크를 제공하며 본문과 사진은 재게시하지 않습니다. 기사 사실관계는 해당 언론사에서, 정책 시행 여부·신청자격·기한은 관계기관 원문에서 확인하세요.</p>
         </>
       )}
     </AppShell>
