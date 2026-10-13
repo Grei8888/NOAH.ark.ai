@@ -131,7 +131,7 @@ export function ReaderLab({
         return;
       }
       const term = (await navigator.clipboard.readText()).trim();
-      if (term.length < 2 || term.length > 50 || /[\\r\\n]/.test(term)) {
+      if (term.length < 2 || term.length > 50 || term.includes(String.fromCharCode(10)) || term.includes(String.fromCharCode(13))) {
         setError("원문에서 2~50자의 짧은 단어만 복사해 주세요. 문단 전체는 자동 전송하지 않습니다.");
         setPane("ai");
         return;
