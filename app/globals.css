@@ -2767,3 +2767,83 @@ section[id] {
   .businessSupportSubmitRow { align-items:stretch; flex-direction:column; }
   .businessSupportQueryButton { width:100%; }
 }
+
+
+/* Article-first mobile reader v1: publisher's headline is the primary content. */
+.newsAiCompanion {
+  background: #fafbfd;
+  box-shadow: none;
+}
+.newsAiSelected {
+  gap: 6px;
+  margin-top: 0;
+  padding: 0 0 12px;
+  background: transparent;
+  border-left: 0;
+  border-bottom: 1px solid #dce4ed;
+  border-radius: 0;
+  scroll-margin-top: 14px;
+}
+.newsAiSelected > span { font-size: 11px; color: #64748b; }
+.newsAiSelected strong {
+  font-size: clamp(17px, 1.35vw, 21px);
+  line-height: 1.45;
+  font-weight: 800;
+  letter-spacing: -.35px;
+  color: var(--navy);
+  overflow-wrap: anywhere;
+}
+.newsAiSelected a {
+  font-size: 12px;
+  min-height: 33px;
+  font-weight: 750;
+}
+.newsAiCompanionHeader {
+  align-items: center;
+  margin-top: 11px;
+}
+.newsAiModeLegend {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+.newsAiModes { margin: 10px 0 8px; }
+.newsAiModeButtons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+}
+.newsAiModeButtons button {
+  min-width: 0;
+  min-height: 42px;
+  padding: 7px 2px;
+  font-size: 10px;
+  white-space: nowrap;
+  border-radius: 7px;
+}
+.newsAiLabel { margin: 7px 0 5px; }
+.newsAiCompanion textarea { min-height: 84px; font-size: 14px; line-height: 1.55; }
+.newsAiDisabled {
+  margin: 9px 0 0;
+  padding: 9px 10px;
+  font-size: 10px;
+  line-height: 1.6;
+}
+.newsAiSubmit { margin-top: 10px; min-height: 41px; }
+.newsAiFootnote { margin-top: 11px; padding-top: 10px; }
+@media (max-width: 767px) {
+  .newsAiCompanion { padding: 14px; }
+  .newsAiSelected strong { font-size: clamp(20px, 5.4vw, 23px); line-height: 1.4; }
+  .newsAiCompanionHeader { margin-top: 10px; }
+  .newsAiEyebrow { font-size: 10px; letter-spacing: .9px; }
+  .newsAiCompanion textarea { min-height: 84px; resize: vertical; }
+  .newsAiStories .newsDiscoveryItem h3 { font-size: 17px; }
+  .newsAiCompanion #newsAiQuestion { scroll-margin-top: 65px; scroll-margin-bottom: 90px; }
+}
+@media (max-width: 355px) {
+  .newsAiCompanion { padding: 11px; }
+  .newsAiModeButtons { gap: 3px; }
+  .newsAiModeButtons button { font-size: 9px; padding: 5px 1px; }
+}
