@@ -67,6 +67,9 @@ export function NewsDiscoveryPanel({ readerLabAvailable, enabled }: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
+  const selectedQuery = NEWS_SEARCH_TOPICS.find(item => item.id === topic)!.query;
+  const googleNewsPage = "https://news.google.com/search?q=" +
+    encodeURIComponent(selectedQuery) + "&hl=ko&gl=KR&ceid=KR%3Ako";
   const current = data[topic];
   const filtered = current?.items.filter(row =>
     !filter.trim() ||
@@ -101,9 +104,16 @@ export function NewsDiscoveryPanel({ readerLabAvailable, enabled }: {
         <p className="newsDiscoveryStatus" role="status">
           검색 API 연결 전입니다. 실제 뉴스 검색 결과를 가장해서 표시하지 않으며,
           아래 정부 공식자료는 그대로 이용할 수 있습니다.
+          <a className="newsDiscoveryFallback" href={googleNewsPage} target="_blank" rel="noopener noreferrer">
+            현재 주제를 Google 뉴스에서 직접 검색하기 ↗
+          </a>
         </p>
       ) : loading ? <p className="newsDiscoveryStatus" role="status">실제 뉴스 검색 결과를 불러오는 중입니다…</p> :
-        error ? <p className="newsDiscoveryStatus" role="status">{error}</p> :
+        error ? <p className="newsDiscoveryStatus" role="status">{error}
+          <a className="newsDiscoveryFallback" href={googleNewsPage} target="_blank" rel="noopener noreferrer">
+            Google 뉴스 검색 페이지에서 원문 찾아보기 ↗
+          </a>
+        </p> :
         filtered.length === 0 ? <p className="newsDiscoveryStatus">
           {current ? "조건에 맞는 검색 결과가 없습니다." : "주제를 선택하면 실제 뉴스가 표시됩니다."}
         </p> : (
