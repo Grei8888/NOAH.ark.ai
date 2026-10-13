@@ -122,6 +122,34 @@ export function ReaderLab({
     }
   }
 
+  async function explainCopiedTerm() {
+    // Clipboard is accessed only after a deliberate button click.
+    // Do not monitor external frames or collect article text automatically.
+    try {
+      if (!navigator.clipboard?.readText) {
+        setError("이 브라우저에서는 클립보드 접근이 제한됩니다. 짧은 단어를 질문창에 붙여 넣어 주세요.");
+        return;
+      }
+      const term = (await navigator.clipboard.readText()).trim();
+      if (term.length < 2 || term.length > 50 || /[\\r\\n]/.test(term)) {
+        setError("원문에서 2~50자의 짧은 단어만 복사해 주세요. 문단 전체는 자동 전송하지 않습니다.");
+        setPane("ai");
+        return;
+      }
+      const prompted = termExplanationQuestion(term);
+      setMode("terms");
+      setQuestion(prompted);
+      setPane("ai");
+      setAnswer("");
+      setError("");
+      if (modelReady && accessCode.length >= 32) {
+        await ask({ mode: "terms", question: prompted, inline: false });
+      }
+    } catch {
+      setError("클립보드를 읽을 수 없습니다. 복사한 단어를 오른쪽 질문창에 직접 붙여 넣어 주세요.");
+    }
+  }
+
   function clickWord(key: string, word: string) {
     if (selectedWord?.key === key) {
       setSelectedWord(null);
@@ -272,6 +300,13 @@ export function ReaderLab({
           <div className="readerAIInner">
             <p className="readerAIHint">기사 요약 대신 용어와 맥락을 이해하고, 검토할 질문을 만들어 드립니다. 원문 두 건 읽기는 강제하지 않습니다.</p>
             {!modelReady && <p className="readerAIUnavailable" role="status">현재 실제 API 키가 연결되지 않았습니다. 말풍선과 분할 화면은 시험할 수 있으며 AI 답변은 연결 후 활성화됩니다.</p>}
+            <button type="button" className="readerClipboardAction"
+              onClick={() => void explainCopiedTerm()}>
+              <span aria-hidden="true">↳</span> 원문에서 복사한 단어 설명하기
+            </button>
+            <p className="readerClipboardNote">
+              왼쪽 원문에서 단어를 선택해 복사(Ctrl+C)한 뒤 눌러보세요. 단어를 기억해서 다시 입력할 필요가 없습니다.
+            </p>
             <div className="readerLabModes" role="group" aria-label="AI 독해 유형">
               {READER_MODES.map(item => (
                 <button type="button" key={item.id} aria-pressed={mode === item.id}
