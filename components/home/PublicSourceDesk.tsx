@@ -189,9 +189,10 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
     if (view === "my" && !interests.includes(s.kind)) return false;
     if (view !== "saved" && hidden.includes(s.url)) return false;
     if (currentKind !== "all" && s.kind !== currentKind) return false;
-    if (view !== "saved" && activeTopics.length && !activeTopics.some(t => matchesTodayTopic(s.title, t))) return false;
+    // MY FOCUS drives only the personalized news briefing on Home; official sources remain independently browsable.
+    if (view !== "saved" && view !== "home" && todayTopics.length && !todayTopics.some(t => matchesTodayTopic(s.title, t))) return false;
     return !query.trim() || (s.title + s.sourceName).toLocaleLowerCase("ko-KR").includes(query.trim().toLocaleLowerCase("ko-KR"));
-  }), [currentSnapshot.items, saved, hidden, interests, activeTopics, currentKind, query, view]);
+  }), [currentSnapshot.items, saved, hidden, interests, todayTopics, currentKind, query, view]);
 
   const showControls = view !== "settings";
   const title = view === "saved" ? "내가 저장한 자료" : view === "my" ? "내 관심 분야" :
