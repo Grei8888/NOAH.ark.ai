@@ -289,7 +289,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
             </div>
           )}
           {(view === "home" || view === "discover" || view === "startup") && (
-            <NewsDiscoveryPanel readerLabAvailable={readerLabAvailable} enabled={newsSearchEnabled} />
+            <NewsDiscoveryPanel readerLabAvailable={readerLabAvailable} readerModelReady={readerModelReady} enabled={newsSearchEnabled} />
           )}
           <section className="feedSection" aria-label="공식 자료 목록">
             <div className="sectionHeading">
