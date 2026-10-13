@@ -2700,3 +2700,50 @@ section[id] {
 
 /* This is government RSS freshness, deliberately outside personal news focus. */
 .officialFreshnessBar { margin: 14px 0 6px; border-top: 1px solid var(--border); padding-top: 10px; }
+
+/* My Business: official public support-program metadata, not eligibility certification. */
+.businessSupportSection { margin: 8px 0 43px; padding: 24px 0 29px; border-top: 2px solid var(--navy); border-bottom: 2px solid #dce4ed; }
+.businessSupportHeader { display: flex; align-items: start; justify-content: space-between; gap: 15px; }
+.businessSupportEyebrow { display: block; color: #70819a; font-size: 10px; letter-spacing: 1.3px; font-weight: 750; margin-bottom: 9px; }
+.businessSupportHeader h2 { color: var(--intro-navy); font-size: clamp(20px,2vw,27px); font-weight: 800; letter-spacing: -.5px; }
+.businessSupportHeader p { color: var(--slate); font-size: 12px; line-height: 1.7; margin-top: 7px; }
+.businessSupportHeader>a { font-size: 11px; color: var(--intro-navy); font-weight: 700; white-space: nowrap; padding: 10px 0; min-height: 40px; }
+.businessSupportProfile { margin-top: 21px; background: #f5f7fa; border: 1px solid #dce5ee; border-radius: 10px; padding: 17px; }
+.businessSupportProfileTitle { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+.businessSupportProfileTitle strong { color: var(--navy); font-size: 12px; }
+.businessSupportProfileTitle span { color: var(--slate); font-size: 10px; }
+.businessSupportInputs { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
+.businessSupportInputs label { min-width: 0; display: block; }
+.businessSupportInputs label>span { display: block; color: var(--slate); font-size: 10px; font-weight: 650; margin-bottom: 6px; }
+.businessSupportInputs select { display: block; width: 100%; min-width: 0; border: 1px solid #ccd9e5; border-radius: 7px; background: white; color: var(--navy); padding: 10px 7px; min-height: 42px; font-size: 11px; }
+.businessSupportInputs select:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.businessSupportStatus { padding: 22px; margin-top: 19px; border: 1px solid #d9e4ed; border-radius: 9px; background: #f8fafc; color: var(--slate); font-size: 12px; line-height: 1.75; }
+.businessSupportStatus strong { display: block; font-size: 13px; color: var(--navy); margin-bottom: 7px; }
+.businessSupportStatus a { display: inline-flex; align-items: center; min-height: 43px; margin-top: 8px; color: var(--intro-navy); text-decoration: underline; text-underline-offset: 4px; font-weight: 750; }
+.businessSupportCount { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--slate); font-size: 11px; margin: 18px 0 4px; }
+.businessSupportNotice { padding: 19px 0 18px; border-top: 1px solid var(--border); }
+.businessSupportNoticeMeta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 10px; color: var(--slate); }
+.businessSupportNoticeMeta>span:first-child { font-weight: 750; color: var(--navy); }
+.businessSupportNoticeStatus { margin-left: auto; padding: 4px 7px; color: #4c6075; border: 1px solid #d5dee8; border-radius: 6px; font-weight: 650; }
+.businessSupportNotice h3 { color: var(--intro-navy); font-size: 16px; line-height: 1.55; margin-top: 9px; }
+.businessSupportNotice h3 a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.businessSupportTarget { color: var(--navy); margin-top: 9px; font-size: 11px; line-height: 1.7; }
+.businessSupportPeriod { color: var(--slate); font-size: 11px; line-height: 1.65; margin-top: 6px; }
+.businessSupportReasons { margin-top: 9px; background: #f8fafc; border-left: 2px solid #bcc9d5; padding: 9px 11px; }
+.businessSupportReasons p { font-size: 11px; color: var(--slate); line-height: 1.8; }
+.businessSupportOriginal { display: inline-flex; min-height: 44px; align-items: center; color: var(--intro-navy); font-size: 11px; font-weight: 750; margin-top: 9px; }
+.businessSupportMore { border: 1px solid var(--border); border-radius: 7px; color: var(--navy); font-size: 12px; font-weight: 750; padding: 11px 15px; min-height: 44px; }
+.businessSupportDisclaimer { color: var(--slate); font-size: 10px; line-height: 1.85; border-top: 1px solid var(--border); padding-top: 13px; margin-top: 15px; word-break: keep-all; }
+.businessSupportSection :is(a,button):focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (max-width: 1050px) {
+ .businessSupportInputs { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 767px) {
+ .businessSupportSection { padding-top: 20px; margin-bottom: 29px; }
+ .businessSupportHeader h2 { font-size: 20px; }
+ .businessSupportHeader p { font-size: 11px; }
+ .businessSupportProfile { padding: 12px; }
+ .businessSupportProfileTitle { display: block; }
+ .businessSupportProfileTitle span { display: block; margin-top: 5px; }
+ .businessSupportNotice h3 { font-size: 15px; }
+}
