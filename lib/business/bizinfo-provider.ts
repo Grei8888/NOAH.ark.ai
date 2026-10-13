@@ -1,11 +1,11 @@
 import { unstable_cache } from "next/cache";
 import { publicSourceMode } from "@/lib/news/public-official-sources";
 import {
-  normalizeBizinfoPayload, type BusinessSupportSnapshot,
+  normalizeBizinfoPayload, bizinfoRawItems, type BusinessSupportSnapshot,
 } from "@/lib/business/support-contract";
 
 export type BusinessSupportError =
-  | "not_configured" | "authorization" | "provider_error" | "invalid_response" | "no_results";
+  | "not_configured" | "authorization" | "provider_error" | "invalid_response" | "unusable_items" | "no_results";
 export type BusinessSupportResult =
   | { ok:true; snapshot:BusinessSupportSnapshot }
   | { ok:false; reason:BusinessSupportError };
@@ -36,8 +36,10 @@ async function loadBizinfoSnapshot():Promise<BusinessSupportSnapshot>{
   if(typeof root.error==="string"||typeof root.message==="string"&&/인증|오류|error|실패/.test(root.message)){
     throw new Error(/인증|인증키|서비스키|key/i.test(String(root.error??root.message))?"authorization":"provider_error");
   }
+  const rawItems=bizinfoRawItems(payload);
+  if(rawItems===null)throw new Error("invalid_response");
   const notices=normalizeBizinfoPayload(payload);
-  if(!notices.length)throw new Error("no_results");
+  if(!notices.length)throw new Error(rawItems.length?"unusable_items":"no_results");
   return {provider:"기업마당 공식 지원사업 API",checkedAt:new Date().toISOString(),notices};
 }
 const cached=unstable_cache(loadBizinfoSnapshot,["noah-bizinfo-support-v1"],{revalidate:21600});
@@ -45,7 +47,7 @@ export async function getBusinessSupportData():Promise<BusinessSupportResult>{
   if(!businessSupportEnabled())return {ok:false,reason:"not_configured"};
   try{return {ok:true,snapshot:await cached()};}
   catch(e){
-    const reason=e instanceof Error&&["authorization","provider_error","invalid_response","no_results"].includes(e.message)
+    const reason=e instanceof Error&&["authorization","provider_error","invalid_response","unusable_items","no_results"].includes(e.message)
       ? e.message as BusinessSupportError:"provider_error";
     // Deliberately do not include raw server URLs containing keys in logs.
     console.warn("[NOAH Bizinfo] request unavailable:",reason);
