@@ -24,7 +24,7 @@ export function AppShell({
   compactRail?: boolean;
 }) {
   return (
-    <div className="appShell">
+    <div className={compactRail ? "appShell appShell--compactRail" : "appShell"}>
       <a className="skipLink" href="#main-content">
         본문으로 이동
       </a>
