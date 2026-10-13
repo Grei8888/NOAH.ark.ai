@@ -1,4 +1,3 @@
-import "server-only";
 import { unstable_cache } from "next/cache";
 import { publicSourceMode } from "@/lib/news/public-official-sources";
 import {
