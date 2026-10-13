@@ -86,13 +86,15 @@ export function parseApplicationPeriod(input:unknown):{startDate:string|null;end
 }
 export function normalizeBizinfoPayload(input:unknown):BusinessSupportNotice[] {
   const root=obj(input);
-  // RSS-in-JSON envelope from documented "channel.item" and defensive variants.
-  // Never recurse arbitrary body fields or expose source descriptions.
+  // Official Bizinfo API JSON envelope is { jsonArray: { item: [...] } }.
+  // Also accept backwards-compatible channel and response variants.
+  // Never recurse arbitrary article/body fields or expose descriptions or attachments.
+  const documented=obj(root?.jsonArray);
   const response=obj(root?.response);
   const body=obj(response?.body);
-  const channel=obj(root?.channel)||obj(root?.rss)&&obj(obj(root?.rss)?.channel);
+  const channel=obj(root?.channel)||(obj(root?.rss)?obj(obj(root?.rss)?.channel):null);
   const bodyItems=obj(body?.items);
-  const raw=root?.item??channel?.item??bodyItems?.item??body?.items??root?.items;
+  const raw=documented?.item??root?.item??channel?.item??bodyItems?.item??body?.items??root?.items;
   const list=Array.isArray(raw)?raw:raw&&typeof raw==="object"?[raw]:[];
   const results:BusinessSupportNotice[]=[];
   const seen=new Set<string>();
