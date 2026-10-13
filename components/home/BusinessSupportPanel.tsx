@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   BUSINESS_REGIONS, BUSINESS_FIELDS, BUSINESS_STAGES, BUSINESS_FORMS,
   DEFAULT_BUSINESS_PROFILE, rankBusinessSupport, validateBusinessProfile,
@@ -23,6 +23,8 @@ function validNotice(n:unknown):n is BusinessSupportNotice {
 }
 export function BusinessSupportPanel({enabled}:{enabled:boolean}){
   const [profile,setProfile]=useState<BusinessProfile>(DEFAULT_BUSINESS_PROFILE);
+  const [appliedProfile,setAppliedProfile]=useState<BusinessProfile|null>(null);
+  const [hasRequested,setHasRequested]=useState(false);
   const [profileReady,setProfileReady]=useState(false);
   const [snapshot,setSnapshot]=useState<BusinessSupportSnapshot|null>(null);
   const [error,setError]=useState("");
@@ -38,31 +40,43 @@ export function BusinessSupportPanel({enabled}:{enabled:boolean}){
       setProfileReady(true);
     });
   },[]);
-  useEffect(()=>{
-    if(!enabled)return;
-    const controller=new AbortController();
-    queueMicrotask(()=>setLoading(true));
-    void (async()=>{
-      try{
-        const r=await fetch("/api/business/support",{
-          cache:"no-store",signal:AbortSignal.any([controller.signal,AbortSignal.timeout(17000)]),
-        });
-        const json:unknown=await r.json();
-        if(controller.signal.aborted)return;
-        const data=json as NoticePayload;
-        if(!r.ok)throw new Error(typeof data.error==="string"?data.error:"공고 데이터를 불러오지 못했습니다.");
-        if(data.provider!=="기업마당 공식 지원사업 API" ||
-          !Array.isArray(data.notices)||data.notices.length>80||!data.notices.every(validNotice)||
-          typeof data.checkedAt!=="string")throw new Error("지원사업 데이터 검증에 실패했습니다.");
-        setSnapshot(data as BusinessSupportSnapshot);
-        setError("");
-      }catch(e){
-        if(!controller.signal.aborted)setError(e instanceof Error&&e.name!=="TimeoutError"?e.message:"공고 API 연결이 지연되고 있습니다.");
-      }finally{if(!controller.signal.aborted)setLoading(false);}
-    })();
-    return()=>controller.abort();
-  },[enabled]);
-  const matches=useMemo(()=>snapshot?rankBusinessSupport(snapshot.notices,profile):[],[profile,snapshot]);
+  // The profile is a draft until the reader explicitly requests matching.
+  // This makes it clear when a search has run and when profile edits need confirmation.
+  async function searchForBusiness(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if(!enabled||loading||!profileReady)return;
+    setHasRequested(true);
+    setLoading(true);
+    setError("");
+    setShowAll(false);
+    setAppliedProfile({...profile});
+    try{
+      const response=await fetch("/api/business/support", {
+        cache:"no-store",signal:AbortSignal.timeout(18000),
+      });
+      const json:unknown=await response.json();
+      const data=json as NoticePayload;
+      if(!response.ok){
+        throw new Error(typeof data.error==="string" ?
+          data.error : "기업마당 API 응답을 확인할 수 없습니다.");
+      }
+      if(data.provider!=="기업마당 공식 지원사업 API" ||
+        !Array.isArray(data.notices)||data.notices.length>80||
+        !data.notices.every(validNotice)||typeof data.checkedAt!=="string"){
+        throw new Error("지원사업 데이터 형식을 검증할 수 없습니다.");
+      }
+      setSnapshot(data as BusinessSupportSnapshot);
+    }catch(cause){
+      setSnapshot(null);
+      setError(cause instanceof Error && cause.name!=="TimeoutError" ?
+        cause.message : "공고 API 응답이 지연되고 있습니다. 잠시 후 다시 조회해 주세요.");
+    }finally{setLoading(false);}
+  }
+  const matches=useMemo(()=>
+    snapshot && appliedProfile?rankBusinessSupport(snapshot.notices,appliedProfile):[],
+    [appliedProfile,snapshot]);
+  const needsNewSearch=appliedProfile!==null &&
+    (Object.keys(profile) as (keyof BusinessProfile)[]).some(k=>profile[k]!==appliedProfile[k]);
   const shown=showAll?matches:matches.slice(0,5);
   function update<K extends keyof BusinessProfile>(field:K,value:BusinessProfile[K]){
     const next=validateBusinessProfile({...profile,[field]:value});
@@ -85,7 +99,7 @@ export function BusinessSupportPanel({enabled}:{enabled:boolean}){
         </div>
         <a href="https://www.bizinfo.go.kr/" target="_blank" rel="noopener noreferrer">기업마당 ↗</a>
       </div>
-      <div className="businessSupportProfile">
+      <form className="businessSupportProfile" onSubmit={searchForBusiness}>
         <div className="businessSupportProfileTitle">
           <strong>사업자 프로필</strong>
           <span>이 브라우저에만 저장 · 사업자등록번호 불필요</span>
@@ -101,12 +115,33 @@ export function BusinessSupportPanel({enabled}:{enabled:boolean}){
             </label>
           ))}
         </div>
-      </div>
+        {profile.stage==="예비창업" && profile.form!=="미설정" && (
+          <p className="businessProfileCaution">예비창업과 사업자 유형을 함께 선택하셨습니다. 실제 예비창업자 자격과 사업자등록 상태가 일치하는지 공고문에서 확인하세요.</p>
+        )}
+        <div className="businessSupportSubmitRow">
+          <span aria-live="polite">
+            {!enabled?"공공데이터 API 연결 대기":
+              loading?"정부 공고 조회 중…":
+              needsNewSearch?"설정을 변경했습니다. 다시 조회하면 적용됩니다.":
+              hasRequested?"마지막으로 확인한 조건으로 결과를 표시합니다.":
+              "조건을 선택한 뒤 조회 버튼을 눌러주세요."}
+          </span>
+          <button className="businessSupportQueryButton" type="submit"
+            disabled={!profileReady||!enabled||loading}>
+            {loading?"공고 확인 중…":hasRequested?"이 조건으로 다시 조회 ↗":"맞춤 지원사업 조회 ↗"}
+          </button>
+        </div>
+      </form>
       {!enabled ? (
         <div className="businessSupportStatus" role="status">
           <strong>기업마당 공공데이터 연결 대기</strong>
           <p>공식 API 인증키를 연결하면 실제 지원사업 공고가 표시됩니다. 예시 공고를 실제 결과인 것처럼 보여주지 않습니다.</p>
           <a href={sourceLink} target="_blank" rel="noopener noreferrer">기업마당 API 키 신청 안내 ↗</a>
+        </div>
+      ) : !hasRequested ? (
+        <div className="businessSupportStatus" role="status">
+          <strong>사업자 조건을 설정한 뒤 조회해 주세요.</strong>
+          <p>기업마당 공식 공고를 확인하고, 관련성 근거와 추가 확인 사항을 보여드립니다.</p>
         </div>
       ) : loading ? (
         <p className="businessSupportStatus" role="status">기업마당 실제 지원사업 공고를 확인하는 중입니다…</p>
@@ -123,8 +158,9 @@ export function BusinessSupportPanel({enabled}:{enabled:boolean}){
         </div>
       ) : (
         <div className="businessSupportResults">
+          {needsNewSearch && <p className="businessSupportPending" role="status">현재는 이전 조회 결과입니다. 변경한 조건을 적용하려면 ‘이 조건으로 다시 조회’를 눌러주세요.</p>}
           <p className="businessSupportCount">
-            공식 데이터 {snapshot?.notices.length ?? 0}건 확인 · 현재 표시 {shown.length}건
+            공식 데이터 {snapshot?.notices.length ?? 0}건 확인 · 조건 일치 가능성 순위 {shown.length}건
             <span>자동 선별은 적격 심사가 아닙니다.</span>
           </p>
           {shown.map(({notice,status,reasons,cautions})=>(
