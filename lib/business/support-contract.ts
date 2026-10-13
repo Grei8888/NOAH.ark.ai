@@ -84,18 +84,24 @@ export function parseApplicationPeriod(input:unknown):{startDate:string|null;end
   if(!start||!end||start>end)return {startDate:null,endDate:null};
   return {startDate:start,endDate:end};
 }
-export function normalizeBizinfoPayload(input:unknown):BusinessSupportNotice[] {
+/**
+ * null = undocumented or invalid response shape, zero = documented empty item array.
+ * This distinction prevents "no announcements" masking a broken upstream schema.
+ */
+export function bizinfoRawItems(input:unknown):unknown[]|null {
   const root=obj(input);
-  // Official Bizinfo API JSON envelope is { jsonArray: { item: [...] } }.
-  // Also accept backwards-compatible channel and response variants.
-  // Never recurse arbitrary article/body fields or expose descriptions or attachments.
   const documented=obj(root?.jsonArray);
   const response=obj(root?.response);
   const body=obj(response?.body);
   const channel=obj(root?.channel)||(obj(root?.rss)?obj(obj(root?.rss)?.channel):null);
   const bodyItems=obj(body?.items);
   const raw=documented?.item??root?.item??channel?.item??bodyItems?.item??body?.items??root?.items;
-  const list=Array.isArray(raw)?raw:raw&&typeof raw==="object"?[raw]:[];
+  if(Array.isArray(raw))return raw.slice(0,150);
+  return obj(raw)?[raw]:null;
+}
+export function normalizeBizinfoPayload(input:unknown):BusinessSupportNotice[] {
+  // Strictly only title, original URL and approved metadata are copied.
+  const list=bizinfoRawItems(input)||[];
   const results:BusinessSupportNotice[]=[];
   const seen=new Set<string>();
   for(const value of list.slice(0,150)){
