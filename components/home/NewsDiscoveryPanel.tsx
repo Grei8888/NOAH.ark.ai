@@ -44,17 +44,26 @@ export function NewsDiscoveryPanel({ readerLabAvailable, enabled }: {
     setLoading(true);
     try {
       const response = await fetch("/api/news/discovery?topic=" + encodeURIComponent(next), {
-        cache: "no-store", signal: AbortSignal.timeout(15000),
+        cache: "no-store", signal: AbortSignal.timeout(25000),
       });
       const json: unknown = await response.json();
-      if (!response.ok) throw new Error("검색 연결이 지연되고 있습니다.");
+      if (!response.ok) {
+        const failure = json !== null && typeof json === "object" &&
+          typeof (json as { error?: unknown }).error === "string"
+          ? (json as { error: string }).error : "뉴스 검색 API의 응답을 확인할 수 없습니다.";
+        throw new Error(failure.slice(0, 140));
+      }
       const snapshot = safeSnapshot(json, next);
       if (!snapshot) throw new Error("검색 결과 형식을 확인할 수 없습니다.");
       if (requestId.current === id) {
         setData(old => ({ ...old, [next]: snapshot }));
       }
-    } catch {
-      if (requestId.current === id) setError("뉴스 검색 결과를 불러오지 못했습니다. 기존 정부 공식자료는 계속 이용할 수 있습니다.");
+    } catch (err) {
+      if (requestId.current === id) setError(
+        err instanceof Error && err.name !== "TimeoutError"
+          ? err.message
+          : "검색 응답이 지연되고 있습니다. 연결을 다시 확인해 주세요."
+      );
     } finally {
       if (requestId.current === id) setLoading(false);
     }
