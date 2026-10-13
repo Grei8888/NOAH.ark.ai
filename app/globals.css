@@ -2471,3 +2471,6 @@ section[id] {
   .newsDiscoveryItem h3 { font-size: 15px; }
   .newsDiscoveryCredit { font-size: 10px; }
 }
+
+.newsDiscoveryFallback { display: block; color: var(--intro-navy); text-decoration: underline; text-underline-offset: 4px; margin-top: 11px; font-size: 12px; font-weight: 700; width: fit-content; }
+.newsDiscoveryFallback:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
