@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { NewsInlineCompanion, type SelectedNews } from "@/components/home/NewsInlineCompanion";
 import { NEWS_SEARCH_TOPICS, type NewsSearchItem, type NewsSearchSnapshot, type NewsSearchTopic } from "@/lib/news/news-search-contract";
 
 const newsDate = new Intl.DateTimeFormat("ko-KR", {
@@ -24,8 +25,9 @@ function safeSnapshot(data: unknown, topic: NewsSearchTopic): NewsSearchSnapshot
   return valid ? obj as NewsSearchSnapshot : null;
 }
 
-export function NewsDiscoveryPanel({ readerLabAvailable, enabled }: {
+export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabled }: {
   readerLabAvailable: boolean;
+  readerModelReady: boolean;
   enabled: boolean;
 }) {
   const [topic, setTopic] = useState<NewsSearchTopic>("economy");
@@ -33,11 +35,15 @@ export function NewsDiscoveryPanel({ readerLabAvailable, enabled }: {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("");
+  const [selectedNews, setSelectedNews] = useState<SelectedNews | null>(null);
+  const [mobilePanel, setMobilePanel] = useState<"articles" | "ai">("articles");
   const requestId = useRef(0);
 
   async function pick(next: NewsSearchTopic) {
     setTopic(next);
     setFilter("");
+    setSelectedNews(null);
+    setMobilePanel("articles");
     setError("");
     const id = ++requestId.current;
     if (!enabled || data[next]) { setLoading(false); return; }
@@ -79,6 +85,10 @@ export function NewsDiscoveryPanel({ readerLabAvailable, enabled }: {
   const selectedQuery = NEWS_SEARCH_TOPICS.find(item => item.id === topic)!.query;
   const googleNewsPage = "https://news.google.com/search?q=" +
     encodeURIComponent(selectedQuery) + "&hl=ko&gl=KR&ceid=KR%3Ako";
+  function selectArticle(item: NewsSearchItem) {
+    setSelectedNews({ item, topic });
+    setMobilePanel("ai");
+  }
   const current = data[topic];
   const filtered = current?.items.filter(row =>
     !filter.trim() ||
@@ -94,6 +104,12 @@ export function NewsDiscoveryPanel({ readerLabAvailable, enabled }: {
         </div>
         <span>{enabled ? "SEARCH API" : "API 준비 중"}</span>
       </div>
+      <nav className="newsAiMobileTabs" aria-label="뉴스 기사와 AI 독해 화면 전환">
+        <button type="button" aria-pressed={mobilePanel === "articles"} onClick={() => setMobilePanel("articles")}>뉴스 목록</button>
+        <button type="button" aria-pressed={mobilePanel === "ai"} onClick={() => setMobilePanel("ai")}>AI 질문하기</button>
+      </nav>
+      <div className="newsAiSplit">
+      <div className="newsAiStories" data-mobile-active={mobilePanel === "articles"}>
       <div className="newsDiscoveryIntro">
         <p>언론사 웹페이지를 대신 보여주지 않습니다. 검색 결과에서 기사 제목을 고르면 각 언론사의 원문으로 연결됩니다.</p>
         <div className="newsDiscoveryTopics" role="group" aria-label="뉴스 검색 주제">
@@ -128,7 +144,7 @@ export function NewsDiscoveryPanel({ readerLabAvailable, enabled }: {
         </p> : (
           <div className="newsDiscoveryResults">
             {filtered.map(item => (
-              <article key={item.url} className="newsDiscoveryItem">
+              <article key={item.url} className="newsDiscoveryItem" data-selected={selectedNews?.item.url === item.url}>
                 <div className="newsDiscoverySource">
                   <span>기사</span><span aria-hidden="true">·</span><span>{item.sourceName}</span>
                   {item.publishedAt && <time dateTime={item.publishedAt}>
@@ -138,11 +154,10 @@ export function NewsDiscoveryPanel({ readerLabAvailable, enabled }: {
                 <h3><a href={item.url} target="_blank" rel="noopener noreferrer">{item.title}</a></h3>
                 <div className="newsDiscoveryActions">
                   <a href={item.url} target="_blank" rel="noopener noreferrer">언론사 원문 보기 ↗</a>
-                  {readerLabAvailable && (
-                    <Link href={`/lab/reader?topic=${topic}&news=${encodeURIComponent(item.url)}`}>
-                      AI로 이해하기 ↗
-                    </Link>
-                  )}
+                  <button type="button" onClick={() => selectArticle(item)}
+                    aria-pressed={selectedNews?.item.url === item.url}>
+                    AI에게 질문 ↗
+                  </button>
                 </div>
               </article>
             ))}
@@ -153,6 +168,11 @@ export function NewsDiscoveryPanel({ readerLabAvailable, enabled }: {
         원문 기사·사진은 복제하지 않습니다. 검색 결과의 정확성이나 언론사별 입장을 NOAH가 보증하지 않으며,
         세부 사실은 반드시 언론사 원문에서 확인하세요.
       </p>
+      </div>
+      <div className="newsAiSide" data-mobile-active={mobilePanel === "ai"}>
+        <NewsInlineCompanion selected={selectedNews} modelReady={readerModelReady} labAvailable={readerLabAvailable} />
+      </div>
+      </div>
     </section>
   );
 }
