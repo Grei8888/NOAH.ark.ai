@@ -299,7 +299,22 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
             {view === "saved" && !ready ? (
               <p className="emptyState">이 브라우저에 저장된 자료를 확인하는 중입니다.</p>
             ) : filtered.length === 0 ? (
-              <p className="emptyState">{view === "saved" ? "아직 저장한 자료가 없습니다. 홈에서 자료를 저장해 보세요." : query ? "검색어와 일치하는 원문이 없습니다." : todayTopics.length ? "선택한 관심사와 일치하는 제목이 없습니다. 다른 주제를 선택하거나 '전체 보기'를 눌러 주세요." : "표시할 공식 자료가 없습니다. 잠시 후 다시 확인해 주세요."}</p>
+              <div className="emptyState" role="status">
+                {view === "saved" ? "아직 저장한 자료가 없습니다. 홈에서 자료를 저장해 보세요." :
+                  currentSnapshot.items.length > 0
+                    ? `공식자료는 전체 ${currentSnapshot.items.length}건 있습니다. 현재 관심사·검색 조건에 맞는 자료가 0건입니다.`
+                    : "최근 14일에 표시할 정부 공식자료가 없습니다. RSS 연결 상태를 확인해 주세요."}
+                {view !== "saved" && currentSnapshot.items.length > 0 && (
+                  <div className="sourceEmptyActions">
+                    <button type="button" onClick={() => {
+                      clearTodayTopics();
+                      setQuery("");
+                      setFilter("all");
+                    }}>관심사·검색 조건 해제하고 전체 보기 →</button>
+                    {view === "startup" && <Link href="/?view=discover">전체 자료 탐색으로 이동 ↗</Link>}
+                  </div>
+                )}
+              </div>
             ) : filtered.slice(0, view === "home" ? 14 : 40).map((s: OfficialSourceLink, i: number) => (
               <article className="sourceNewsItem" key={s.url}>
                 <div className="eventRank">{String(i + 1).padStart(2, "0")}</div>
