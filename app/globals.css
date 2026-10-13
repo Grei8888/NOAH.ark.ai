@@ -2618,6 +2618,10 @@ section[id] {
   .newsAiStories .newsDiscoveryItem { padding: 17px 0; }
   .newsAiStories .newsDiscoveryItem h3 { font-size: 15px; }
   .newsAiStories .newsDiscoveryTopics button { flex: 1 1 calc(25% - 6px); }
+  /* Keep the question input visible above iOS bottom navigation/browser chrome. */
+  .newsAiMobileTabs { scroll-margin-top: 26px; }
+  .newsAiCompanion { scroll-margin-top: 22px; }
+  .newsAiCompanion #newsAiQuestion { scroll-margin-top: 90px; scroll-margin-bottom: 145px; }
 }
 
 /* Personalized briefing v1 — minimal monochrome/navy hierarchy; no fake imagery. */
