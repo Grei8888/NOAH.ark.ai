@@ -16,10 +16,12 @@ export function AppShell({
   children,
   rail,
   view = "home",
+  compactRail = false,
 }: {
   children: ReactNode;
   rail?: ReactNode;
   view?: HomeView;
+  compactRail?: boolean;
 }) {
   return (
     <div className="appShell">
