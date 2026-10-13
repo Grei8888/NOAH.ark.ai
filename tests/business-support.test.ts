@@ -44,6 +44,18 @@ describe("live Bizinfo metadata without invented grants",()=>{
     expect(notices[1].field).toBe("기술");
   });
   it("understands documented envelope and avoids arbitrary external or script links",()=>{
+    // The official API example wraps the data as `jsonArray.item`, NOT `channel.item`.
+    const documented=normalizeBizinfoPayload({
+      jsonArray:{
+        title:"기업마당 지원사업정보",
+        link:"https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/list.do",
+        item:[fixtures[0]],
+      },
+    });
+    expect(documented).toHaveLength(1);
+    expect(documented[0].title).toBe(fixtures[0].title);
+    expect(documented[0].url).toBe(fixtures[0].link);
+    expect(documented[0]).not.toHaveProperty("description");
     expect(normalizeBizinfoPayload({rss:{channel:{item:[fixtures[0]]}}})).toHaveLength(1);
     expect(normalizeBizinfoPayload({item:[fixtures[0],fixtures[0]]})).toHaveLength(1);
     expect(normalizeBizinfoPayload({item:[{...fixtures[0],link:"https://evil.example/view.do"}]})).toEqual([]);
