@@ -34,9 +34,9 @@ function safeSnapshot(data: unknown, topic: NewsSearchTopic): NewsSearchSnapshot
  */
 export function mobileNewsScrollDestination(
   panel: "articles" | "ai", hasSelectedArticle: boolean,
-): "tabs" | "reader" | "question" {
+): "tabs" | "reader" | "article" {
   if (panel === "articles") return "tabs";
-  return hasSelectedArticle ? "question" : "reader";
+  return hasSelectedArticle ? "article" : "reader";
 }
 
 export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabled, showBriefing = false, focusTopics = [], preferenceReady = true, businessSupportEnabled = false, showBusinessSupport = false, onUpdateFocus }: {
@@ -143,18 +143,20 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
         !window.matchMedia("(max-width: 767px)").matches) return;
     // iOS Safari needs the previous news list to be hidden and the new AI panel
     // laid out before scrolling. Two frames avoid jumping to the old position.
+// Scroll to the ARTICLE, not to the textarea: reader sees the headline
+// and question composer together. The textarea must not grab focus.
     let followupFrame = 0;
     const firstFrame = window.requestAnimationFrame(() => {
       followupFrame = window.requestAnimationFrame(() => {
         const scrollTarget = mobileNewsScrollDestination(mobileJump.target, Boolean(selectedNews));
         const destination = scrollTarget === "tabs" ? mobileTabsRef.current
-          : scrollTarget === "question"
-            ? mobileAiRef.current?.querySelector<HTMLTextAreaElement>("#newsAiQuestion")
+          : scrollTarget === "article"
+            ? mobileAiRef.current?.querySelector<HTMLElement>(".newsAiSelected")
             : mobileAiRef.current?.querySelector<HTMLElement>(".newsAiCompanion");
         if (!destination) return;
         destination.scrollIntoView({
           behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
-          block: scrollTarget === "question" ? "center" : "start",
+          block: "start",
           inline: "nearest",
         });
         // Deliberately do NOT focus the textarea: Safari would unexpectedly
