@@ -2619,3 +2619,81 @@ section[id] {
   .newsAiStories .newsDiscoveryItem h3 { font-size: 15px; }
   .newsAiStories .newsDiscoveryTopics button { flex: 1 1 calc(25% - 6px); }
 }
+
+/* Personalized briefing v1 — minimal monochrome/navy hierarchy; no fake imagery. */
+.personalFocusPanel {
+  border: 1px solid #dfe6ee;
+  background: #f5f7fa;
+  border-radius: 12px;
+  padding: clamp(18px,2vw,24px);
+  margin: 25px 0 34px;
+}
+.personalFocusPanel .todayInterestHeading { margin-bottom: 6px; }
+.personalFocusPanel .todayInterestHeading h2 { color: var(--intro-navy); letter-spacing: -.15px; font-size: 15px; }
+.personalFocusPanel .todayInterestHeading p { color: var(--slate); font-size: 11px; }
+.personalFocusPanel .todayInterestChips { margin: 15px 0 8px; gap: 8px; }
+.personalFocusPanel .todayInterestChips button { background: #fff; }
+.personalFocusPanel .todayInterestChips button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+.personalFocusPanel .todayInterestNote { margin: 12px 0 0; font-size: 10px; line-height: 1.6; }
+.personalFocusPanel .sourceFreshnessBar { margin: 5px 0 0; }
+.myBriefingPanel { margin: 12px 0 42px; padding: 0 0 26px; border-bottom: 2px solid #dce4ed; }
+.myBriefingHead { display: flex; align-items: start; justify-content: space-between; gap: 18px; }
+.myBriefingEyebrow { display: block; font-size: 10px; letter-spacing: 1.5px; font-weight: 750; color: #6e7f94; margin-bottom: 10px; }
+.myBriefingHead h2 { font-size: clamp(21px, 2.1vw, 28px); font-weight: 800; letter-spacing: -.6px; color: var(--intro-navy); line-height: 1.35; word-break: keep-all; }
+.myBriefingHead p { font-size: 12px; line-height: 1.7; color: var(--slate); margin-top: 9px; }
+.myBriefingSettings {
+  flex: 0 0 auto; min-height: 42px; padding: 10px 13px; font-size: 11px;
+  color: var(--navy); border: 1px solid var(--border); border-radius: 7px; background: #fff; font-weight: 700;
+}
+.myBriefingSettings:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.myBriefingMeta { display:flex; flex-wrap:wrap; gap: 7px 16px; color: var(--slate); font-size: 10px; margin: 16px 0 7px; }
+.myBriefingMeta span { display: inline-flex; align-items: center; }
+.myBriefingMeta span::before { content: "·"; margin-right: 5px; color: var(--gold); }
+.myBriefingFocus { display: flex; gap: 6px; flex-wrap: wrap; margin: 18px 0 2px; }
+.myBriefingFocus span { padding: 5px 9px; border-radius: 16px; font-size: 10px; font-weight: 650; color: var(--navy); border: 1px solid #d7e1ec; background: #f8fafc; }
+.myBriefingList { list-style: none; margin: 16px 0 0; padding: 0; }
+.myBriefingItem { display: grid; grid-template-columns: 39px minmax(0, 1fr); gap: 11px; padding: 19px 0; border-top: 1px solid var(--border); }
+.myBriefingItem:first-child { border-top: 2px solid var(--navy); }
+.myBriefingRank { font-size: 22px; line-height: 1.35; font-weight: 600; color: #8d9aac; font-variant-numeric: tabular-nums; }
+.myBriefingBody { min-width: 0; }
+.myBriefingSource { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: var(--slate); font-size: 10px; }
+.myBriefingSource span:first-child { color: var(--navy); font-weight: 750; }
+.myBriefingSource time { margin-left: auto; }
+.myBriefingBody h3 { font-size: clamp(15px, 1.6vw, 18px); color: var(--intro-navy); line-height: 1.52; letter-spacing: -.25px; margin: 9px 0; overflow-wrap: anywhere; }
+.myBriefingWhy { font-size: 11px; color: var(--slate); line-height: 1.75; word-break: keep-all; }
+.myBriefingActions { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 9px; }
+.myBriefingActions :is(button,a) {
+  display: inline-flex; align-items: center; min-height: 42px; font-size: 11px;
+  font-weight: 750; color: var(--intro-navy); text-decoration: none;
+}
+.myBriefingActions :is(button,a):focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.briefingReadButton span { padding-left: 4px; }
+.myBriefingMore { background: #f8fafc; border: 1px solid var(--border); border-radius: 7px; margin-top: 10px; padding: 8px 11px; }
+.myBriefingMore summary { cursor: pointer; color: var(--navy); font-size: 11px; font-weight: 700; }
+.myBriefingMore ul { list-style: disc; padding-left: 17px; margin-top: 9px; font-size: 11px; line-height: 1.75; color: var(--slate); }
+.myBriefingMore li { margin: 7px 0; }
+.myBriefingMore a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.myBriefingState { margin: 18px 0; padding: 21px; border: 1px solid var(--border); border-radius: 8px; background: #f8fafc; color: var(--slate); font-size: 12px; line-height: 1.8; }
+.myBriefingState strong { display: block; font-size: 13px; color: var(--navy); margin-bottom: 6px; }
+.myBriefingState button { margin-top: 13px; color: var(--intro-navy); font-size: 12px; font-weight: 750; min-height: 40px; }
+.myBriefingPartial, .myBriefingDisclaimer { font-size: 10px; line-height: 1.85; color: var(--slate); margin-top: 13px; }
+.myBriefingDisclaimer { border-top: 1px solid #e8edf2; padding-top: 12px; }
+.newsDiscoverySecondary { padding-top: 22px; border-top: 1px solid #dbe3eb; }
+.newsDiscoverySecondary .sectionHeading h2 { font-size: 17px; color: var(--navy); }
+.newsDiscoverySecondary .sectionHeading p { color: var(--slate); }
+.officialDataControls { border-top: 1px solid var(--border); padding-top: 15px; }
+.officialDataControls > p { font-size: 11px; color: var(--slate); margin-bottom: 7px; }
+.officialDataControls .sourceToolbar { margin-top: 0; }
+@media(max-width:767px) {
+  .personalFocusPanel { margin: 19px 0 25px; padding: 17px 13px; }
+  .myBriefingPanel { margin-bottom: 29px; }
+  .myBriefingHead { gap: 9px; }
+  .myBriefingHead h2 { font-size: 21px; }
+  .myBriefingHead p { font-size: 11px; }
+  .myBriefingSettings { padding: 8px; font-size: 10px; }
+  .myBriefingItem { grid-template-columns: 30px minmax(0,1fr); gap: 9px; padding: 16px 0; }
+  .myBriefingRank { font-size: 18px; }
+  .myBriefingBody h3 { font-size: 15px; }
+  .myBriefingActions { gap: 10px 19px; }
+  .myBriefingFocus span { font-size: 10px; }
+}
