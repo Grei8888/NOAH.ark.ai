@@ -51,7 +51,7 @@ export function decodeProviderStatus(payload: unknown): NewsSearchFailureCode | 
     ? (meta as Record<string, unknown>).status : undefined;
   if (!error && status !== "Error") return null;
   if (/api.key|unauthoriz|invalid.key|authentication|permission/.test(error)) return "invalid_key";
-  if (/searches remaining|quota|limit|credit|exhaust/.test(error)) return "quota";
+  if (/searches remaining|run out of searches|out of searches|quota|limit|credit|exhaust/.test(error)) return "quota";
   return "provider_unavailable";
 }
 
