@@ -16,13 +16,15 @@ export function AppShell({
   children,
   rail,
   view = "home",
+  compactRail = false,
 }: {
   children: ReactNode;
   rail?: ReactNode;
   view?: HomeView;
+  compactRail?: boolean;
 }) {
   return (
-    <div className="appShell">
+    <div className={compactRail ? "appShell appShell--compactRail" : "appShell"}>
       <a className="skipLink" href="#main-content">
         본문으로 이동
       </a>
