@@ -68,6 +68,11 @@ describe("transparent real-headline personalized briefing", () => {
     expect(x[0].rationale).toContain("발행일 확인 필요");
     expect(x[0]).not.toHaveProperty("aiSummary");
   });
+  it("marks older than 14 days as outdated rather than labeling it today", () => {
+    const rows = curateFromHeadlines([snap("finance", [story("정책자금 금융 지원 제도 확대", "경제신문", "old", "2026-09-25T10:00:00Z")])], ["funding"], now);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].rationale.some(line => line.includes("최신 정보 확인 필요"))).toBe(true);
+  });
   it("caps list to five by default", () => {
     const rows = Array.from({ length: 12 }, (_, i) =>
       story(`창업 소상공인 지원 모집 ${i + 10}`, `매체${i}`, String(i)));
