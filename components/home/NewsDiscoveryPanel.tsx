@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { NewsInlineCompanion, type SelectedNews } from "@/components/home/NewsInlineCompanion";
 import { NEWS_SEARCH_TOPICS, type NewsSearchItem, type NewsSearchSnapshot, type NewsSearchTopic } from "@/lib/news/news-search-contract";
