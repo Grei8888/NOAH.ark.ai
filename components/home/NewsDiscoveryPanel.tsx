@@ -128,7 +128,8 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
   }
 
   useEffect(() => {
-    if (!mobileJump.sequence || !window.matchMedia("(max-width: 767px)").matches) return;
+    if (!mobileJump.sequence || mobilePanel !== mobileJump.target ||
+        !window.matchMedia("(max-width: 767px)").matches) return;
     // iOS Safari needs the previous news list to be hidden and the new AI panel
     // laid out before scrolling. Two frames avoid jumping to the old position.
     let followupFrame = 0;
@@ -142,7 +143,7 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
             : mobileAiRef.current?.querySelector<HTMLElement>(".newsAiCompanion");
         if (!destination) return;
         destination.scrollIntoView({
-          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
           block: mobileJump.target === "ai" && selectedNews ? "center" : "start",
           inline: "nearest",
         });
@@ -154,7 +155,7 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
       window.cancelAnimationFrame(firstFrame);
       window.cancelAnimationFrame(followupFrame);
     };
-  }, [mobileJump, selectedNews]);
+  }, [mobileJump, mobilePanel, selectedNews]);
   const current = data[topic];
   const loading = pendingTopics.includes(topic);
   const error = errors[topic] || "";
