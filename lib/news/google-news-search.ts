@@ -27,8 +27,12 @@ async function searchNewsOnce(topic: NewsSearchTopic): Promise<NewsSearchSnapsho
   });
   if (!response.ok) throw new Error("Search provider unavailable");
   const json: unknown = await response.json();
-  const body = record(json);
-  if (body?.error || record(body?.search_metadata)?.status === "Error")
+  const body = json !== null && typeof json === "object" && !Array.isArray(json)
+    ? json as Record<string, unknown> : null;
+  const metadata = body?.search_metadata && typeof body.search_metadata === "object" &&
+    !Array.isArray(body.search_metadata)
+    ? body.search_metadata as Record<string, unknown> : null;
+  if (body?.error || metadata?.status === "Error")
     throw new Error("Search provider returned error");
   return {
     topic,
