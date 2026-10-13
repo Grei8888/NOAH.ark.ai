@@ -71,33 +71,28 @@ export function NewsInlineCompanion({
 
   return (
     <aside className="newsAiCompanion" aria-label="기사별 NOAH AI 뉴스 파트너">
-      <div className="newsAiCompanionHeader">
-        <div>
-          <span className="newsAiEyebrow">NOAH · READING PARTNER</span>
-          <h3>읽고, 이해하고, 질문하기</h3>
+      {selected ? (
+        <div className="newsAiSelected" aria-live="polite">
+          <span>선택한 기사 · {selected.item.sourceName}</span>
+          <strong>{selected.item.title}</strong>
+          <a href={selected.item.url} target="_blank" rel="noopener noreferrer">
+            기사 원문 직접 읽기 ↗
+          </a>
         </div>
+      ) : (
+        <div className="newsAiEmpty" role="status">
+          <strong>어떤 기사가 궁금하세요?</strong>
+          <p>뉴스 목록에서 기사를 선택하면 그 제목을 참고하며 질문할 수 있습니다.</p>
+        </div>
+      )}
+
+      <div className="newsAiCompanionHeader">
+        <span className="newsAiEyebrow">NOAH · 기사 이해 도우미</span>
         <span className="newsAiAvailability">{modelReady ? "AI 테스트 연결" : "AI 연결 대기"}</span>
       </div>
 
-      {!selected ? (
-        <div className="newsAiEmpty" role="status">
-          <span className="newsAiEmptyNumber" aria-hidden="true">01 / 02</span>
-          <strong>어떤 기사가 궁금하세요?</strong>
-          <p>왼쪽 뉴스에서 <b>AI에게 질문</b>을 누르세요. 해당 기사를 요약하는 대신 경제용어와 배경, 검토할 질문을 함께 살펴봅니다.</p>
-        </div>
-      ) : (
-        <>
-          <div className="newsAiSelected" aria-live="polite">
-            <span>선택한 기사 · {selected.item.sourceName}</span>
-            <strong>{selected.item.title}</strong>
-            <a href={selected.item.url} target="_blank" rel="noopener noreferrer">기사 원문 직접 읽기 ↗</a>
-          </div>
-          <p className="newsAiDescription">원문을 먼저 읽어도 좋고, 이해가 어려운 용어부터 질문해도 됩니다. 다른 관점의 기사 읽기는 선택입니다.</p>
-        </>
-      )}
-
       <fieldset className="newsAiModes" disabled={!selected || pending}>
-        <legend>어떤 도움이 필요한가요?</legend>
+        <legend className="newsAiModeLegend">도움받을 방식 선택</legend>
         <div className="newsAiModeButtons">
           {modes.map(item => (
             <button key={item.id} type="button" aria-pressed={mode === item.id}
@@ -106,8 +101,8 @@ export function NewsInlineCompanion({
         </div>
       </fieldset>
 
-      <label className="newsAiLabel" htmlFor="newsAiQuestion">NOAH AI에게 질문</label>
-      <textarea id="newsAiQuestion" rows={4} maxLength={380}
+      <label className="newsAiLabel" htmlFor="newsAiQuestion">이 기사에 대해 질문하기</label>
+      <textarea id="newsAiQuestion" rows={3} maxLength={380}
         disabled={!selected || pending} value={question}
         onChange={event => setQuestion(event.target.value)}
         placeholder="모르는 용어나 궁금한 경제·정책 배경을 질문해 보세요." />
@@ -122,16 +117,15 @@ export function NewsInlineCompanion({
         </>
       )}
 
-      {!modelReady && (
-        <p className="newsAiDisabled" role="status">
-          현재 OpenAI API가 연결되지 않아 실제 AI 답변은 제공되지 않습니다.
-          기사 선택과 질문 화면은 미리 확인할 수 있습니다.
-        </p>
-      )}
       <button className="newsAiSubmit" type="button" onClick={() => void submitQuestion()}
         disabled={!selected || !modelReady || pending || question.trim().length < 4 || inviteCode.length < 32}>
         {pending ? "NOAH가 살펴보는 중…" : modelReady ? "AI에게 물어보기 ↗" : "AI 연결 대기"}
       </button>
+      {!modelReady && (
+        <p className="newsAiDisabled" role="status">
+          AI 답변 연결 전입니다. 기사와 질문 작성 화면을 미리 이용할 수 있습니다.
+        </p>
+      )}
 
       {(answer || error) && (
         <section className="newsAiAnswer" aria-live="polite" aria-label="NOAH AI 응답">
