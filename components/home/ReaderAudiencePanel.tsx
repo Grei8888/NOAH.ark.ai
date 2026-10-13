@@ -18,10 +18,12 @@ export function ReaderAudiencePanel({
   activeTopics,
   onFocusTopic,
   aiReaderAvailable = false,
+  newsSearchEnabled = false,
 }: {
   activeTopics: readonly TodayTopic[];
   onFocusTopic: (topic: TodayTopic) => void;
   aiReaderAvailable?: boolean;
+  newsSearchEnabled?: boolean;
 }) {
   const [audience, setAudience] = useState<ReaderAudience | null>(null);
   const [ready, setReady] = useState(false);
@@ -83,7 +85,7 @@ export function ReaderAudiencePanel({
         </div>
       )}
       <p className="readerAudienceFoot">
-        현재는 중소벤처기업부의 공식 원문과 제목 키워드 필터만 제공합니다.
+        {newsSearchEnabled ? "언론사 제목을 관심사와 매칭해 개인별로 정리하고, 정책 원문도 별도로 제공합니다." : "현재는 중소벤처기업부 공식 원문과 제목 키워드 필터만 제공합니다."}
         {aiReaderAvailable
           ? "AI 용어 설명·배경 이해·비판적 독해는 테스트할 수 있습니다. 기사별 관점 비교는 아직 미제공입니다."
           : "AI 용어 설명·배경 이해·비판적 독해·다른 관점 추천은 준비 중입니다."}

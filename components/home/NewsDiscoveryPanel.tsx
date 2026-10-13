@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { NewsInlineCompanion, type SelectedNews } from "@/components/home/NewsInlineCompanion";
+import { MyBriefingPanel } from "@/components/home/MyBriefingPanel";
+import { requiredSearchTopics } from "@/lib/news/personalized-briefing";
+import type { TodayTopic } from "@/lib/news/daily-interests";
 import { NEWS_SEARCH_TOPICS, type NewsSearchItem, type NewsSearchSnapshot, type NewsSearchTopic } from "@/lib/news/news-search-contract";
 
 const newsDate = new Intl.DateTimeFormat("ko-KR", {
@@ -24,62 +27,84 @@ function safeSnapshot(data: unknown, topic: NewsSearchTopic): NewsSearchSnapshot
   return valid ? obj as NewsSearchSnapshot : null;
 }
 
-export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabled }: {
+export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabled, showBriefing = false, focusTopics = [], preferenceReady = true, onUpdateFocus }: {
   readerLabAvailable: boolean;
   readerModelReady: boolean;
   enabled: boolean;
+  showBriefing?: boolean;
+  focusTopics?: readonly TodayTopic[];
+  preferenceReady?: boolean;
+  onUpdateFocus?: () => void;
 }) {
   const [topic, setTopic] = useState<NewsSearchTopic>("economy");
   const [data, setData] = useState<Partial<Record<NewsSearchTopic, NewsSearchSnapshot>>>({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [pendingTopics, setPendingTopics] = useState<NewsSearchTopic[]>([]);
+  const [errors, setErrors] = useState<Partial<Record<NewsSearchTopic, string>>>({});
+  const inFlight = useRef(new Map<NewsSearchTopic, Promise<void>>());
   const [filter, setFilter] = useState("");
   const [selectedNews, setSelectedNews] = useState<SelectedNews | null>(null);
   const [mobilePanel, setMobilePanel] = useState<"articles" | "ai">("articles");
   const requestId = useRef(0);
 
-  async function pick(next: NewsSearchTopic) {
+  async function loadTopic(next: NewsSearchTopic): Promise<void> {
+    if (!enabled || data[next]) return;
+    const existing = inFlight.current.get(next);
+    if (existing) return existing;
+    const task = (async () => {
+      setPendingTopics(old => old.includes(next) ? old : [...old, next]);
+      try {
+        const response = await fetch("/api/news/discovery?topic=" + encodeURIComponent(next), {
+          cache: "no-store", signal: AbortSignal.timeout(25000),
+        });
+        const json: unknown = await response.json();
+        if (!response.ok) {
+          const reason = json !== null && typeof json === "object" &&
+            typeof (json as { error?: unknown }).error === "string"
+            ? (json as { error: string }).error
+            : "뉴스 검색 API의 응답을 확인할 수 없습니다.";
+          throw new Error(reason.slice(0, 140));
+        }
+        const snapshot = safeSnapshot(json, next);
+        if (!snapshot) throw new Error("검색 결과 형식을 확인할 수 없습니다.");
+        setData(old => ({ ...old, [next]: snapshot }));
+        setErrors(old => ({ ...old, [next]: undefined }));
+      } catch (err) {
+        setErrors(old => ({
+          ...old,
+          [next]: err instanceof Error && err.name !== "TimeoutError"
+            ? err.message : "검색 응답이 지연되고 있습니다.",
+        }));
+      } finally {
+        setPendingTopics(old => old.filter(key => key !== next));
+        inFlight.current.delete(next);
+      }
+    })();
+    inFlight.current.set(next, task);
+    return task;
+  }
+
+  function pick(next: NewsSearchTopic) {
     setTopic(next);
     setFilter("");
     setSelectedNews(null);
     setMobilePanel("articles");
-    setError("");
-    const id = ++requestId.current;
-    if (!enabled || data[next]) { setLoading(false); return; }
-    setLoading(true);
-    try {
-      const response = await fetch("/api/news/discovery?topic=" + encodeURIComponent(next), {
-        cache: "no-store", signal: AbortSignal.timeout(25000),
-      });
-      const json: unknown = await response.json();
-      if (!response.ok) {
-        const failure = json !== null && typeof json === "object" &&
-          typeof (json as { error?: unknown }).error === "string"
-          ? (json as { error: string }).error : "뉴스 검색 API의 응답을 확인할 수 없습니다.";
-        throw new Error(failure.slice(0, 140));
-      }
-      const snapshot = safeSnapshot(json, next);
-      if (!snapshot) throw new Error("검색 결과 형식을 확인할 수 없습니다.");
-      if (requestId.current === id) {
-        setData(old => ({ ...old, [next]: snapshot }));
-      }
-    } catch (err) {
-      if (requestId.current === id) setError(
-        err instanceof Error && err.name !== "TimeoutError"
-          ? err.message
-          : "검색 응답이 지연되고 있습니다. 연결을 다시 확인해 주세요."
-      );
-    } finally {
-      if (requestId.current === id) setLoading(false);
-    }
+    void loadTopic(next);
   }
 
   useEffect(() => {
-    // Explicitly enabled private beta only. No paid query before server has API credentials.
     if (!enabled) return;
-    queueMicrotask(() => { void pick("economy"); });
+    queueMicrotask(() => { void loadTopic("economy"); });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
+
+  useEffect(() => {
+    if (!enabled || !showBriefing || !preferenceReady) return;
+    queueMicrotask(() => {
+      for (const key of requiredSearchTopics(focusTopics)) void loadTopic(key);
+    });
+    // Stable parent state provides the actual selected-interest array.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, showBriefing, preferenceReady, focusTopics]);
 
   const selectedQuery = NEWS_SEARCH_TOPICS.find(item => item.id === topic)!.query;
   const googleNewsPage = "https://news.google.com/search?q=" +
@@ -89,17 +114,30 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
     setMobilePanel("ai");
   }
   const current = data[topic];
+  const loading = pendingTopics.includes(topic);
+  const error = errors[topic] || "";
   const filtered = current?.items.filter(row =>
     !filter.trim() ||
     (row.title + " " + row.sourceName).toLocaleLowerCase("ko-KR")
       .includes(filter.trim().toLocaleLowerCase("ko-KR"))) ?? [];
 
   return (
-    <section className="newsDiscoveryPanel" aria-labelledby="news-discovery-title">
+    <>
+    {showBriefing && (
+      <MyBriefingPanel focusTopics={focusTopics} preferenceReady={preferenceReady}
+        data={data} loadingTopics={pendingTopics} onUpdateFocus={onUpdateFocus || (() => {})}
+        onSelectArticle={(item, searchTopic) => {
+          setTopic(searchTopic);
+          setSelectedNews({ item, topic: searchTopic });
+          setMobilePanel("ai");
+          document.getElementById("news-discovery-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }} />
+    )}
+    <section className={showBriefing ? "newsDiscoveryPanel newsDiscoverySecondary" : "newsDiscoveryPanel"} aria-labelledby="news-discovery-title">
       <div className="sectionHeading">
         <div>
-          <h2 id="news-discovery-title">NEWS · 언론사 원문 탐색</h2>
-          <p>실제 언론사의 기사 제목·출처·원문 링크를 확인하세요.</p>
+          <h2 id="news-discovery-title">{showBriefing ? "DISCOVER · 전체 기사 탐색" : "NEWS · 언론사 원문 탐색"}</h2>
+          <p>{showBriefing ? "맞춤 브리핑 외의 기사도 직접 살펴볼 수 있습니다." : "실제 언론사의 기사 제목·출처·원문 링크를 확인하세요."}</p>
         </div>
         <span>{enabled ? "SEARCH API" : "API 준비 중"}</span>
       </div>
@@ -173,5 +211,6 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
       </div>
       </div>
     </section>
+    </>
   );
 }

@@ -8,13 +8,14 @@ import { SourceCardVisual } from "@/components/home/SourceCardVisual";
 import { ReaderAudiencePanel } from "@/components/home/ReaderAudiencePanel";
 import { NewsDiscoveryPanel } from "@/components/home/NewsDiscoveryPanel";
 import type { OfficialFeedSnapshot, OfficialSourceLink } from "@/lib/news/public-official-sources";
-import { TODAY_TOPICS, matchesTodayTopic, restoreTodayTopics, todayKstDate, type TodayTopic } from "@/lib/news/daily-interests";
+import { TODAY_TOPICS, matchesTodayTopic, restoreTodayTopics, validTodayTopics, todayKstDate, type TodayTopic } from "@/lib/news/daily-interests";
 
 type SourceKind = "all" | "notice" | "press";
 const SAVED_KEY = "noah:official-saved:v1";
 const HIDDEN_KEY = "noah:official-hidden:v1";
 const INTEREST_KEY = "noah:official-interests:v1";
 const TODAY_KEY = "noah:today-topics:v1";
+const FOCUS_KEY = "noah:personal-focus:v1";
 const RECENT_REFRESH_KEY = "noah:manual-source-refresh:v1";
 const MANUAL_WAIT_MS = 120000;
 const refreshTime = new Intl.DateTimeFormat("ko-KR", {
@@ -53,6 +54,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
   const [hidden, setHidden] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>(["notice", "press"]);
   const [todayTopics, setTodayTopics] = useState<TodayTopic[]>([]);
+  const [focusTopics, setFocusTopics] = useState<TodayTopic[]>([]);
   const [currentSnapshot, setCurrentSnapshot] = useState(snapshot);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshStatus, setRefreshStatus] = useState<{ text: string; persistent: boolean } | null>(null);
@@ -71,7 +73,13 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
       setHidden(storedStrings(HIDDEN_KEY));
       const preferred = storedStrings(INTEREST_KEY).filter(s => s === "notice" || s === "press");
       if (localStorage.getItem(INTEREST_KEY) !== null) setInterests(preferred);
-      setTodayTopics(restoreTodayTopics(localStorage.getItem(TODAY_KEY), todayKstDate()));
+      const today = restoreTodayTopics(localStorage.getItem(TODAY_KEY), todayKstDate());
+      setTodayTopics(today);
+      try {
+        const storedFocus = localStorage.getItem(FOCUS_KEY);
+        if (storedFocus !== null) setFocusTopics(validTodayTopics(JSON.parse(storedFocus)));
+        else setFocusTopics(today);
+      } catch { setFocusTopics(today); }
       try {
         const stored: unknown = JSON.parse(sessionStorage.getItem(RECENT_REFRESH_KEY) ?? "null");
         if (isOfficialRefresh(stored)) {
@@ -151,16 +159,38 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
   function focusReaderTopic(topic: TodayTopic) {
     const next: TodayTopic[] = [topic];
     setTodayTopics(next);
-    try { localStorage.setItem(TODAY_KEY, JSON.stringify({ date: todayKstDate(), topics: next })); } catch { /* private mode */ }
+    setFocusTopics(next);
+    try {
+      localStorage.setItem(TODAY_KEY, JSON.stringify({ date: todayKstDate(), topics: next }));
+      localStorage.setItem(FOCUS_KEY, JSON.stringify(next));
+    } catch { /* private mode */ }
+  }
+  function setPersonalFocus(next: TodayTopic[]) {
+    const valid = validTodayTopics(next);
+    setFocusTopics(valid);
+    setTodayTopics(valid);
+    try {
+      localStorage.setItem(FOCUS_KEY, JSON.stringify(valid));
+      localStorage.setItem(TODAY_KEY, JSON.stringify({ date: todayKstDate(), topics: valid }));
+    } catch { /* private mode */ }
+  }
+  function updatePersonalFocus(topic: TodayTopic) {
+    setPersonalFocus(focusTopics.includes(topic)
+      ? focusTopics.filter(t => t !== topic) : [...focusTopics, topic]);
+  }
+  function focusInterestControls() {
+    document.getElementById("my-focus-settings")?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   const currentKind: SourceKind = view === "startup" ? "notice" : filter;
+  const activeTopics = view === "home" ? focusTopics : todayTopics;
   const filtered = useMemo(() => currentSnapshot.items.filter(s => {
     if (view === "saved" && !saved.includes(s.url)) return false;
     if (view === "my" && !interests.includes(s.kind)) return false;
     if (view !== "saved" && hidden.includes(s.url)) return false;
     if (currentKind !== "all" && s.kind !== currentKind) return false;
-    if (view !== "saved" && todayTopics.length && !todayTopics.some(t => matchesTodayTopic(s.title, t))) return false;
+    // MY FOCUS drives only the personalized news briefing on Home; official sources remain independently browsable.
+    if (view !== "saved" && view !== "home" && todayTopics.length && !todayTopics.some(t => matchesTodayTopic(s.title, t))) return false;
     return !query.trim() || (s.title + s.sourceName).toLocaleLowerCase("ko-KR").includes(query.trim().toLocaleLowerCase("ko-KR"));
   }), [currentSnapshot.items, saved, hidden, interests, todayTopics, currentKind, query, view]);
 
@@ -210,17 +240,18 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
         <p className="sourceHealth" role="status">일부 자료원의 연결이 원활하지 않습니다. 표시 가능한 원문만 제공하며 가상 자료로 대체하지 않습니다.</p>
       )}
       {(view === "home" || view === "my") && (
-        <ReaderAudiencePanel activeTopics={todayTopics} onFocusTopic={focusReaderTopic} aiReaderAvailable={readerModelReady} />
+        <ReaderAudiencePanel activeTopics={activeTopics} onFocusTopic={focusReaderTopic} aiReaderAvailable={readerModelReady} newsSearchEnabled={newsSearchEnabled} />
       )}
       {(view === "home" || view === "discover" || view === "startup" || view === "my") && (
-        <section className="todayInterestPanel" aria-label="오늘의 관심사 선택">
+        <section id={view === "home" ? "my-focus-settings" : undefined} className={view === "home" ? "todayInterestPanel personalFocusPanel" : "todayInterestPanel"} aria-label={view === "home" ? "나의 관심사 설정" : "오늘의 관심사 선택"}>
           <div className="todayInterestHeading">
             <div>
-              <h2>오늘의 관심사</h2>
-              <p>관심사는 언제든 변경할 수 있습니다.</p>
+              <h2>{view === "home" ? "MY FOCUS · 나의 관심사" : "오늘의 관심사"}</h2>
+              <p>{view === "home" ? "선택한 분야를 기억하고 관련 기사 제목을 우선 선별합니다." : "관심사는 언제든 변경할 수 있습니다."}</p>
             </div>
-            {todayTopics.length > 0 && <button className="todayInterestReset" type="button" onClick={clearTodayTopics}>전체 보기</button>}
+            {activeTopics.length > 0 && <button className="todayInterestReset" type="button" onClick={() => view === "home" ? setPersonalFocus([]) : clearTodayTopics()}>{view === "home" ? "선택 해제" : "전체 보기"}</button>}
           </div>
+{view !== "home" && (
           <div className="sourceFreshnessBar">
             <span className="sourceFreshnessText" aria-live="polite" aria-atomic="true">
               <span
@@ -238,16 +269,22 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
               <Icon name="refresh" /> {refreshing ? "확인 중…" : "최신 자료 확인"}
             </button>
           </div>
+          )}
           <div className="todayInterestChips">
             {TODAY_TOPICS.map(topic => (
-              <button type="button" key={topic.id} aria-pressed={todayTopics.includes(topic.id)} onClick={() => toggleTodayTopic(topic.id)}>
-                <span aria-hidden="true">{todayTopics.includes(topic.id) ? "✓ " : ""}</span>{topic.label}
+              <button type="button" key={topic.id} aria-pressed={activeTopics.includes(topic.id)}
+                onClick={() => view === "home" ? updatePersonalFocus(topic.id) : toggleTodayTopic(topic.id)}>
+                <span aria-hidden="true">{activeTopics.includes(topic.id) ? "✓ " : ""}</span>{topic.label}
               </button>
             ))}
           </div>
           <p className="todayInterestNote" aria-live="polite">
-            {todayTopics.length ? `${todayTopics.length}개 관심사 선택 · 해당 주제 중 하나라도 일치하면 표시합니다.` : "전체 주제 표시 · 선택하면 현재 목록에서 바로 선별됩니다."}
-            {" "}설정은 한국시간 기준 다음 날 다시 방문할 때 초기화됩니다.
+            {view === "home"
+              ? activeTopics.length
+                ? `${activeTopics.length}개 분야 선택 · 관심 분야에 일치하는 실제 기사 제목을 먼저 보여드립니다.`
+                : "관심사 미설정 · 하나 이상 고르면 맞춤 뉴스 브리핑을 시작합니다."
+              : `${todayTopics.length ? `${todayTopics.length}개 관심사 선택 · 주제 일치 자료만 표시` : "전체 주제 표시"} · 한국시간 기준 다음 날 초기화`}
+            {view === "home" && " 선택한 관심사는 이 브라우저에 유지되고 언제든 변경할 수 있습니다."}
           </p>
         </section>
       )}
@@ -275,7 +312,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
               </div>
             </section>
           )}
-          {showControls && (
+          {showControls && view !== "home" && (
             <div className="sourceToolbar">
               <label className="sourceSearch">
                 <Icon name="search" />
@@ -289,7 +326,42 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
             </div>
           )}
           {(view === "home" || view === "discover" || view === "startup") && (
-            <NewsDiscoveryPanel readerLabAvailable={readerLabAvailable} readerModelReady={readerModelReady} enabled={newsSearchEnabled} />
+            <NewsDiscoveryPanel readerLabAvailable={readerLabAvailable}
+              readerModelReady={readerModelReady} enabled={newsSearchEnabled}
+              showBriefing={view === "home"} focusTopics={focusTopics}
+              preferenceReady={ready} onUpdateFocus={focusInterestControls} />
+          )}
+          {view === "home" && (
+            <div className="officialFreshnessBar">
+              <div className="sourceFreshnessBar">
+                <span className="sourceFreshnessText" aria-live="polite" aria-atomic="true">
+                  {refreshStatus?.text ?? (currentSnapshot.availableFeeds > 0 && currentSnapshot.retrievedAt
+                    ? `정부자료 확인 ${refreshTime.format(new Date(currentSnapshot.retrievedAt))} · 신청기한은 원문 확인`
+                    : "정부 공식자료의 최신 확인이 지연되고 있습니다.")}
+                </span>
+                <button type="button" className="sourceRefreshButton" onClick={refreshSources} disabled={refreshing}>
+                  <Icon name="refresh" /> {refreshing ? "확인 중…" : "공식 RSS 새로 확인"}
+                </button>
+              </div>
+            </div>
+          )}
+          {view === "home" && (
+            <div className="officialDataControls">
+              <p>정부 공식자료 · 제목으로 직접 찾기</p>
+              <div className="sourceToolbar">
+                <label className="sourceSearch">
+                  <Icon name="search" />
+                  <input value={query} onChange={e => setQuery(e.target.value)}
+                    placeholder="정부 공고·보도자료 제목 검색" aria-label="정부 공식자료 제목 검색" />
+                </label>
+                <div className="sourceFilters" aria-label="정부 자료 종류">
+                  {(["all", "notice", "press"] as const).map(k => (
+                    <button key={k} type="button" aria-pressed={currentKind === k}
+                      onClick={() => setFilter(k)}>{sourceLabel(k)}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
           )}
           <section className="feedSection" aria-label="공식 자료 목록">
             <div className="sectionHeading">
