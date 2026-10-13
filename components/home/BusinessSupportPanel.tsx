@@ -95,7 +95,7 @@ export function BusinessSupportPanel({enabled}:{enabled:boolean}){
             <label key={field.id}>
               <span>{field.label}</span>
               <select disabled={!profileReady} value={profile[field.id]}
-                onChange={e=>update(field.id,e.target.value)}>
+                onChange={e=>update(field.id,e.target.value as BusinessProfile[typeof field.id])}>
                 {field.values.map(value=><option key={value} value={value}>{value}</option>)}
               </select>
             </label>
