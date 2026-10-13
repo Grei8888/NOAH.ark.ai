@@ -35,14 +35,14 @@ export function newsSearchConfigured(): boolean {
     !!process.env.SERPAPI_KEY?.trim();
 }
 
-function failureCodeFromStatus(status: number): NewsSearchFailureCode {
+export function failureCodeFromStatus(status: number): NewsSearchFailureCode {
   if (status === 401 || status === 403) return "invalid_key";
   if (status === 429) return "quota";
   if (status === 400 || status === 422) return "upstream_rejected";
   return "provider_unavailable";
 }
 
-function decodeProviderStatus(payload: unknown): NewsSearchFailureCode | null {
+export function decodeProviderStatus(payload: unknown): NewsSearchFailureCode | null {
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) return "unexpected_response";
   const body = payload as Record<string, unknown>;
   const error = typeof body.error === "string" ? body.error.toLowerCase() : "";
