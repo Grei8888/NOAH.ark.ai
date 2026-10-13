@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { curateFromHeadlines, requiredSearchTopics, type CuratedIssue } from "@/lib/news/personalized-briefing";
 import { TODAY_TOPICS, type TodayTopic } from "@/lib/news/daily-interests";
 import type { NewsSearchSnapshot, NewsSearchTopic, NewsSearchItem } from "@/lib/news/news-search-contract";
@@ -26,10 +25,10 @@ export function MyBriefingPanel({
   const required = requiredSearchTopics(focusTopics);
   const waiting = required.some(topic => !data[topic] && loadingTopics.includes(topic));
   const unavailable = required.filter(topic => !data[topic] && !loadingTopics.includes(topic));
-  const results = useMemo(() => curateFromHeadlines(
+  const results = curateFromHeadlines(
     required.map(topic => data[topic]).filter((entry): entry is NewsSearchSnapshot => !!entry),
     focusTopics,
-  ), [data, focusTopics, required.join(",")]); // deterministic selected topic order
+  );
 
   function articleButton(issue: CuratedIssue) {
     const first = issue.sources[0];
