@@ -309,7 +309,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
               </div>
             </section>
           )}
-          {showControls && (
+          {showControls && view !== "home" && (
             <div className="sourceToolbar">
               <label className="sourceSearch">
                 <Icon name="search" />
@@ -327,6 +327,24 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
               readerModelReady={readerModelReady} enabled={newsSearchEnabled}
               showBriefing={view === "home"} focusTopics={focusTopics}
               preferenceReady={ready} onUpdateFocus={focusInterestControls} />
+          )}
+          {view === "home" && (
+            <div className="officialDataControls">
+              <p>정부 공식자료 · 제목으로 직접 찾기</p>
+              <div className="sourceToolbar">
+                <label className="sourceSearch">
+                  <Icon name="search" />
+                  <input value={query} onChange={e => setQuery(e.target.value)}
+                    placeholder="정부 공고·보도자료 제목 검색" aria-label="정부 공식자료 제목 검색" />
+                </label>
+                <div className="sourceFilters" aria-label="정부 자료 종류">
+                  {(["all", "notice", "press"] as const).map(k => (
+                    <button key={k} type="button" aria-pressed={currentKind === k}
+                      onClick={() => setFilter(k)}>{sourceLabel(k)}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
           )}
           <section className="feedSection" aria-label="공식 자료 목록">
             <div className="sectionHeading">
