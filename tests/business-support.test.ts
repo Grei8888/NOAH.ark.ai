@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextResponse } from "next/server";
 import {
-  DEFAULT_BUSINESS_PROFILE, normalizeBizinfoPayload, officialAnnouncementUrl,
+  DEFAULT_BUSINESS_PROFILE, normalizeBizinfoPayload, bizinfoRawItems, officialAnnouncementUrl,
   parseApplicationPeriod, rankBusinessSupport, validateBusinessProfile,
 } from "@/lib/business/support-contract";
 import { businessSupportEnabled } from "@/lib/business/bizinfo-provider";
@@ -62,6 +62,12 @@ describe("live Bizinfo metadata without invented grants",()=>{
     expect(officialAnnouncementUrl("javascript:alert(1)")).toBeNull();
     expect(officialAnnouncementUrl("https://bizinfo.go.kr.evil.site/x/view.do")).toBeNull();
     expect(officialAnnouncementUrl("https://www.bizinfo.go.kr/uss/rss/bizinfoApi.do?crtfcKey=test")).toBeNull();
+  });
+  it("distinguishes a documented empty list, a malformed envelope, and links rejected by validation",()=>{
+    expect(bizinfoRawItems({jsonArray:{item:[]}})).toEqual([]);
+    expect(bizinfoRawItems({unexpected:{results:[fixtures[0]]}})).toBeNull();
+    expect(bizinfoRawItems({jsonArray:{item:[{...fixtures[0],link:"https://outside.example/view.do"}]}})).toHaveLength(1);
+    expect(normalizeBizinfoPayload({jsonArray:{item:[{...fixtures[0],link:"https://outside.example/view.do"}]}})).toEqual([]);
   });
   it("interprets dates conservatively and ignores invalid ranges",()=>{
     expect(parseApplicationPeriod("20261001 ~ 20261020")).toEqual({startDate:"2026-10-01",endDate:"2026-10-20"});
