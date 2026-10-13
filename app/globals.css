@@ -2697,3 +2697,6 @@ section[id] {
   .myBriefingActions { gap: 10px 19px; }
   .myBriefingFocus span { font-size: 10px; }
 }
+
+/* This is government RSS freshness, deliberately outside personal news focus. */
+.officialFreshnessBar { margin: 14px 0 6px; border-top: 1px solid var(--border); padding-top: 10px; }
