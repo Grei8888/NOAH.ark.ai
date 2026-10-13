@@ -75,7 +75,7 @@ export function MyBriefingPanel({
             {!waiting && results.length === 0 &&
               <div className="myBriefingState" role="status">
                 <strong>일치하는 최신 기사 제목이 아직 없습니다.</strong>
-                <p>지난 14일 내 기사 제목만 대상으로 확인했습니다. 임의의 기사를 추천하지 않습니다.</p>
+                <p>최근 30일 내 기사 제목만 대상으로 확인했습니다. 임의의 기사를 추천하지 않습니다.</p>
                 {unavailable.length > 0 && <p>일부 뉴스 검색을 불러오지 못했습니다. 아래 전체 탐색에서 검색 상태를 확인하세요.</p>}
               </div>}
             {results.length > 0 && (
