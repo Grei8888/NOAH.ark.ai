@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { readerLabConfigured, readerLabModelReady } from "@/lib/news/reader-lab-access";
 import { getOfficialSourceSnapshot, publicSourceMode } from "@/lib/news/public-official-sources";
 import { ReaderLab } from "@/components/lab/ReaderLab";
-import { getNewsSearchSnapshot, parseNewsSearchTopic } from "@/lib/news/google-news-search";
+import { getNewsSearchSnapshot } from "@/lib/news/google-news-search";
+import { parseNewsSearchTopic } from "@/lib/news/news-search-contract";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
