@@ -19,27 +19,30 @@ export function NewsInlineCompanion({
   const [question, setQuestion] = useState<string>(READER_MODES[0].hint);
   const [inviteCode, setInviteCode] = useState("");
   const [pending, setPending] = useState(false);
-  const [answer, setAnswer] = useState("");
-  const [error, setError] = useState("");
+  const [answerState, setAnswerState] = useState<{ url: string; value: string } | null>(null);
+  const [errorState, setErrorState] = useState<{ url: string; value: string } | null>(null);
+  const currentUrl = selected?.item.url ?? "";
+  const answer = answerState?.url === currentUrl ? answerState.value : "";
+  const error = errorState?.url === currentUrl ? errorState.value : "";
 
   const modes = READER_MODES;
 
   function changeMode(next: ReaderMode) {
     setMode(next);
     setQuestion(modes.find(row => row.id === next)!.hint);
-    setAnswer("");
-    setError("");
+    setAnswerState(null);
+    setErrorState(null);
   }
 
   async function submitQuestion() {
     if (!selected || !modelReady || pending) return;
     if (inviteCode.length < 32 || question.trim().length < 4 || question.trim().length > 380) {
-      setError("테스터 초대 코드와 4~380자의 질문을 확인해 주세요.");
+      setErrorState({ url: selected.item.url, value: "테스터 초대 코드와 4~380자의 질문을 확인해 주세요." });
       return;
     }
     setPending(true);
-    setAnswer("");
-    setError("");
+    setAnswerState(null);
+    setErrorState(null);
     try {
       // Reuse the exact real AI endpoint from the 10-reader lab, not a mock.
       // The server receives only the selected headline and user's question,
@@ -58,9 +61,9 @@ export function NewsInlineCompanion({
       if (!response.ok || typeof data.answer !== "string" || !data.answer.trim()) {
         throw new Error(typeof data.error === "string" ? data.error : "AI의 답변을 확인하지 못했습니다.");
       }
-      setAnswer(data.answer.slice(0, 4500));
+      setAnswerState({ url: selected.item.url, value: data.answer.slice(0, 4500) });
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "AI에 연결할 수 없습니다.");
+      setErrorState({ url: selected.item.url, value: cause instanceof Error ? cause.message : "AI에 연결할 수 없습니다." });
     } finally {
       setPending(false);
     }
