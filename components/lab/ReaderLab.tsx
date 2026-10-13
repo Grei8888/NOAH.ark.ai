@@ -224,7 +224,7 @@ export function ReaderLab({
             {link && <a className="readerWorkspaceExternal" href={link}
               target="_blank" rel="noopener noreferrer">원문 새 창 ↗</a>}
           </div>
-          <details className="readerSourceChooser" open={undefined}>
+          <details className="readerSourceChooser">
             <summary>읽을 원문 선택 · 실제 정부 RSS {availableFeeds}/{totalFeeds} · {sources.length}건</summary>
             {sources.length ? (
               <>
