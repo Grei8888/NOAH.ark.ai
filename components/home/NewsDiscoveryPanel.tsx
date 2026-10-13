@@ -28,6 +28,17 @@ function safeSnapshot(data: unknown, topic: NewsSearchTopic): NewsSearchSnapshot
   return valid ? obj as NewsSearchSnapshot : null;
 }
 
+/**
+ * The mobile reader panel replaces the article list, so the viewport must
+ * follow the newly visible target after React commits the layout switch.
+ */
+export function mobileNewsScrollDestination(
+  panel: "articles" | "ai", hasSelectedArticle: boolean,
+): "tabs" | "reader" | "question" {
+  if (panel === "articles") return "tabs";
+  return hasSelectedArticle ? "question" : "reader";
+}
+
 export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabled, showBriefing = false, focusTopics = [], preferenceReady = true, businessSupportEnabled = false, showBusinessSupport = false, onUpdateFocus }: {
   readerLabAvailable: boolean;
   readerModelReady: boolean;
@@ -47,7 +58,12 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
   const [filter, setFilter] = useState("");
   const [selectedNews, setSelectedNews] = useState<SelectedNews | null>(null);
   const [mobilePanel, setMobilePanel] = useState<"articles" | "ai">("articles");
-  const requestId = useRef(0);
+  const mobileTabsRef = useRef<HTMLElement>(null);
+  const mobileAiRef = useRef<HTMLDivElement>(null);
+  // Increment even if the same article is selected again: every deliberate tap navigates.
+  const [mobileJump, setMobileJump] = useState<{ target: "articles" | "ai"; sequence: number }>({
+    target: "articles", sequence: 0,
+  });
 
   async function loadTopic(next: NewsSearchTopic): Promise<void> {
     if (!enabled || data[next]) return;
@@ -112,10 +128,44 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
   const selectedQuery = NEWS_SEARCH_TOPICS.find(item => item.id === topic)!.query;
   const googleNewsPage = "https://news.google.com/search?q=" +
     encodeURIComponent(selectedQuery) + "&hl=ko&gl=KR&ceid=KR%3Ako";
+  function navigateMobile(target: "articles" | "ai") {
+    setMobilePanel(target);
+    setMobileJump(previous => ({ target, sequence: previous.sequence + 1 }));
+  }
+
   function selectArticle(item: NewsSearchItem) {
     setSelectedNews({ item, topic });
-    setMobilePanel("ai");
+    navigateMobile("ai");
   }
+
+  useEffect(() => {
+    if (!mobileJump.sequence || mobilePanel !== mobileJump.target ||
+        !window.matchMedia("(max-width: 767px)").matches) return;
+    // iOS Safari needs the previous news list to be hidden and the new AI panel
+    // laid out before scrolling. Two frames avoid jumping to the old position.
+    let followupFrame = 0;
+    const firstFrame = window.requestAnimationFrame(() => {
+      followupFrame = window.requestAnimationFrame(() => {
+        const scrollTarget = mobileNewsScrollDestination(mobileJump.target, Boolean(selectedNews));
+        const destination = scrollTarget === "tabs" ? mobileTabsRef.current
+          : scrollTarget === "question"
+            ? mobileAiRef.current?.querySelector<HTMLTextAreaElement>("#newsAiQuestion")
+            : mobileAiRef.current?.querySelector<HTMLElement>(".newsAiCompanion");
+        if (!destination) return;
+        destination.scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+          block: scrollTarget === "question" ? "center" : "start",
+          inline: "nearest",
+        });
+        // Deliberately do NOT focus the textarea: Safari would unexpectedly
+        // open the keyboard and hide the selected article context.
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      window.cancelAnimationFrame(followupFrame);
+    };
+  }, [mobileJump, mobilePanel, selectedNews]);
   const current = data[topic];
   const loading = pendingTopics.includes(topic);
   const error = errors[topic] || "";
@@ -132,8 +182,10 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
         onSelectArticle={(item, searchTopic) => {
           setTopic(searchTopic);
           setSelectedNews({ item, topic: searchTopic });
-          setMobilePanel("ai");
-          document.getElementById("news-discovery-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          navigateMobile("ai");
+          if (typeof window !== "undefined" && !window.matchMedia("(max-width: 767px)").matches) {
+            document.getElementById("news-discovery-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
         }} />
     )}
     {showBusinessSupport && <BusinessSupportPanel enabled={businessSupportEnabled} />}
@@ -145,9 +197,9 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
         </div>
         <span>{enabled ? "SEARCH API" : "API 준비 중"}</span>
       </div>
-      <nav className="newsAiMobileTabs" aria-label="뉴스 기사와 AI 독해 화면 전환">
-        <button type="button" aria-pressed={mobilePanel === "articles"} onClick={() => setMobilePanel("articles")}>뉴스 목록</button>
-        <button type="button" aria-pressed={mobilePanel === "ai"} onClick={() => setMobilePanel("ai")}>AI 질문하기</button>
+      <nav ref={mobileTabsRef} className="newsAiMobileTabs" aria-label="뉴스 기사와 AI 독해 화면 전환">
+        <button type="button" aria-pressed={mobilePanel === "articles"} onClick={() => navigateMobile("articles")}>뉴스 목록</button>
+        <button type="button" aria-pressed={mobilePanel === "ai"} onClick={() => navigateMobile("ai")}>AI 질문하기</button>
       </nav>
       <div className="newsAiSplit">
       <div className="newsAiStories" data-mobile-active={mobilePanel === "articles"}>
@@ -210,7 +262,7 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
         세부 사실은 반드시 언론사 원문에서 확인하세요.
       </p>
       </div>
-      <div className="newsAiSide" data-mobile-active={mobilePanel === "ai"}>
+      <div ref={mobileAiRef} className="newsAiSide" data-mobile-active={mobilePanel === "ai"}>
         <NewsInlineCompanion selected={selectedNews} modelReady={readerModelReady} labAvailable={readerLabAvailable} />
       </div>
       </div>
