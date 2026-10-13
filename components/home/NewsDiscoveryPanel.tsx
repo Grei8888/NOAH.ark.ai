@@ -28,6 +28,17 @@ function safeSnapshot(data: unknown, topic: NewsSearchTopic): NewsSearchSnapshot
   return valid ? obj as NewsSearchSnapshot : null;
 }
 
+/**
+ * The mobile reader panel replaces the article list, so the viewport must
+ * follow the newly visible target after React commits the layout switch.
+ */
+export function mobileNewsScrollDestination(
+  panel: "articles" | "ai", hasSelectedArticle: boolean,
+): "tabs" | "reader" | "question" {
+  if (panel === "articles") return "tabs";
+  return hasSelectedArticle ? "question" : "reader";
+}
+
 export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabled, showBriefing = false, focusTopics = [], preferenceReady = true, businessSupportEnabled = false, showBusinessSupport = false, onUpdateFocus }: {
   readerLabAvailable: boolean;
   readerModelReady: boolean;
@@ -135,16 +146,15 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
     let followupFrame = 0;
     const firstFrame = window.requestAnimationFrame(() => {
       followupFrame = window.requestAnimationFrame(() => {
-        const selectedQuestion = mobileAiRef.current?.querySelector<HTMLTextAreaElement>("#newsAiQuestion");
-        const destination = mobileJump.target === "articles"
-          ? mobileTabsRef.current
-          : selectedNews && selectedQuestion
-            ? selectedQuestion
+        const scrollTarget = mobileNewsScrollDestination(mobileJump.target, Boolean(selectedNews));
+        const destination = scrollTarget === "tabs" ? mobileTabsRef.current
+          : scrollTarget === "question"
+            ? mobileAiRef.current?.querySelector<HTMLTextAreaElement>("#newsAiQuestion")
             : mobileAiRef.current?.querySelector<HTMLElement>(".newsAiCompanion");
         if (!destination) return;
         destination.scrollIntoView({
           behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
-          block: mobileJump.target === "ai" && selectedNews ? "center" : "start",
+          block: scrollTarget === "question" ? "center" : "start",
           inline: "nearest",
         });
         // Deliberately do NOT focus the textarea: Safari would unexpectedly
