@@ -55,17 +55,27 @@ export function decodeProviderStatus(payload: unknown): NewsSearchFailureCode | 
   return "provider_unavailable";
 }
 
-async function searchNewsOnce(topic: NewsSearchTopic): Promise<NewsSearchSnapshot> {
-  if (!newsSearchConfigured()) throw new NewsSearchFailure("configuration");
-  const selected = NEWS_SEARCH_TOPICS.find(t => t.id === topic)!;
-  const query = new URLSearchParams({
+/**
+ * Google News SerpApi: q is a standard search parameter.
+ * According to the provider docs, combining q with advanced parameters
+ * can cause an HTTP 400. In particular do not add so=1 alongside q.
+ * Google News will use its default relevance ordering.
+ */
+export function buildGoogleNewsQuery(topic: NewsSearchTopic, apiKey: string): URLSearchParams {
+  const selected = NEWS_SEARCH_TOPICS.find(item => item.id === topic);
+  if (!selected) throw new Error("Unsupported search category");
+  return new URLSearchParams({
     engine: "google_news",
     q: selected.query,
     gl: "kr",
     hl: "ko",
-    so: "1",
-    api_key: process.env.SERPAPI_KEY!,
+    api_key: apiKey,
   });
+}
+
+async function searchNewsOnce(topic: NewsSearchTopic): Promise<NewsSearchSnapshot> {
+  if (!newsSearchConfigured()) throw new NewsSearchFailure("configuration");
+  const query = buildGoogleNewsQuery(topic, process.env.SERPAPI_KEY!);
   try {
     // A 9s timeout caused needless empty screens during third-party degradation.
     // Don't retry automatically: each new search may consume API quota.
