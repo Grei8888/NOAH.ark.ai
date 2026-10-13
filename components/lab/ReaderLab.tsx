@@ -5,7 +5,7 @@ import Link from "next/link";
 import { READER_MODES, type ReaderMode } from "@/lib/news/reader-companion";
 import { readerWordTokens, termExplanationQuestion } from "@/lib/news/reader-word-selection";
 import type { OfficialSourceLink } from "@/lib/news/public-official-sources";
-import type { NewsSearchItem } from "@/lib/news/google-news-search";
+import type { NewsSearchItem } from "@/lib/news/news-search-contract";
 
 type LabResponse = { answer?: string; error?: string; note?: string };
 type SelectedWord = { key: string; word: string };
