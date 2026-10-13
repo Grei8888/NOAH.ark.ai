@@ -49,7 +49,7 @@ function sourceLabel(kind: SourceKind) {
   return kind === "notice" ? "사업공고" : kind === "press" ? "보도자료" : "모든 자료";
 }
 
-export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, readerModelReady = false, newsSearchEnabled = false }: { snapshot: OfficialFeedSnapshot; view: HomeView; readerLabAvailable?: boolean; readerModelReady?: boolean; newsSearchEnabled?: boolean }) {
+export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, readerModelReady = false, newsSearchEnabled = false, businessSupportEnabled = false }: { snapshot: OfficialFeedSnapshot; view: HomeView; readerLabAvailable?: boolean; readerModelReady?: boolean; newsSearchEnabled?: boolean; businessSupportEnabled?: boolean }) {
   const [saved, setSaved] = useState<string[]>([]);
   const [hidden, setHidden] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>(["notice", "press"]);
@@ -329,7 +329,8 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
             <NewsDiscoveryPanel readerLabAvailable={readerLabAvailable}
               readerModelReady={readerModelReady} enabled={newsSearchEnabled}
               showBriefing={view === "home"} focusTopics={focusTopics}
-              preferenceReady={ready} onUpdateFocus={focusInterestControls} />
+              preferenceReady={ready} onUpdateFocus={focusInterestControls}
+              businessSupportEnabled={businessSupportEnabled} showBusinessSupport={view === "home" || view === "startup"} />
           )}
           {view === "home" && (
             <div className="officialFreshnessBar">
