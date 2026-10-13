@@ -250,6 +250,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
             </div>
             {activeTopics.length > 0 && <button className="todayInterestReset" type="button" onClick={() => view === "home" ? setPersonalFocus([]) : clearTodayTopics()}>{view === "home" ? "선택 해제" : "전체 보기"}</button>}
           </div>
+{view !== "home" && (
           <div className="sourceFreshnessBar">
             <span className="sourceFreshnessText" aria-live="polite" aria-atomic="true">
               <span
@@ -267,6 +268,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
               <Icon name="refresh" /> {refreshing ? "확인 중…" : "최신 자료 확인"}
             </button>
           </div>
+          )}
           <div className="todayInterestChips">
             {TODAY_TOPICS.map(topic => (
               <button type="button" key={topic.id} aria-pressed={activeTopics.includes(topic.id)}
@@ -327,6 +329,20 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
               readerModelReady={readerModelReady} enabled={newsSearchEnabled}
               showBriefing={view === "home"} focusTopics={focusTopics}
               preferenceReady={ready} onUpdateFocus={focusInterestControls} />
+          )}
+          {view === "home" && (
+            <div className="officialFreshnessBar">
+              <div className="sourceFreshnessBar">
+                <span className="sourceFreshnessText" aria-live="polite" aria-atomic="true">
+                  {refreshStatus?.text ?? (currentSnapshot.availableFeeds > 0 && currentSnapshot.retrievedAt
+                    ? `정부자료 확인 ${refreshTime.format(new Date(currentSnapshot.retrievedAt))} · 신청기한은 원문 확인`
+                    : "정부 공식자료의 최신 확인이 지연되고 있습니다.")}
+                </span>
+                <button type="button" className="sourceRefreshButton" onClick={refreshSources} disabled={refreshing}>
+                  <Icon name="refresh" /> {refreshing ? "확인 중…" : "공식 RSS 새로 확인"}
+                </button>
+              </div>
+            </div>
           )}
           {view === "home" && (
             <div className="officialDataControls">
