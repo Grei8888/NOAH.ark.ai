@@ -34,15 +34,13 @@ export function NewsDiscoveryPanel({ readerLabAvailable, enabled }: {
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("");
   const requestId = useRef(0);
-  const dataRef = useRef(data);
-  dataRef.current = data;
 
   async function pick(next: NewsSearchTopic) {
     setTopic(next);
     setFilter("");
     setError("");
-    if (!enabled || dataRef.current[next]) return;
     const id = ++requestId.current;
+    if (!enabled || data[next]) { setLoading(false); return; }
     setLoading(true);
     try {
       const response = await fetch("/api/news/discovery?topic=" + encodeURIComponent(next), {
