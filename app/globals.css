@@ -2847,3 +2847,44 @@ section[id] {
   .newsAiModeButtons { gap: 3px; }
   .newsAiModeButtons button { font-size: 9px; padding: 5px 1px; }
 }
+
+/* MY BUSINESS: separate support, research and public procurement opportunities. */
+.businessOpportunityPanel { margin: 14px 0 39px; border-top: 2px solid var(--navy); padding: 23px 0 19px; }
+.businessOpportunityHeading h2 { font-size: clamp(20px,2vw,27px); color: var(--navy); line-height: 1.45; font-weight: 800; }
+.businessOpportunityHeading p { margin-top: 7px; font-size: 12px; color: var(--slate); line-height: 1.7; }
+.opportunityTabs { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-top: 18px; }
+.opportunityTabs button { min-width: 0; min-height: 45px; font-size: 12px; font-weight: 750; color: var(--navy); border: 1px solid #d4dfe9; border-radius: 8px; background: #fff; padding: 9px 6px; }
+.opportunityTabs button[aria-selected="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+.businessOpportunityPanel :is(a,button,input):focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.opportunityTabPanel { min-width: 0; }
+.opportunityTabPanel > .businessSupportSection { border: 0; margin: 7px 0 0; padding: 0; }
+.opportunityTabPanel > .businessSupportSection > .businessSupportHeader { display: none; }
+.opportunitySearchLabel { display: block; color: var(--navy); font-size: 11px; font-weight: 750; margin: 20px 0 8px; }
+.opportunitySearchLabel span { color: var(--slate); font-size: 10px; font-weight: 400; }
+.opportunityKeyword { width: 100%; min-height: 45px; padding: 9px 13px; border: 1px solid #d4dfe9; border-radius: 8px; font-size: 12px; color: var(--navy); background: #fff; }
+.opportunityQuickTopics { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 16px; }
+.opportunityQuickTopics button { min-height: 40px; padding: 8px 13px; background: #fff; color: var(--navy); border: 1px solid #d4dfe9; border-radius: 24px; font-size: 11px; }
+.opportunityQuickTopics button[aria-pressed="true"] { background: #e8edf3; border-color: #a6b4c6; font-weight: 700; }
+.opportunitySourceLine { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; border-top: 1px solid #dce3eb; padding-top: 13px; color: var(--slate); font-size: 10px; line-height: 1.7; }
+.opportunitySourceLine a { color: var(--navy); text-decoration: underline; text-underline-offset: 3px; }
+.opportunityNotice { border-bottom: 1px solid #e0e6ed; padding: 17px 0 19px; }
+.opportunityNoticeMeta { font-size: 10px; color: #667990; font-weight: 700; margin-bottom: 8px; }
+.opportunityNotice h3 { font-size: clamp(14px,1.6vw,17px); font-weight: 750; line-height: 1.55; word-break: keep-all; color: var(--navy); }
+.opportunityNotice h3 a:hover { text-decoration: underline; }
+.opportunityDeadline { font-size: 11px; font-weight: 650; color: var(--navy); line-height: 1.7; margin-top: 8px; }
+.opportunityScope { font-size: 11px; color: var(--slate); line-height: 1.7; margin-top: 7px; }
+.opportunityCaution { font-size: 11px; line-height: 1.7; color: #695c45; border-left: 2px solid #c5b386; padding: 5px 10px; margin-top: 10px; }
+.opportunityReference, .opportunityCoverage { font-size: 10px; line-height: 1.8; color: var(--slate); margin-top: 9px; }
+.opportunityNoticeState { padding: 17px; margin: 16px 0; border: 1px solid #dbe4ec; background: #f8fafc; border-radius: 8px; font-size: 12px; line-height: 1.8; color: var(--slate); }
+.opportunityNoticeState strong { display: block; color: var(--navy); margin-bottom: 4px; }
+.opportunityNoticeState a { color: var(--navy); font-weight: 700; text-decoration: underline; }
+.opportunityOfficialLink { display: inline-flex; min-height: 43px; align-items: center; font-size: 11px; font-weight: 750; color: var(--navy); text-decoration: underline; text-underline-offset: 3px; }
+.opportunityFooter { border-top: 1px solid #e0e6ed; margin-top: 16px; padding-top: 13px; font-size: 10px; line-height: 1.85; color: var(--slate); }
+@media (max-width: 767px) {
+  .businessOpportunityPanel { padding-top: 20px; }
+  .businessOpportunityHeading h2 { font-size: 21px; }
+  .businessOpportunityHeading p { font-size: 11px; }
+  .opportunityTabs { gap: 5px; }
+  .opportunityTabs button { padding: 8px 2px; font-size: 11px; }
+  .opportunityNotice h3 { font-size: 15px; }
+}

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NewsInlineCompanion, type SelectedNews } from "@/components/home/NewsInlineCompanion";
 import { MyBriefingPanel } from "@/components/home/MyBriefingPanel";
-import { BusinessSupportPanel } from "@/components/home/BusinessSupportPanel";
+import { BusinessOpportunityPanel } from "@/components/home/BusinessOpportunityPanel";
 import { requiredSearchTopics } from "@/lib/news/personalized-briefing";
 import type { TodayTopic } from "@/lib/news/daily-interests";
 import { NEWS_SEARCH_TOPICS, type NewsSearchItem, type NewsSearchSnapshot, type NewsSearchTopic } from "@/lib/news/news-search-contract";
@@ -190,7 +190,7 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
           }
         }} />
     )}
-    {showBusinessSupport && <BusinessSupportPanel enabled={businessSupportEnabled} />}
+    {showBusinessSupport && <BusinessOpportunityPanel enabled={businessSupportEnabled} />}
     <section className={showBriefing ? "newsDiscoveryPanel newsDiscoverySecondary" : "newsDiscoveryPanel"} aria-labelledby="news-discovery-title">
       <div className="sectionHeading">
         <div>
