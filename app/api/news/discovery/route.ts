@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getNewsSearchSnapshot, newsSearchConfigured, parseNewsSearchTopic } from "@/lib/news/google-news-search";
+import { getNewsSearchSnapshot, newsSearchConfigured } from "@/lib/news/google-news-search";
+import { parseNewsSearchTopic } from "@/lib/news/news-search-contract";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
