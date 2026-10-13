@@ -133,11 +133,11 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
           document.getElementById("news-discovery-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
         }} />
     )}
-    <section className="newsDiscoveryPanel" aria-labelledby="news-discovery-title">
+    <section className={showBriefing ? "newsDiscoveryPanel newsDiscoverySecondary" : "newsDiscoveryPanel"} aria-labelledby="news-discovery-title">
       <div className="sectionHeading">
         <div>
-          <h2 id="news-discovery-title">NEWS · 언론사 원문 탐색</h2>
-          <p>실제 언론사의 기사 제목·출처·원문 링크를 확인하세요.</p>
+          <h2 id="news-discovery-title">{showBriefing ? "DISCOVER · 전체 기사 탐색" : "NEWS · 언론사 원문 탐색"}</h2>
+          <p>{showBriefing ? "맞춤 브리핑 외의 기사도 직접 살펴볼 수 있습니다." : "실제 언론사의 기사 제목·출처·원문 링크를 확인하세요."}</p>
         </div>
         <span>{enabled ? "SEARCH API" : "API 준비 중"}</span>
       </div>
