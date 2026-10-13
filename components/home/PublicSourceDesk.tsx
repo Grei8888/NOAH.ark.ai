@@ -170,7 +170,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
   const kstDay = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "long", day: "numeric", weekday: "long" }).format(new Date());
 
   return (
-    <AppShell view={view} rail={
+    <AppShell view={view} compactRail={newsSearchEnabled && (view === "home" || view === "discover" || view === "startup")} rail={
       <>
         <section className="railPanel">
           <div className="railEyebrow">YOUR AI NEWS PARTNER</div>
