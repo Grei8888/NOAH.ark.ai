@@ -64,7 +64,7 @@ function eligibleArticle(article: NewsSearchItem, nowMs: number): boolean {
   const time = asMillis(article.publishedAt);
   // Unknown publication date is never called "recent"; allow with lower rank.
   if (time === null) return true;
-  return time <= nowMs + 6 * 3600_000 && time >= nowMs - 14 * 86_400_000;
+  return time <= nowMs + 6 * 3600_000 && time >= nowMs - 30 * 86_400_000;
 }
 function articleTopicMatches(title: string, focus: readonly TodayTopic[]): TodayTopic[] {
   return focus.filter(topic => matchesTodayTopic(title, topic));
@@ -93,7 +93,7 @@ export function curateFromHeadlines(
   // Cluster only close headline matches, not broad thematic co-mentions.
   const groupList: CurationSource[][] = [];
   for (const item of unique.values()) {
-    const target = groupList.find(group => group.some(other => {
+    const target = groupList.find(group => group.every(other => {
       const left = asMillis(other.publishedAt), right = asMillis(item.publishedAt);
       const closeInTime = left === null || right === null || Math.abs(left - right) <= 72 * 3600_000;
       return closeInTime && likelySameHeadlineEvent(other.title, item.title);
@@ -118,7 +118,7 @@ export function curateFromHeadlines(
       Math.min(3, sources.length - 1);
     const rationale = [
       ...matched.map(topic => (TODAY_TOPICS.find(t => t.id === topic)?.label || topic) + " 관심사와 제목 일치"),
-      days === null ? "발행일 확인 필요" : days < 1 ? "최근 24시간 내 보도" : "최근 14일 내 보도",
+      days === null ? "발행일 확인 필요" : days < 1 ? "최근 24시간 내 보도" : days < 7 ? "최근 7일 내 보도" : days < 14 ? "최근 14일 내 보도" : "14~30일 전 보도 · 최신 정보 확인 필요",
       ...(outletCount > 1 ? [`복수 매체의 유사 제목 ${outletCount}곳 · 독립 취재 여부 미검증`] : []),
     ];
     return {
