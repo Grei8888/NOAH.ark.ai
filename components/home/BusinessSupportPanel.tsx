@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   BUSINESS_REGIONS, BUSINESS_FIELDS, BUSINESS_STAGES, BUSINESS_FORMS,
   DEFAULT_BUSINESS_PROFILE, rankBusinessSupport, validateBusinessProfile,
@@ -42,7 +42,7 @@ export function BusinessSupportPanel({enabled}:{enabled:boolean}){
   },[]);
   // The profile is a draft until the reader explicitly requests matching.
   // This makes it clear when a search has run and when profile edits need confirmation.
-  async function searchForBusiness(event: React.FormEvent<HTMLFormElement>) {
+  async function searchForBusiness(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if(!enabled||loading||!profileReady)return;
     setHasRequested(true);
