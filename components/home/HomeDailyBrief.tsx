@@ -78,7 +78,7 @@ export function HomeDailyBrief() {
     <section className="homeDailyBrief" aria-labelledby="home-daily-title">
       <div className="homeDailyHeading">
         <div>
-          <span className="homeDailyEyebrow">TODAY'S SIGNALS · NEWS HEADLINES</span>
+          <span className="homeDailyEyebrow">TODAY · SIGNALS · NEWS HEADLINES</span>
           <h2 id="home-daily-title">오늘 확인할 변화</h2>
           <p>오늘의 흐름을 짧게 살펴보고, 더 알고 싶은 영역으로 들어가세요.</p>
         </div>
