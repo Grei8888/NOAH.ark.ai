@@ -195,7 +195,7 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
       <div className="sectionHeading">
         <div>
           <h2 id="news-discovery-title">{showBriefing ? "DISCOVER · 전체 기사 탐색" : "NEWS · 언론사 원문 탐색"}</h2>
-          <p>{showBriefing ? "맞춤 브리핑 외의 기사도 직접 살펴볼 수 있습니다." : "실제 언론사의 기사 제목·출처·원문 링크를 확인하세요."}</p>
+          <p>{showBriefing ? "맞춤 브리핑 외의 기사도 직접 살펴볼 수 있습니다." : "언론사 기사 제목·출처·원문 링크를 확인하세요. 목록 번호는 중요도 순위가 아닙니다."}</p>
         </div>
         <span>{enabled ? "SEARCH API" : "API 준비 중"}</span>
       </div>
@@ -237,22 +237,26 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
         filtered.length === 0 ? <p className="newsDiscoveryStatus">
           {current ? "조건에 맞는 검색 결과가 없습니다." : "주제를 선택하면 실제 뉴스가 표시됩니다."}
         </p> : (
-          <div className="newsDiscoveryResults">
-            {filtered.map(item => (
+          <div className="newsDiscoveryResults" aria-label="언론사 기사 목록">
+            {filtered.map((item, index) => (
               <article key={item.url} className="newsDiscoveryItem" data-selected={selectedNews?.item.url === item.url}>
-                <div className="newsDiscoverySource">
-                  <span>기사</span><span aria-hidden="true">·</span><span>{item.sourceName}</span>
-                  {item.publishedAt && <time dateTime={item.publishedAt}>
-                    {newsDate.format(new Date(item.publishedAt))}
-                  </time>}
-                </div>
-                <h3><a href={item.url} target="_blank" rel="noopener noreferrer">{item.title}</a></h3>
-                <div className="newsDiscoveryActions">
-                  <a href={item.url} target="_blank" rel="noopener noreferrer">언론사 원문 보기 ↗</a>
-                  <button type="button" onClick={() => selectArticle(item)}
-                    aria-pressed={selectedNews?.item.url === item.url}>
-                    AI에게 질문 ↗
-                  </button>
+                <span className="newsDiscoveryRank" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                <div className="newsDiscoveryBody">
+                  <span className="newsListOrderA11y">목록 {index + 1}번. 중요도 순위가 아닙니다.</span>
+                  <div className="newsDiscoverySource">
+                    <span className="newsSourceKind">언론 기사</span><span className="newsSourcePublisher">{item.sourceName}</span>
+                    {item.publishedAt && <time dateTime={item.publishedAt}>
+                      {newsDate.format(new Date(item.publishedAt))}
+                    </time>}
+                  </div>
+                  <h3><a href={item.url} target="_blank" rel="noopener noreferrer">{item.title}</a></h3>
+                  <div className="newsDiscoveryActions">
+                    <a href={item.url} target="_blank" rel="noopener noreferrer">원문 보기 ↗</a>
+                    <button type="button" onClick={() => selectArticle(item)}
+                      aria-pressed={selectedNews?.item.url === item.url}>
+                      AI에게 질문 ↗
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}

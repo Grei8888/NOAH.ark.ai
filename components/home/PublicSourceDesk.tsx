@@ -39,6 +39,9 @@ const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
   timeZone: "Asia/Seoul", month: "short", day: "numeric",
   hour: "2-digit", minute: "2-digit", hourCycle: "h23",
 });
+const shortDateFormatter = new Intl.DateTimeFormat("ko-KR", {
+  timeZone: "Asia/Seoul", month: "short", day: "numeric",
+});
 function storedStrings(key: string): string[] {
   try {
     const value: unknown = JSON.parse(localStorage.getItem(key) ?? "[]");
@@ -389,15 +392,19 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
                 )}
               </div>
             ) : filtered.slice(0, view === "home" ? 14 : 40).map((s: OfficialSourceLink, i: number) => (
-              <article className="sourceNewsItem" key={s.url}>
+              <article className={`sourceNewsItem sourceNewsItem--${s.kind}`} key={s.url}>
                 <div className="eventRank">{String(i + 1).padStart(2, "0")}</div>
                 <a className="sourceVisualLink" href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.title + " 원문 열기"}>
                   <SourceCardVisual title={s.title} kind={s.kind} />
                 </a>
                 <div className="sourceNewsBody">
                   <div className="eventMeta">
-                    <span>{sourceLabel(s.kind)}</span><span className="metaDot">·</span><span>{s.sourceName}</span><span className="metaDot">·</span>
-                    <time dateTime={s.publishedAt}>{dateFormatter.format(new Date(s.publishedAt))} KST</time>
+                    <span className="sourceKindBadge">{s.kind === "notice" ? "정부 공고" : "정부 보도"}</span>
+                    <span className="sourcePublisherName">{s.sourceName.replace(/\s*·\s*(사업공고|보도자료)$/, "")}</span>
+                    <time dateTime={s.publishedAt}>
+                      <span className="sourceDateDesktop">{dateFormatter.format(new Date(s.publishedAt))} KST</span>
+                      <span className="sourceDateMobile">{shortDateFormatter.format(new Date(s.publishedAt))}</span>
+                    </time>
                   </div>
                   <h3><a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a></h3>
                   <div className="sourceNewsActions">
