@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { forgetBetaInvitation, readBetaInvitation } from "@/lib/news/beta-invitation";
 
@@ -19,6 +20,18 @@ function fakeBrowser(fragment: string) {
   });
   return { data, location, replaceState };
 }
+
+describe("home-to-news invitation continuity", () => {
+  it("consumes the office invite on Home before the user chooses a workspace", () => {
+    const home = readFileSync("components/home/HomeGatewayPage.tsx", "utf8");
+    const capture = readFileSync("components/home/HomeInviteCapture.tsx", "utf8");
+    const reader = readFileSync("components/home/NewsInlineCompanion.tsx", "utf8");
+    expect(home).toContain("<HomeInviteCapture />");
+    expect(home.indexOf("<HomeInviteCapture />")).toBeLessThan(home.indexOf("<HomeGateway />"));
+    expect(capture).toContain("readBetaInvitation();");
+    expect(reader).toContain("readBetaInvitation()");
+  });
+});
 
 describe("one-tap beta access link", () => {
   const code = "A".repeat(36);
