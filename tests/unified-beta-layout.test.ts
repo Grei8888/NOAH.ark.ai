@@ -14,10 +14,12 @@ describe("shared beta navigation layout", () => {
       expect(shell).toContain('id: "' + view + '"');
     }
   });
-  it("has deliberate mobile navigation and touch-first layout", () => {
+  it("uses identical Korean labels on desktop and mobile with a touch-first layout", () => {
     for (const label of ["홈", "뉴스", "사업기회", "저장", "마이"]) {
-      expect(shell).toContain('mobileLabel: "' + label + '"');
+      expect(shell).toContain('label: "' + label + '"');
     }
+    expect(shell.match(/<span>{item.label}<\\/span>/g)).toHaveLength(2);
+    expect(shell).not.toContain("mobileLabel");
     expect(css).toMatch(/@media \(max-width: 767px\)[\s\S]*?\.appShell--compactRail \.mobileNav/);
     expect(css).toContain("grid-template-columns: repeat(5, minmax(0, 1fr))");
     expect(css).toContain(".appShell--compactRail .newsAiMobileTabs");
