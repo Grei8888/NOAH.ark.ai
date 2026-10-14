@@ -172,7 +172,7 @@ export default function HousingWorkspace({arkUrl}) {
           <div className="network-card current"><span className="network-index">02 · ADVISORY</span><strong>NOAH Housing</strong>
             <p>공급자의 사업성·보증·금융구조를 검토합니다.</p><span>현재 화면</span></div>
           <div className="network-card"><span className="network-index">03 · DEMAND</span><strong>HOME:LINK</strong>
-            <p>입주 수요와 주택을 연결하는 별도 서비스입니다. 향후 검증된 집계 신호를 주거사업 분석에 연동합니다.</p>
+            <p>입주 수요와 주택을 연결하는 별도 서비스입니다. 사업자 승인 공급조건을 전달하고, 이용이 승인된 집계 수요 신호를 받아 분석에 활용하는 연계를 준비합니다.</p>
             <span className="muted">수요 데이터 연동 준비 중 · 실제 데이터 없음</span></div>
         </div>
       </section>
