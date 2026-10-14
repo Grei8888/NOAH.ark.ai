@@ -4,12 +4,13 @@ import { BrandLockup } from "./BrandLockup";
 import { Icon } from "./Icon";
 export type HomeView =
   "home" | "discover" | "startup" | "saved" | "my" | "settings";
-const nav: { id: HomeView; label: string; mobileLabel: string; icon: string }[] = [
-  { id: "home", label: "Home", mobileLabel: "홈", icon: "home" },
-  { id: "discover", label: "Discover", mobileLabel: "뉴스", icon: "discover" },
-  { id: "startup", label: "Startup", mobileLabel: "사업기회", icon: "startup" },
-  { id: "saved", label: "Saved", mobileLabel: "저장", icon: "saved" },
-  { id: "my", label: "My NOAH", mobileLabel: "마이", icon: "my" },
+// One shared label for both desktop and mobile navigation.
+const nav: { id: HomeView; label: string; icon: string }[] = [
+  { id: "home", label: "홈", icon: "home" },
+  { id: "discover", label: "뉴스", icon: "discover" },
+  { id: "startup", label: "사업기회", icon: "startup" },
+  { id: "saved", label: "저장", icon: "saved" },
+  { id: "my", label: "마이", icon: "my" },
 ];
 export const viewURL = (id: HomeView) => (id === "home" ? "/" : `/?view=${id}`);
 export function AppShell({
@@ -83,7 +84,7 @@ export function AppShell({
             aria-current={view === item.id ? "page" : undefined}
           >
             <Icon name={item.icon} />
-            <span>{item.mobileLabel}</span>
+            <span>{item.label}</span>
           </Link>
         ))}
       </nav>
