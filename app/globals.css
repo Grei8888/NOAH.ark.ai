@@ -2903,3 +2903,196 @@ section[id] {
   font: inherit; text-decoration: underline; text-underline-offset: 3px; color: inherit;
 }
 .newsAiInviteConnected button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+
+/*
+ * Unified NOAH mobile experience v1.
+ * The Home/Discover/Startup/Saved/My NOAH views share the same shell;
+ * mobile has its own hierarchy, touch targets and article-first layout.
+ */
+@media (max-width: 767px) {
+  html { scroll-padding-top: 80px; }
+  .appShell--compactRail {
+    width: 100%;
+    max-width: 680px;
+    padding-inline: clamp(14px, 4vw, 22px);
+  }
+  .appShell--compactRail .mobileHeader {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    height: 64px;
+    gap: 8px;
+    background: rgba(255, 255, 255, .97);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  .appShell--compactRail .mobileHeader .brandSymbol { width: 46px; }
+  .appShell--compactRail .mobileHeader .brandWordmark { font-size: 19px; }
+  .appShell--compactRail .mobileHeader .brandWordmark > span { font-size: 12px; }
+  .appShell--compactRail .mobileHeader .iconButton {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+  }
+  .appShell--compactRail .readingColumn {
+    padding-top: 20px;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  }
+  .appShell--compactRail .mobileNav {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    justify-items: stretch;
+    gap: 0;
+    min-height: 70px;
+    padding: 6px 8px max(8px, env(safe-area-inset-bottom));
+    box-shadow: 0 -5px 20px rgba(23, 42, 68, .045);
+  }
+  .appShell--compactRail .mobileNav a {
+    min-width: 0;
+    min-height: 54px;
+    position: relative;
+    gap: 5px;
+    padding: 6px 1px;
+    font-size: 11px;
+    letter-spacing: -.15px;
+    line-height: 1.25;
+    white-space: nowrap;
+    border-radius: 6px;
+  }
+  .appShell--compactRail .mobileNav a[aria-current="page"] {
+    color: var(--navy);
+    background: #f2f5f9;
+  }
+  .appShell--compactRail .mobileNav svg {
+    width: 21px;
+    height: 21px;
+    flex-shrink: 0;
+  }
+  .appShell--compactRail .homeIntro { margin-bottom: 20px; }
+  .appShell--compactRail .dateLine { margin-bottom: 13px; }
+  .appShell--compactRail .dateLine > span { font-size: 10px; }
+  .appShell--compactRail .greeting { font-size: 12px; line-height: 1.5; }
+  .appShell--compactRail .homeIntro h1 {
+    font-size: clamp(25px, 6.3vw, 30px);
+    line-height: 1.32;
+  }
+  .appShell--compactRail .editionLine { font-size: 11px; line-height: 1.6; gap: 7px; }
+  .appShell--compactRail .sectionHeading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 20px 0 13px;
+  }
+  .appShell--compactRail .sectionHeading h2 {
+    font-size: 16px;
+    line-height: 1.45;
+    letter-spacing: -.2px;
+  }
+  .appShell--compactRail .sectionHeading p {
+    font-size: 12px;
+    line-height: 1.65;
+  }
+  .appShell--compactRail .sectionHeading > span { font-size: 10px; }
+  .appShell--compactRail .trustNotice { font-size: 11px; line-height: 1.6; padding: 11px; }
+  .appShell--compactRail .trustNotice strong { font-size: 10px; }
+  .appShell--compactRail .personalFocusPanel {
+    margin: 19px 0 27px;
+    padding: 17px 14px;
+  }
+  .appShell--compactRail .todayInterestHeading { align-items: flex-start; }
+  .appShell--compactRail .todayInterestHeading h2 { font-size: 16px; }
+  .appShell--compactRail .todayInterestHeading p { font-size: 12px; line-height: 1.55; }
+  .appShell--compactRail .todayInterestChips { gap: 8px; }
+  .appShell--compactRail .todayInterestChips button {
+    min-height: 46px;
+    font-size: 13px;
+    padding: 10px 13px;
+  }
+  .appShell--compactRail .todayInterestNote,
+  .appShell--compactRail .personalFocusPanel .todayInterestNote {
+    font-size: 11px;
+    line-height: 1.7;
+  }
+  .appShell--compactRail .myBriefingHead { flex-wrap: wrap; align-items: flex-start; }
+  .appShell--compactRail .myBriefingHead > div { min-width: 0; flex: 1 1 200px; }
+  .appShell--compactRail .myBriefingSettings {
+    margin-left: auto;
+    min-height: 44px;
+    font-size: 12px;
+  }
+  .appShell--compactRail .myBriefingBody h3 { font-size: 17px; }
+  .appShell--compactRail .myBriefingWhy { font-size: 12px; }
+  .appShell--compactRail .myBriefingActions :is(button,a) { min-height: 44px; font-size: 12px; }
+  .appShell--compactRail .sourceSearch { max-width: none; width: 100%; min-width: 0; }
+  .appShell--compactRail :is(.sourceSearch input, .newsDiscoveryFilter input, .opportunityKeyword, .businessSupportInputs select, .newsAiCompanion textarea, .newsAiCompanion input) {
+    font-size: 16px;
+    min-height: 46px;
+  }
+  .appShell--compactRail .sourceFilters button { min-height: 44px; font-size: 12px; }
+  /* Decorative source covers add clutter on narrow screens: keep the article title. */
+  .appShell--compactRail .sourceVisualLink { display: none; }
+  .appShell--compactRail .sourceNewsItem {
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 11px;
+    padding: 20px 0;
+  }
+  .appShell--compactRail .sourceNewsItem h3 {
+    font-size: 18px;
+    line-height: 1.52;
+    margin: 6px 0 10px;
+  }
+  .appShell--compactRail .sourceNewsItem .eventMeta { font-size: 11px; gap: 6px; }
+  .appShell--compactRail .sourceNewsActions { gap: 9px 16px; }
+  .appShell--compactRail .sourceNewsActions > :is(a,button) { min-height: 44px; font-size: 12px; }
+  .appShell--compactRail .newsDiscoveryTopics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 14px 0;
+  }
+  .appShell--compactRail .newsDiscoveryTopics button {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    font-size: 13px;
+    padding: 9px 8px;
+  }
+  .appShell--compactRail .newsAiMobileTabs {
+    position: sticky;
+    top: 64px;
+    z-index: 12;
+    padding: 8px 0;
+    margin: 9px 0 13px;
+    background: rgba(255,255,255,.98);
+  }
+  .appShell--compactRail .newsAiMobileTabs button { font-size: 14px; min-height: 46px; }
+  .appShell--compactRail .newsAiStories .newsDiscoveryItem h3 { font-size: 18px; line-height: 1.5; }
+  .appShell--compactRail .newsAiStories .newsDiscoverySource { font-size: 11px; }
+  .appShell--compactRail .newsAiCompanion { padding: 15px; }
+  .appShell--compactRail .newsAiSelected strong { font-size: 20px; line-height: 1.45; }
+  .appShell--compactRail .newsAiModeButtons { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+  .appShell--compactRail .newsAiModeButtons button {
+    min-height: 46px;
+    font-size: 13px;
+    padding: 9px 5px;
+  }
+  .appShell--compactRail .newsAiLabel { font-size: 12px; margin-top: 12px; }
+  .appShell--compactRail .newsAiSubmit { min-height: 48px; font-size: 14px; }
+  .appShell--compactRail .newsAiSelected { scroll-margin-top: 130px; }
+  .appShell--compactRail .businessSupportProfile { padding: 14px; }
+  .appShell--compactRail .businessSupportInputs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 9px; }
+  .appShell--compactRail .businessSupportInputs label > span { font-size: 12px; }
+  .appShell--compactRail .opportunityTabs { gap: 7px; }
+  .appShell--compactRail .opportunityTabs button { min-height: 49px; font-size: 12px; line-height: 1.3; }
+  .appShell--compactRail .opportunityNotice h3 { font-size: 17px; }
+  .appShell--compactRail .sourceSettings p { font-size: 14px; }
+}
+@media (max-width: 380px) {
+  .appShell--compactRail .mobileHeader .brandSymbol { width: 41px; }
+  .appShell--compactRail .mobileHeader .brandWordmark { font-size: 18px; }
+  .appShell--compactRail .mobileNav a { font-size: 10px; }
+  .appShell--compactRail .businessSupportInputs { grid-template-columns: minmax(0, 1fr); }
+  .appShell--compactRail .todayInterestChips button { flex: 1 1 calc(50% - 8px); }
+}
