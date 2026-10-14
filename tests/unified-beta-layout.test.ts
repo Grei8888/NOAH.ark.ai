@@ -18,7 +18,7 @@ describe("shared beta navigation layout", () => {
     for (const label of ["홈", "뉴스", "사업기회", "저장", "마이"]) {
       expect(shell).toContain('label: "' + label + '"');
     }
-    expect(shell.match(/<span>{item.label}<\\/span>/g)).toHaveLength(2);
+    expect(shell.split("<span>{item.label}</span>").length - 1).toBe(2);
     expect(shell).not.toContain("mobileLabel");
     expect(css).toMatch(/@media \(max-width: 767px\)[\s\S]*?\.appShell--compactRail \.mobileNav/);
     expect(css).toContain("grid-template-columns: repeat(5, minmax(0, 1fr))");
