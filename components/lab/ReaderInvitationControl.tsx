@@ -23,15 +23,15 @@ export function ReaderInvitationControl({ invitation, id, busy = false }: {
       )}
       {status !== "verified" && (
         <>
-          <label className="newsAiLabel" htmlFor={id}>테스터 초대 코드 <small>발급받은 원본 코드를 입력해 주세요.</small></label>
+          <label className="newsAiLabel" htmlFor={id}>공유 베타 링크 <small>초대 링크로 들어오면 자동 인증됩니다. 링크 인증이 실패한 경우에만 원본 코드를 입력하세요.</small></label>
           <input id={id} type="password" autoComplete="off" maxLength={256}
-            value={code} disabled={busy} onChange={event => invitation.changeCode(event.target.value)} placeholder="개별 발급 코드" />
+            value={code} disabled={busy} onChange={event => invitation.changeCode(event.target.value)} placeholder="공유 링크의 초대 코드" />
           <button type="button" className="readerInviteAction" disabled={busy || status === "checking" || code.trim().length < 32}
             onClick={() => void invitation.verify()}>초대코드 확인</button>
         </>
       )}
       {status !== "empty" && (
-        <button type="button" className="readerInviteAction" disabled={busy} onClick={invitation.reset}>다른 초대코드 사용</button>
+        <button type="button" className="readerInviteAction" disabled={busy} onClick={invitation.reset}>다른 링크 코드 사용</button>
       )}
     </div>
   );
