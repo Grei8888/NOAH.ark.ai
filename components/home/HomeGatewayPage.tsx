@@ -1,9 +1,10 @@
 import { AppShell } from "@/components/home/AppShell";
 import { HomeGateway } from "@/components/home/HomeGateway";
+import { HomeDailyBrief } from "@/components/home/HomeDailyBrief";
 
 /**
- * The Preview landing page is deliberately lightweight: it does not request
- * RSS feeds, news APIs, or business API data until a workspace is opened.
+ * The landing shell stays fast. The client brief reuses cached news search
+ * endpoints after mount and never contacts business / procurement APIs.
  */
 export function HomeGatewayPage({ privateBeta }: { privateBeta: boolean }) {
   return (
@@ -14,9 +15,10 @@ export function HomeGatewayPage({ privateBeta }: { privateBeta: boolean }) {
       </div>
       <header className="homeIntro homeGatewayHero">
         <p className="greeting">Your Intelligence Partner.</p>
-        <h1>무엇을 살펴볼까요?</h1>
-        <p className="homeGatewaySubtitle">중요한 뉴스를 이해하거나, 새로운 사업기회를 찾거나.</p>
+        <h1>오늘의 변화, 필요한 기회.</h1>
+        <p className="homeGatewaySubtitle">오늘 무슨 일이 벌어지고 있는지 먼저 살펴보세요.</p>
       </header>
+      <HomeDailyBrief />
       <HomeGateway />
     </AppShell>
   );
