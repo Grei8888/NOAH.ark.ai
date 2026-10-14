@@ -7,6 +7,9 @@ import { Icon } from "@/components/home/Icon";
 import { SourceCardVisual } from "@/components/home/SourceCardVisual";
 import { ReaderAudiencePanel } from "@/components/home/ReaderAudiencePanel";
 import { NewsDiscoveryPanel } from "@/components/home/NewsDiscoveryPanel";
+import { BusinessOpportunityPanel } from "@/components/home/BusinessOpportunityPanel";
+import { CrossWorkspaceNudge } from "@/components/home/CrossWorkspaceNudge";
+import { HomeGateway } from "@/components/home/HomeGateway";
 import type { OfficialFeedSnapshot, OfficialSourceLink } from "@/lib/news/public-official-sources";
 import { TODAY_TOPICS, matchesTodayTopic, restoreTodayTopics, validTodayTopics, todayKstDate, type TodayTopic } from "@/lib/news/daily-interests";
 
@@ -185,76 +188,94 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
     document.getElementById("my-focus-settings")?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-  const currentKind: SourceKind = view === "startup" ? "notice" : filter;
-  const activeTopics = view === "home" ? focusTopics : todayTopics;
+  const currentKind: SourceKind = filter;
+  const activeTopics = view === "discover" ? focusTopics : todayTopics;
   const filtered = useMemo(() => currentSnapshot.items.filter(s => {
     if (view === "saved" && !saved.includes(s.url)) return false;
     if (view === "my" && !interests.includes(s.kind)) return false;
     if (view !== "saved" && hidden.includes(s.url)) return false;
     if (currentKind !== "all" && s.kind !== currentKind) return false;
-    // MY FOCUS drives only the personalized news briefing on Home; official sources remain independently browsable.
-    if (view !== "saved" && view !== "home" && todayTopics.length && !todayTopics.some(t => matchesTodayTopic(s.title, t))) return false;
+    // Personal news briefing controls do not silently hide government documents.
+    if (view === "my" && todayTopics.length && !todayTopics.some(t => matchesTodayTopic(s.title, t))) return false;
     return !query.trim() || (s.title + s.sourceName).toLocaleLowerCase("ko-KR").includes(query.trim().toLocaleLowerCase("ko-KR"));
   }), [currentSnapshot.items, saved, hidden, interests, todayTopics, currentKind, query, view]);
 
-  const showControls = view !== "settings";
+  const showOfficialSources = view === "startup" || view === "saved" || view === "my";
   const title = view === "saved" ? "내가 저장한 자료" : view === "my" ? "내 관심 분야" :
-    view === "startup" ? "창업 · 지원사업" : view === "discover" ? "원문 자료 탐색" : view === "settings" ? "서비스 안내" : "오늘 확인할 변화";
+    view === "startup" ? "사업기회" : view === "discover" ? "나에게 중요한 뉴스" : view === "settings" ? "서비스 안내" : "무엇을 살펴볼까요?";
   const kstDay = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "long", day: "numeric", weekday: "long" }).format(new Date());
 
   return (
-    <AppShell view={view} compactRail={newsSearchEnabled} rail={
+    <AppShell view={view} compactRail={newsSearchEnabled} rail={view === "home" ? undefined : view === "startup" ? (
+      <section className="railPanel">
+        <div className="railEyebrow">BUSINESS OPPORTUNITIES</div>
+        <h2>사업기회를 한곳에서.</h2>
+        <p>지원사업·국가 R&amp;D·공공입찰을 유형별로 분리해 확인합니다. 공고의 실제 자격요건과 마감일은 원문에서 최종 확인하세요.</p>
+      </section>
+    ) : (
       <>
         <section className="railPanel">
           <div className="railEyebrow">YOUR AI NEWS PARTNER</div>
           <h2>뉴스를 넘어, 이해로.</h2>
-          <p>원문을 직접 읽고 스스로 판단하도록 돕는 AI 뉴스 파트너입니다. 현재는 정부 공식자료와 {newsSearchEnabled ? "검색 기반 언론사 기사" : "공식자료 탐색"}를 제공하며, {readerModelReady ? "실제 AI 독해 기능을 시험할 수 있습니다." : readerLabAvailable ? "AI 독해 화면은 확인할 수 있으며 실제 답변은 API 연결 대기 중입니다." : "AI 독해 도우미는 준비 중입니다."}</p>
+          <p>{view === "discover" ? "나에게 중요한 언론사 기사와 독해 AI를 함께 이용합니다." : "브라우저에 저장한 정부 공식자료와 관심 분야를 관리합니다."} {readerModelReady ? "실제 AI 질문을 테스트할 수 있습니다." : readerLabAvailable ? "AI 독해 화면은 시험 가능하며 모델 연결 상태를 확인해야 합니다." : "AI 독해 기능은 준비 중입니다."}</p>
         </section>
-        <section className="railPanel">
-          <div className="railEyebrow">SOURCE STATUS</div>
-          <div className="signalRow"><span>최근 14일 자료</span><strong>{currentSnapshot.items.length}</strong></div>
-          <div className="signalRow"><span>응답한 RSS</span><strong>{currentSnapshot.availableFeeds}/{currentSnapshot.totalFeeds}</strong></div>
-          <div className="signalRow"><span>AI 상태</span><strong>{readerModelReady ? "실사용 테스트" : readerLabAvailable ? "모델 연결 대기" : "비활성"}</strong></div>
-          <p className="sourceRailFoot">정부 공식자료는 중소벤처기업부 RSS를 이용합니다. {newsSearchEnabled ? "언론사 기사는 검색 API에서 별도로 가져옵니다." : "언론사 검색 기능은 연결 준비 중입니다."} 키워드 선택은 AI 추천·중요도 평가가 아닙니다.</p>
-        </section>
+        {view === "discover" ? (
+          <section className="railPanel">
+            <div className="railEyebrow">NEWS STATUS</div>
+            <div className="signalRow"><span>기사 검색</span><strong>{newsSearchEnabled ? "API 연결" : "준비 중"}</strong></div>
+            <div className="signalRow"><span>AI 독해</span><strong>{readerModelReady ? "테스트 가능" : "연결 확인"}</strong></div>
+            <p className="sourceRailFoot">기사 목록은 검색 결과입니다. 중요도 순위가 아니며, 내용은 반드시 원문에서 확인하세요.</p>
+          </section>
+        ) : (
+          <section className="railPanel">
+            <div className="railEyebrow">SAVED OFFICIAL SOURCES</div>
+            <div className="signalRow"><span>최근 14일 정부자료</span><strong>{currentSnapshot.items.length}</strong></div>
+            <div className="signalRow"><span>응답한 공식 RSS</span><strong>{currentSnapshot.availableFeeds}/{currentSnapshot.totalFeeds}</strong></div>
+            <p className="sourceRailFoot">현재 중소벤처기업부 자료만 제공됩니다. 모든 정부 부처의 자료는 아닙니다.</p>
+          </section>
+        )}
         <section className="railPanel">
           <div className="railEyebrow">NEXT PHASE</div>
           <h2>Read. Understand. Decide.</h2>
           <p>{readerModelReady ? "경제용어 설명·배경지식·비판적 독해를 실제 AI로 시험합니다." : readerLabAvailable ? "AI 독해 화면을 검토할 수 있으며 실제 모델 연결은 대기 중입니다." : "경제용어 설명과 비판적 독해는 후속 출시 예정입니다."} 검증된 기사 간 관점 비교는 아직 미제공이며, 두 기사 읽기를 강제하지 않습니다.</p>
         </section>
       </>
-    }>
+    )}>
       <div className="topUtility">
         <span>NOAH ARK / {readerLabAvailable ? "10-READER PRIVATE BETA" : "PUBLIC BETA v0.1"}</span>
-        <span>{newsSearchEnabled ? "PUBLISHER LINKS + OFFICIAL SOURCES" : "OFFICIAL SOURCES ONLY"}</span>
+        <span>{view === "home" ? "CHOOSE YOUR WORKSPACE" : view === "startup" ? "SUPPORT · R&D · PROCUREMENT · POLICY" : newsSearchEnabled ? "PUBLISHER LINKS + OFFICIAL SOURCES" : "OFFICIAL SOURCES ONLY"}</span>
       </div>
       <header className="homeIntro">
         <div className="dateLine"><span>{kstDay}</span><span>ONLY WHAT MATTERS.</span></div>
-        <p className="greeting">Your AI News Partner. · 어려운 뉴스를 이해하기 쉽게.</p>
+        <p className="greeting">{view === "home" ? "정보는 나누고, 선택은 간단하게." : view === "startup" ? "정부와 공공기관이 제공하는 사업 기회를 찾아보세요." : "Your AI News Partner. · 어려운 뉴스를 이해하기 쉽게."}</p>
         <h1>{title}</h1>
-        <div className="editionLine"><span className="signalDot" /><span>{newsSearchEnabled ? "언론사 기사 검색 + 정부 공식자료" : "실제 정부 RSS · 최근 14일 · 최신순"}</span><span>{readerLabAvailable ? "10명 사전검증" : "무료 공개 베타"}</span></div>
-        {readerLabAvailable && <div className="readerBetaPrompt"><Link href="/lab/reader">실제 AI 뉴스 독해 도우미 사용하기 →</Link></div>}
+        <div className="editionLine"><span className="signalDot" /><span>{view === "home" ? "뉴스 · 사업기회" : view === "startup" ? "지원사업 · 국가 R&D · 공공입찰 · 정부 정책" : newsSearchEnabled ? "언론사 기사 검색 + 정부 공식자료" : "실제 정부 RSS · 최근 14일 · 최신순"}</span><span>{readerLabAvailable ? "10명 사전검증" : "무료 공개 베타"}</span></div>
+        {readerLabAvailable && view === "discover" && <div className="readerBetaPrompt"><Link href="/lab/reader">원문과 AI를 나란히 보는 독해 도우미 →</Link></div>}
       </header>
-      <div className="trustNotice" role="note">
+      {view === "home" ? (
+        <HomeGateway />
+      ) : (
+      <>
+      {view !== "startup" && <div className="trustNotice" role="note">
         <strong>LIVE SOURCES</strong>
-        <span>{newsSearchEnabled ? "아래 언론사 기사는 검색 API에서 가져온 원문 링크이고, 정부 공고·보도자료는 공식 RSS에서 가져옵니다." : "아래는 실제 기관의 공고·보도자료 원문 링크입니다."} AI 중요도 선정이나 정책 시행 확정 판단은 아닙니다.</span>
-      </div>
-      {currentSnapshot.availableFeeds < currentSnapshot.totalFeeds && (
+        <span>{view === "discover" ? "아래 언론사 기사 제목은 실제 검색 API의 결과입니다." : "저장·관심 정부자료는 공식 RSS 기반입니다."} 중요도 순위나 정책 시행 확정 판단이 아니므로 원문에서 확인하세요.</span>
+      </div>}
+      {showOfficialSources && currentSnapshot.availableFeeds < currentSnapshot.totalFeeds && (
         <p className="sourceHealth" role="status">일부 자료원의 연결이 원활하지 않습니다. 표시 가능한 원문만 제공하며 가상 자료로 대체하지 않습니다.</p>
       )}
-      {(view === "home" || view === "my") && (
+      {(view === "discover" || view === "my") && (
         <ReaderAudiencePanel activeTopics={activeTopics} onFocusTopic={focusReaderTopic} aiReaderAvailable={readerModelReady} newsSearchEnabled={newsSearchEnabled} />
       )}
-      {(view === "home" || view === "discover" || view === "startup" || view === "my") && (
-        <section id={view === "home" ? "my-focus-settings" : undefined} className={view === "home" ? "todayInterestPanel personalFocusPanel" : "todayInterestPanel"} aria-label={view === "home" ? "나의 관심사 설정" : "오늘의 관심사 선택"}>
+      {(view === "discover" || view === "my") && (
+        <section id={view === "discover" ? "my-focus-settings" : undefined} className={view === "discover" ? "todayInterestPanel personalFocusPanel" : "todayInterestPanel"} aria-label={view === "discover" ? "나의 관심사 설정" : "오늘의 관심사 선택"}>
           <div className="todayInterestHeading">
             <div>
-              <h2>{view === "home" ? "MY FOCUS · 나의 관심사" : "오늘의 관심사"}</h2>
-              <p>{view === "home" ? "선택한 분야를 기억하고 관련 기사 제목을 우선 선별합니다." : "관심사는 언제든 변경할 수 있습니다."}</p>
+              <h2>{view === "discover" ? "MY FOCUS · 나의 관심사" : "오늘의 관심사"}</h2>
+              <p>{view === "discover" ? "선택한 분야를 기억하고 관련 기사 제목을 우선 선별합니다." : "관심사는 언제든 변경할 수 있습니다."}</p>
             </div>
-            {activeTopics.length > 0 && <button className="todayInterestReset" type="button" onClick={() => view === "home" ? setPersonalFocus([]) : clearTodayTopics()}>{view === "home" ? "선택 해제" : "전체 보기"}</button>}
+            {activeTopics.length > 0 && <button className="todayInterestReset" type="button" onClick={() => view === "discover" ? setPersonalFocus([]) : clearTodayTopics()}>{view === "discover" ? "선택 해제" : "전체 보기"}</button>}
           </div>
-{view !== "home" && (
+{view === "my" && (
           <div className="sourceFreshnessBar">
             <span className="sourceFreshnessText" aria-live="polite" aria-atomic="true">
               <span
@@ -276,18 +297,18 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
           <div className="todayInterestChips">
             {TODAY_TOPICS.map(topic => (
               <button type="button" key={topic.id} aria-pressed={activeTopics.includes(topic.id)}
-                onClick={() => view === "home" ? updatePersonalFocus(topic.id) : toggleTodayTopic(topic.id)}>
+                onClick={() => view === "discover" ? updatePersonalFocus(topic.id) : toggleTodayTopic(topic.id)}>
                 <span aria-hidden="true">{activeTopics.includes(topic.id) ? "✓ " : ""}</span>{topic.label}
               </button>
             ))}
           </div>
           <p className="todayInterestNote" aria-live="polite">
-            {view === "home"
+            {view === "discover"
               ? activeTopics.length
                 ? `${activeTopics.length}개 분야 선택 · 관심 분야에 일치하는 실제 기사 제목을 먼저 보여드립니다.`
                 : "관심사 미설정 · 하나 이상 고르면 맞춤 뉴스 브리핑을 시작합니다."
               : `${todayTopics.length ? `${todayTopics.length}개 관심사 선택 · 주제 일치 자료만 표시` : "전체 주제 표시"} · 한국시간 기준 다음 날 초기화`}
-            {view === "home" && " 선택한 관심사는 이 브라우저에 유지되고 언제든 변경할 수 있습니다."}
+            {view === "discover" && " 선택한 관심사는 이 브라우저에 유지되고 언제든 변경할 수 있습니다."}
           </p>
         </section>
       )}
@@ -315,48 +336,45 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
               </div>
             </section>
           )}
-          {showControls && view !== "home" && (
-            <div className="sourceToolbar">
-              <label className="sourceSearch">
-                <Icon name="search" />
-                <input value={query} onChange={e => setQuery(e.target.value)} placeholder="자료 제목 검색" aria-label="자료 제목 검색"/>
-              </label>
-              {view !== "startup" && view !== "my" && <div className="sourceFilters" aria-label="자료 종류">
-                {(["all", "notice", "press"] as const).map(k => (
-                  <button key={k} type="button" aria-pressed={currentKind === k} onClick={() => setFilter(k)}>{sourceLabel(k)}</button>
-                ))}
-              </div>}
-            </div>
-          )}
-          {(view === "home" || view === "discover" || view === "startup") && (
+
+          {view === "discover" && (
             <NewsDiscoveryPanel readerLabAvailable={readerLabAvailable}
               readerModelReady={readerModelReady} enabled={newsSearchEnabled}
-              showBriefing={view === "home"} focusTopics={focusTopics}
-              preferenceReady={ready} onUpdateFocus={focusInterestControls}
-              businessSupportEnabled={businessSupportEnabled} showBusinessSupport={view === "home" || view === "startup"} />
+              showBriefing focusTopics={focusTopics} preferenceReady={ready}
+              onUpdateFocus={focusInterestControls} />
           )}
-          {view === "home" && (
-            <div className="officialFreshnessBar">
-              <div className="sourceFreshnessBar">
-                <span className="sourceFreshnessText" aria-live="polite" aria-atomic="true">
-                  {refreshStatus?.text ?? (currentSnapshot.availableFeeds > 0 && currentSnapshot.retrievedAt
-                    ? `정부자료 확인 ${refreshTime.format(new Date(currentSnapshot.retrievedAt))} · 신청기한은 원문 확인`
-                    : "정부 공식자료의 최신 확인이 지연되고 있습니다.")}
-                </span>
-                <button type="button" className="sourceRefreshButton" onClick={refreshSources} disabled={refreshing}>
-                  <Icon name="refresh" /> {refreshing ? "확인 중…" : "공식 RSS 새로 확인"}
-                </button>
-              </div>
-            </div>
+          {view === "startup" && (
+            <>
+              <BusinessOpportunityPanel enabled={businessSupportEnabled} />
+              <CrossWorkspaceNudge from="business" />
+            </>
           )}
-          {view === "home" && (
-            <div className="officialDataControls">
-              <p>정부 공식자료 · 제목으로 직접 찾기</p>
+          {showOfficialSources && (
+            <section className={view === "startup" ? "officialPolicyGroup" : "officialLibraryGroup"}
+              aria-label={view === "startup" ? "정부 정책과 공식자료" : "저장·관심 정부자료"}>
+              {view === "startup" && (
+                <header className="officialPolicyHeader">
+                  <span>GOVERNMENT POLICY · OFFICIAL SOURCES</span>
+                  <h2>정부 정책 · 공식자료</h2>
+                  <p>정부 정책 발표와 사업공고를 사업기회 아래에서 함께 확인하세요. 현재 공식 RSS는 중소벤처기업부 자료이며, 모든 부처를 포괄하는 것은 아닙니다.</p>
+                  <div className="sourceFreshnessBar">
+                    <span className="sourceFreshnessText" role="status">
+                      {refreshStatus?.text ?? (currentSnapshot.availableFeeds > 0
+                        ? "최근 확인 " + refreshTime.format(new Date(currentSnapshot.retrievedAt)) + " · 정책 시행·기한은 원문 확인"
+                        : "정부 공식자료 연결 확인 필요")}
+                    </span>
+                    <button type="button" className="sourceRefreshButton" onClick={refreshSources} disabled={refreshing}>
+                      <Icon name="refresh" /> {refreshing ? "확인 중…" : "정부자료 새로 확인"}
+                    </button>
+                  </div>
+                </header>
+              )}
               <div className="sourceToolbar">
                 <label className="sourceSearch">
                   <Icon name="search" />
                   <input value={query} onChange={e => setQuery(e.target.value)}
-                    placeholder="정부 공고·보도자료 제목 검색" aria-label="정부 공식자료 제목 검색" />
+                    placeholder={view === "startup" ? "정책·사업공고 제목 검색" : "자료 제목 검색"}
+                    aria-label="정부 공식자료 제목 검색" />
                 </label>
                 <div className="sourceFilters" aria-label="정부 자료 종류">
                   {(["all", "notice", "press"] as const).map(k => (
@@ -365,18 +383,16 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
                   ))}
                 </div>
               </div>
-            </div>
-          )}
           <section className="feedSection" aria-label="공식 자료 목록">
             <div className="sectionHeading">
-              <div><h2>POLICY · 정부 공식자료</h2><p>출처: 중소벤처기업부 공식 RSS · 공고·보도자료는 원문에서 확인하세요.</p></div>
+              <div><h2>{view === "startup" ? "정책 발표 · 사업공고 원문" : "POLICY · 정부 공식자료"}</h2><p>중소벤처기업부 공식 RSS · 상세 요건은 원문에서 확인하세요.</p></div>
               <span>{ready || view !== "saved" ? filtered.length : "—"} LINKS</span>
             </div>
             {view === "saved" && !ready ? (
               <p className="emptyState">이 브라우저에 저장된 자료를 확인하는 중입니다.</p>
             ) : filtered.length === 0 ? (
               <div className="emptyState" role="status">
-                {view === "saved" ? "아직 저장한 자료가 없습니다. 홈에서 자료를 저장해 보세요." :
+                {view === "saved" ? "아직 저장한 자료가 없습니다. 사업기회에서 정부자료를 저장해 보세요." :
                   currentSnapshot.items.length > 0
                     ? `공식자료는 전체 ${currentSnapshot.items.length}건 있습니다. 현재 관심사·검색 조건에 맞는 자료가 0건입니다.`
                     : "최근 14일에 표시할 정부 공식자료가 없습니다. RSS 연결 상태를 확인해 주세요."}
@@ -387,11 +403,10 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
                       setQuery("");
                       setFilter("all");
                     }}>관심사·검색 조건 해제하고 전체 보기 →</button>
-                    {view === "startup" && <Link href="/?view=discover">전체 자료 탐색으로 이동 ↗</Link>}
                   </div>
                 )}
               </div>
-            ) : filtered.slice(0, view === "home" ? 14 : 40).map((s: OfficialSourceLink, i: number) => (
+            ) : filtered.slice(0, 40).map((s: OfficialSourceLink, i: number) => (
               <article className={`sourceNewsItem sourceNewsItem--${s.kind}`} key={s.url}>
                 <div className="eventRank">{String(i + 1).padStart(2, "0")}</div>
                 <a className="sourceVisualLink" href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.title + " 원문 열기"}>
@@ -409,17 +424,20 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
                   <h3><a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a></h3>
                   <div className="sourceNewsActions">
                     <a href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.title + " 원문 열기"}>원문 보기 <Icon name="arrow" /></a>
-                    {readerLabAvailable && <Link href={`/lab/reader?source=${encodeURIComponent(s.url)}`} aria-label={s.title + " AI 독해 도우미에서 질문하기"}>AI로 이해하기 ↗</Link>}
+                    {readerLabAvailable && view !== "startup" && <Link href={`/lab/reader?source=${encodeURIComponent(s.url)}`} aria-label={s.title + " AI 독해 도우미에서 질문하기"}>AI로 이해하기 ↗</Link>}
                     <button type="button" onClick={() => changeSaved(s.url)} aria-pressed={saved.includes(s.url)}>{saved.includes(s.url) ? "저장됨 ✓" : "저장"}</button>
                     {view !== "saved" && <button type="button" onClick={() => hide(s.url)} aria-label={s.title + " 숨기기"}>숨기기</button>}
                   </div>
                 </div>
               </article>
             ))}
-            {view === "home" && filtered.length > 14 && <Link className="sourceMoreLink" href="/?view=discover">원문 자료 더 보기 →</Link>}
           </section>
-          <p className="sourceDisclaimer"><strong>정부 공식자료 출처:</strong> 중소벤처기업부 RSS(사업공고·보도자료). {newsSearchEnabled && <><strong>언론 기사 출처:</strong> 각 카드에 표시된 개별 언론사 · 검색 경로: SerpApi / Google News. </>}제목과 원문 링크를 제공하며 본문과 사진은 재게시하지 않습니다. 기사 사실관계는 해당 언론사에서, 정책 시행 여부·신청자격·기한은 관계기관 원문에서 확인하세요.</p>
+          <p className="sourceDisclaimer"><strong>정부 공식자료 출처:</strong> 중소벤처기업부 RSS(사업공고·보도자료). 제목과 원문 링크만 제공하며 본문·사진은 재게시하지 않습니다. 정책 시행 여부·신청자격·기한은 소관 기관 원문에서 확인하세요.</p>
+            </section>
+          )}
         </>
+      )}
+      </>
       )}
     </AppShell>
   );

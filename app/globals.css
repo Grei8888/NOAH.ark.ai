@@ -3259,3 +3259,160 @@ section[id] {
   .appShell--compactRail .sourceNewsItem { gap: 8px; padding-left: 7px; }
   .appShell--compactRail .sourceNewsActions { gap: 3px 12px; }
 }
+
+
+/* Two clear NOAH journeys: Home is navigation, News is reading, Business is public opportunities. */
+.homeGatewayHero { margin: 32px 0 24px; }
+.homeGatewayHero h1 { font-size: clamp(31px, 3.4vw, 44px); letter-spacing: -1.4px; }
+.homeGatewaySubtitle { margin: 14px 0 0; font-size: 14px; color: var(--slate); line-height: 1.7; }
+.homeGateway { margin: 18px 0 56px; }
+.homeGatewayIntro { font-size: 13px; color: var(--slate); margin-bottom: 21px; line-height: 1.7; }
+.homeGatewayGrid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: clamp(14px, 2vw, 25px); }
+.homeGatewayCard {
+  display: flex; flex-direction: column; align-items: stretch; min-width: 0;
+  min-height: 390px; padding: clamp(22px, 2.8vw, 34px);
+  background: #f7f9fc; border: 1px solid #dce4ed;
+  border-radius: 15px; color: var(--navy);
+  text-decoration: none; transition: border-color .18s, box-shadow .18s, transform .18s;
+}
+.homeGatewayCard--business { background: #fff; }
+.homeGatewayCard:hover { border-color: #8e9fb4; box-shadow: 0 13px 33px rgba(27, 48, 81, .08); transform: translateY(-2px); }
+.homeGatewayCard:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
+.homeGatewayTop { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.homeGatewayEyebrow { font-size: 10px; letter-spacing: 1.25px; font-weight: 750; color: #697d97; }
+.homeGatewaySymbol { display: grid; width: 48px; height: 48px; place-items: center; border: 1px solid #d7e1ec; border-radius: 12px; background: #fff; flex: 0 0 48px; }
+.homeGatewaySymbol svg { width: 24px; height: 24px; }
+.homeGatewayCard > strong { display: block; margin-top: 25px; font-size: clamp(27px, 2.5vw, 35px); font-weight: 800; letter-spacing: -1.2px; }
+.homeGatewayLead { display: block; margin-top: 9px; font-size: 17px; line-height: 1.5; font-weight: 700; letter-spacing: -.2px; }
+.homeGatewayDescription { margin-top: 15px; font-size: 13px; line-height: 1.9; color: var(--slate); word-break: keep-all; }
+.homeGatewayTags { display: flex; gap: 7px; flex-wrap: wrap; margin: 19px 0 24px; }
+.homeGatewayTags span { border: 1px solid #dbe4ed; background: #fff; border-radius: 40px; color: #4a6280; padding: 7px 10px; font-size: 11px; }
+.homeGatewayAction {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: auto; padding-top: 17px; border-top: 1px solid #dce4ed;
+  color: var(--intro-navy); font-size: 14px; font-weight: 750;
+}
+.homeGatewayAction svg { width: 19px; height: 19px; }
+.homeGatewayFoot { margin-top: 20px; color: var(--slate); font-size: 11px; line-height: 1.8; }
+.officialPolicyGroup {
+  margin: 32px 0 44px;
+  padding: 29px 0 0;
+  border-top: 3px solid var(--navy);
+}
+.officialPolicyHeader > span {
+  display: block; margin-bottom: 11px; color: #74849a;
+  font-size: 10px; letter-spacing: 1.1px; font-weight: 750;
+}
+.officialPolicyHeader h2 { color: var(--intro-navy); font-size: clamp(21px, 2vw, 27px); line-height: 1.4; }
+.officialPolicyHeader > p { color: var(--slate); margin-top: 10px; font-size: 12px; line-height: 1.85; word-break: keep-all; }
+.officialPolicyHeader .sourceFreshnessBar { padding-top: 12px; margin-top: 12px; border-top: 1px solid #e4ebf1; }
+.officialPolicyGroup .sourceToolbar { padding-top: 17px; }
+.officialPolicyGroup .feedSection { margin: 15px 0 20px; }
+.officialPolicyGroup .sectionHeading { padding-top: 12px; }
+
+/* The landing page must not reserve the empty right intelligence column. */
+@media (min-width: 1024px) {
+  .appShell--compactRail:has(.homeGateway) {
+    grid-template-columns: 168px minmax(0, 1fr);
+    max-width: 1270px;
+    gap: clamp(32px, 3.5vw, 48px);
+  }
+}
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .appShell--compactRail:has(.homeGateway) { grid-template-columns: 146px minmax(0, 1fr); }
+}
+@media (max-width: 767px) {
+  .homeGatewayHero { margin: 7px 0 21px; }
+  .homeGatewayHero h1 { font-size: clamp(27px, 7vw, 34px); }
+  .homeGatewaySubtitle { font-size: 13px; margin-top: 9px; }
+  .homeGateway { margin: 14px 0 24px; }
+  .homeGatewayIntro { font-size: 12px; margin-bottom: 16px; }
+  .homeGatewayGrid { grid-template-columns: minmax(0,1fr); gap: 14px; }
+  .homeGatewayCard { min-height: 0; padding: 21px 20px; border-radius: 13px; }
+  .homeGatewayEyebrow { font-size: 9px; }
+  .homeGatewaySymbol { width: 43px; height: 43px; flex-basis: 43px; }
+  .homeGatewayCard > strong { font-size: 27px; margin-top: 12px; }
+  .homeGatewayLead { font-size: 16px; }
+  .homeGatewayDescription { font-size: 13px; margin-top: 10px; line-height: 1.7; }
+  .homeGatewayTags { margin: 13px 0 17px; }
+  .homeGatewayTags span { font-size: 11px; }
+  .homeGatewayAction { min-height: 47px; padding-top: 13px; font-size: 14px; }
+  .officialPolicyGroup { margin: 29px 0 34px; padding-top: 21px; }
+  .officialPolicyHeader h2 { font-size: 22px; }
+  .officialPolicyHeader > p { font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .homeGatewayCard { transition: none; }
+  .homeGatewayCard:hover { transform: none; }
+}
+
+
+/* Home: fast orientation before the two clear destination choices. */
+.homeDailyBrief {
+  margin: 11px 0 36px;
+  padding: clamp(21px, 2.7vw, 31px);
+  border: 1px solid #dbe4ed; border-radius: 13px;
+  background: #fafbfd;
+}
+.homeDailyHeading { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 14px; margin-bottom: 17px; }
+.homeDailyEyebrow { display: block; font-size: 10px; font-weight: 750; letter-spacing: 1.1px; color: #77859a; margin-bottom: 8px; }
+.homeDailyHeading h2 { font-size: clamp(23px, 2.4vw, 30px); letter-spacing: -.75px; color: var(--intro-navy); }
+.homeDailyHeading p { margin-top: 6px; color: var(--slate); font-size: 13px; line-height: 1.7; }
+.homeDailyScope { flex: 0 0 auto; font-size: 11px; font-weight: 600; color: #728199; }
+.homeDailyTakeaway { margin-bottom: 20px; padding: 15px 17px; border-left: 3px solid var(--gold); background: #fff; }
+.homeDailyTakeaway strong { display: block; color: var(--navy); font-size: 12px; margin-bottom: 6px; }
+.homeDailyTakeaway p { font-size: 13px; color: #455874; line-height: 1.85; word-break: keep-all; }
+.homeDailyTakeaway b { font-weight: 650; }
+.homeDailyColumns { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: clamp(18px, 3vw, 36px); }
+.homeDailyGroup { min-width: 0; }
+.homeDailyGroupTitle { padding-bottom: 10px; border-bottom: 1px solid #dbe3ed; }
+.homeDailyGroupTitle h3 { font-size: 16px; font-weight: 750; letter-spacing: -.2px; color: var(--intro-navy); }
+.homeDailyGroupTitle > span { display: block; color: var(--slate); margin-top: 3px; font-size: 11px; }
+.homeDailyArticles { margin: 0; padding: 0; list-style: none; }
+.homeDailyArticles li { padding: 13px 0 12px; border-bottom: 1px solid #e8edf3; }
+.homeDailyArticles li a { display: block; font-size: 14px; font-weight: 650; color: var(--navy); line-height: 1.55; overflow-wrap: anywhere; text-decoration: none; }
+.homeDailyArticles li a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.homeDailyArticles li a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.homeDailyArticles li > span { display: block; font-size: 11px; color: var(--slate); margin-top: 6px; }
+.homeDailyState { padding: 18px 0; font-size: 12px; color: var(--slate); line-height: 1.7; }
+.homeDailyFooter { display: flex; flex-wrap: wrap; gap: 10px 18px; justify-content: space-between; align-items: center; margin-top: 18px; }
+.homeDailyFooter p { flex: 1 1 300px; font-size: 11px; color: var(--slate); line-height: 1.7; }
+.homeDailyFooter a { display: inline-flex; align-items: center; font-size: 12px; min-height: 44px; font-weight: 750; color: var(--navy); text-decoration: underline; text-underline-offset: 3px; }
+.homeGatewayIntro { color: var(--navy); font-weight: 700; font-size: 16px; margin-bottom: 16px; }
+.homeGateway { margin-top: 8px; }
+
+/* A subtle route suggestion at a natural break between content areas. */
+.crossWorkspaceNudge {
+  display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 18px;
+  margin: 25px 0 30px; padding: 17px 20px; border: 1px solid #dce4ed;
+  border-radius: 10px; background: #f8fafc;
+}
+.crossWorkspaceCopy { flex: 1 1 230px; min-width: 0; }
+.crossWorkspaceCopy > span { display: block; font-size: 9px; color: #7d8ca0; letter-spacing: 1px; font-weight: 750; margin-bottom: 5px; }
+.crossWorkspaceCopy strong { font-size: 14px; color: var(--intro-navy); display: block; line-height: 1.5; }
+.crossWorkspaceCopy p { margin-top: 3px; color: var(--slate); font-size: 11px; line-height: 1.6; }
+.crossWorkspaceAction {
+  display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; gap: 8px;
+  min-height: 46px; padding: 10px 13px; border-radius: 7px; border: 1px solid #bdcad9;
+  color: var(--navy); font-size: 12px; font-weight: 750; text-decoration: none;
+  background: #fff;
+}
+.crossWorkspaceAction svg { width: 17px; height: 17px; }
+.crossWorkspaceAction:hover { border-color: var(--navy); }
+.crossWorkspaceAction:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+@media (max-width: 767px) {
+  .homeDailyBrief { margin: 5px 0 26px; padding: 19px 15px; }
+  .homeDailyHeading h2 { font-size: 25px; }
+  .homeDailyHeading p { font-size: 13px; }
+  .homeDailyTakeaway { padding: 13px; }
+  .homeDailyTakeaway p { font-size: 13px; }
+  .homeDailyColumns { grid-template-columns: minmax(0,1fr); gap: 21px; }
+  .homeDailyGroupTitle h3 { font-size: 16px; }
+  .homeDailyArticles li a { font-size: 15px; }
+  .homeDailyFooter { align-items: stretch; }
+  .homeDailyFooter a { font-size: 13px; }
+  .crossWorkspaceNudge { padding: 15px; margin: 21px 0; gap: 14px; }
+  .crossWorkspaceCopy strong { font-size: 14px; }
+  .crossWorkspaceCopy p { font-size: 12px; }
+  .crossWorkspaceAction { width: 100%; font-size: 13px; }
+}
