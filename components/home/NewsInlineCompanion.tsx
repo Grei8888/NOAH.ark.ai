@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { readBetaInvitation, forgetBetaInvitation } from "@/lib/news/beta-invitation";
 import Link from "next/link";
 import { READER_MODES, type ReaderMode } from "@/lib/news/reader-companion";
 import type { NewsSearchItem, NewsSearchTopic } from "@/lib/news/news-search-contract";
@@ -18,6 +19,12 @@ export function NewsInlineCompanion({
   const [mode, setMode] = useState<ReaderMode>("terms");
   const [question, setQuestion] = useState<string>(READER_MODES[0].hint);
   const [inviteCode, setInviteCode] = useState("");
+  const [inviteLinked, setInviteLinked] = useState(false);
+  useEffect(() => {
+    const code = readBetaInvitation();
+    if (!code) return;
+    queueMicrotask(() => { setInviteCode(code); setInviteLinked(true); });
+  }, []);
   const [pending, setPending] = useState(false);
   const [answerState, setAnswerState] = useState<{ url: string; value: string } | null>(null);
   const [errorState, setErrorState] = useState<{ url: string; value: string } | null>(null);
@@ -108,13 +115,23 @@ export function NewsInlineCompanion({
         placeholder="모르는 용어나 궁금한 경제·정책 배경을 질문해 보세요." />
 
       {labAvailable && (
-        <>
-          <label className="newsAiLabel" htmlFor="newsAiInvite">테스터 초대 코드 <small>브라우저에 저장되지 않습니다</small></label>
-          <input id="newsAiInvite" type="password" autoComplete="off" maxLength={256}
-            value={inviteCode} disabled={pending}
-            onChange={event => setInviteCode(event.target.value)}
-            placeholder="개별 발급 코드" />
-        </>
+        inviteLinked ? (
+          <div className="newsAiInviteConnected" role="status">
+            <strong>✓ 초대 링크 인식 완료</strong>
+            <span>코드를 따로 입력하지 않아도 됩니다. 질문할 때 인증됩니다.</span>
+            <button type="button" disabled={pending} onClick={() => {
+              forgetBetaInvitation(); setInviteLinked(false); setInviteCode("");
+            }}>다른 초대코드 사용</button>
+          </div>
+        ) : (
+          <>
+            <label className="newsAiLabel" htmlFor="newsAiInvite">테스터 초대 코드 <small>초대 링크로 접속하면 입력할 필요가 없습니다</small></label>
+            <input id="newsAiInvite" type="password" autoComplete="off" maxLength={256}
+              value={inviteCode} disabled={pending}
+              onChange={event => setInviteCode(event.target.value)}
+              placeholder="개별 발급 코드" />
+          </>
+        )
       )}
 
       <button className="newsAiSubmit" type="button" onClick={() => void submitQuestion()}
