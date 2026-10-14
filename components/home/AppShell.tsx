@@ -4,12 +4,12 @@ import { BrandLockup } from "./BrandLockup";
 import { Icon } from "./Icon";
 export type HomeView =
   "home" | "discover" | "startup" | "saved" | "my" | "settings";
-const nav: { id: HomeView; label: string; icon: string }[] = [
-  { id: "home", label: "Home", icon: "home" },
-  { id: "discover", label: "Discover", icon: "discover" },
-  { id: "startup", label: "Startup", icon: "startup" },
-  { id: "saved", label: "Saved", icon: "saved" },
-  { id: "my", label: "My NOAH", icon: "my" },
+const nav: { id: HomeView; label: string; mobileLabel: string; icon: string }[] = [
+  { id: "home", label: "Home", mobileLabel: "홈", icon: "home" },
+  { id: "discover", label: "Discover", mobileLabel: "뉴스", icon: "discover" },
+  { id: "startup", label: "Startup", mobileLabel: "사업기회", icon: "startup" },
+  { id: "saved", label: "Saved", mobileLabel: "저장", icon: "saved" },
+  { id: "my", label: "My NOAH", mobileLabel: "마이", icon: "my" },
 ];
 export const viewURL = (id: HomeView) => (id === "home" ? "/" : `/?view=${id}`);
 export function AppShell({
@@ -66,9 +66,6 @@ export function AppShell({
         >
           <Icon name="search" />
         </Link>
-        <Link href="/?view=my" className="iconButton" aria-label="내 관심사">
-          <Icon name="my" />
-        </Link>
       </header>
       <main id="main-content" className="readingColumn">
         {children}
@@ -86,7 +83,7 @@ export function AppShell({
             aria-current={view === item.id ? "page" : undefined}
           >
             <Icon name={item.icon} />
-            <span>{item.id === "my" ? "My" : item.label}</span>
+            <span>{item.mobileLabel}</span>
           </Link>
         ))}
       </nav>
