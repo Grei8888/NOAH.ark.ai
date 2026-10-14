@@ -7,6 +7,8 @@ import { Icon } from "@/components/home/Icon";
 import { SourceCardVisual } from "@/components/home/SourceCardVisual";
 import { ReaderAudiencePanel } from "@/components/home/ReaderAudiencePanel";
 import { NewsDiscoveryPanel } from "@/components/home/NewsDiscoveryPanel";
+import { BusinessOpportunityPanel } from "@/components/home/BusinessOpportunityPanel";
+import { HomeGateway } from "@/components/home/HomeGateway";
 import type { OfficialFeedSnapshot, OfficialSourceLink } from "@/lib/news/public-official-sources";
 import { TODAY_TOPICS, matchesTodayTopic, restoreTodayTopics, validTodayTopics, todayKstDate, type TodayTopic } from "@/lib/news/daily-interests";
 
@@ -185,25 +187,31 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
     document.getElementById("my-focus-settings")?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-  const currentKind: SourceKind = view === "startup" ? "notice" : filter;
-  const activeTopics = view === "home" ? focusTopics : todayTopics;
+  const currentKind: SourceKind = filter;
+  const activeTopics = view === "discover" ? focusTopics : todayTopics;
   const filtered = useMemo(() => currentSnapshot.items.filter(s => {
     if (view === "saved" && !saved.includes(s.url)) return false;
     if (view === "my" && !interests.includes(s.kind)) return false;
     if (view !== "saved" && hidden.includes(s.url)) return false;
     if (currentKind !== "all" && s.kind !== currentKind) return false;
-    // MY FOCUS drives only the personalized news briefing on Home; official sources remain independently browsable.
-    if (view !== "saved" && view !== "home" && todayTopics.length && !todayTopics.some(t => matchesTodayTopic(s.title, t))) return false;
+    // Personal news briefing controls do not silently hide government documents.
+    if (view === "my" && todayTopics.length && !todayTopics.some(t => matchesTodayTopic(s.title, t))) return false;
     return !query.trim() || (s.title + s.sourceName).toLocaleLowerCase("ko-KR").includes(query.trim().toLocaleLowerCase("ko-KR"));
   }), [currentSnapshot.items, saved, hidden, interests, todayTopics, currentKind, query, view]);
 
-  const showControls = view !== "settings";
+  const showOfficialSources = view === "discover" || view === "saved" || view === "my";
   const title = view === "saved" ? "내가 저장한 자료" : view === "my" ? "내 관심 분야" :
-    view === "startup" ? "창업 · 지원사업" : view === "discover" ? "원문 자료 탐색" : view === "settings" ? "서비스 안내" : "오늘 확인할 변화";
+    view === "startup" ? "사업기회" : view === "discover" ? "나에게 중요한 뉴스" : view === "settings" ? "서비스 안내" : "무엇을 살펴볼까요?";
   const kstDay = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "long", day: "numeric", weekday: "long" }).format(new Date());
 
   return (
-    <AppShell view={view} compactRail={newsSearchEnabled} rail={
+    <AppShell view={view} compactRail={newsSearchEnabled} rail={view === "home" ? undefined : view === "startup" ? (
+      <section className="railPanel">
+        <div className="railEyebrow">BUSINESS OPPORTUNITIES</div>
+        <h2>사업기회를 한곳에서.</h2>
+        <p>지원사업·국가 R&amp;D·공공입찰을 유형별로 분리해 확인합니다. 공고의 실제 자격요건과 마감일은 원문에서 최종 확인하세요.</p>
+      </section>
+    ) : (
       <>
         <section className="railPanel">
           <div className="railEyebrow">YOUR AI NEWS PARTNER</div>
@@ -223,38 +231,42 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
           <p>{readerModelReady ? "경제용어 설명·배경지식·비판적 독해를 실제 AI로 시험합니다." : readerLabAvailable ? "AI 독해 화면을 검토할 수 있으며 실제 모델 연결은 대기 중입니다." : "경제용어 설명과 비판적 독해는 후속 출시 예정입니다."} 검증된 기사 간 관점 비교는 아직 미제공이며, 두 기사 읽기를 강제하지 않습니다.</p>
         </section>
       </>
-    }>
+    )}>
       <div className="topUtility">
         <span>NOAH ARK / {readerLabAvailable ? "10-READER PRIVATE BETA" : "PUBLIC BETA v0.1"}</span>
-        <span>{newsSearchEnabled ? "PUBLISHER LINKS + OFFICIAL SOURCES" : "OFFICIAL SOURCES ONLY"}</span>
+        <span>{view === "home" ? "CHOOSE YOUR WORKSPACE" : view === "startup" ? "SUPPORT · R&D · PROCUREMENT" : newsSearchEnabled ? "PUBLISHER LINKS + OFFICIAL SOURCES" : "OFFICIAL SOURCES ONLY"}</span>
       </div>
       <header className="homeIntro">
         <div className="dateLine"><span>{kstDay}</span><span>ONLY WHAT MATTERS.</span></div>
-        <p className="greeting">Your AI News Partner. · 어려운 뉴스를 이해하기 쉽게.</p>
+        <p className="greeting">{view === "home" ? "정보는 나누고, 선택은 간단하게." : view === "startup" ? "정부와 공공기관이 제공하는 사업 기회를 찾아보세요." : "Your AI News Partner. · 어려운 뉴스를 이해하기 쉽게."}</p>
         <h1>{title}</h1>
-        <div className="editionLine"><span className="signalDot" /><span>{newsSearchEnabled ? "언론사 기사 검색 + 정부 공식자료" : "실제 정부 RSS · 최근 14일 · 최신순"}</span><span>{readerLabAvailable ? "10명 사전검증" : "무료 공개 베타"}</span></div>
-        {readerLabAvailable && <div className="readerBetaPrompt"><Link href="/lab/reader">실제 AI 뉴스 독해 도우미 사용하기 →</Link></div>}
+        <div className="editionLine"><span className="signalDot" /><span>{view === "home" ? "뉴스 · 사업기회" : view === "startup" ? "지원사업 · 국가 R&D · 공공입찰" : newsSearchEnabled ? "언론사 기사 검색 + 정부 공식자료" : "실제 정부 RSS · 최근 14일 · 최신순"}</span><span>{readerLabAvailable ? "10명 사전검증" : "무료 공개 베타"}</span></div>
+        {readerLabAvailable && view === "discover" && <div className="readerBetaPrompt"><Link href="/lab/reader">원문과 AI를 나란히 보는 독해 도우미 →</Link></div>}
       </header>
-      <div className="trustNotice" role="note">
+      {view === "home" ? (
+        <HomeGateway />
+      ) : (
+      <>
+      {view !== "startup" && <div className="trustNotice" role="note">
         <strong>LIVE SOURCES</strong>
         <span>{newsSearchEnabled ? "아래 언론사 기사는 검색 API에서 가져온 원문 링크이고, 정부 공고·보도자료는 공식 RSS에서 가져옵니다." : "아래는 실제 기관의 공고·보도자료 원문 링크입니다."} AI 중요도 선정이나 정책 시행 확정 판단은 아닙니다.</span>
-      </div>
-      {currentSnapshot.availableFeeds < currentSnapshot.totalFeeds && (
+      </div>}
+      {showOfficialSources && currentSnapshot.availableFeeds < currentSnapshot.totalFeeds && (
         <p className="sourceHealth" role="status">일부 자료원의 연결이 원활하지 않습니다. 표시 가능한 원문만 제공하며 가상 자료로 대체하지 않습니다.</p>
       )}
-      {(view === "home" || view === "my") && (
+      {(view === "discover" || view === "my") && (
         <ReaderAudiencePanel activeTopics={activeTopics} onFocusTopic={focusReaderTopic} aiReaderAvailable={readerModelReady} newsSearchEnabled={newsSearchEnabled} />
       )}
-      {(view === "home" || view === "discover" || view === "startup" || view === "my") && (
-        <section id={view === "home" ? "my-focus-settings" : undefined} className={view === "home" ? "todayInterestPanel personalFocusPanel" : "todayInterestPanel"} aria-label={view === "home" ? "나의 관심사 설정" : "오늘의 관심사 선택"}>
+      {(view === "discover" || view === "my") && (
+        <section id={view === "discover" ? "my-focus-settings" : undefined} className={view === "discover" ? "todayInterestPanel personalFocusPanel" : "todayInterestPanel"} aria-label={view === "discover" ? "나의 관심사 설정" : "오늘의 관심사 선택"}>
           <div className="todayInterestHeading">
             <div>
-              <h2>{view === "home" ? "MY FOCUS · 나의 관심사" : "오늘의 관심사"}</h2>
-              <p>{view === "home" ? "선택한 분야를 기억하고 관련 기사 제목을 우선 선별합니다." : "관심사는 언제든 변경할 수 있습니다."}</p>
+              <h2>{view === "discover" ? "MY FOCUS · 나의 관심사" : "오늘의 관심사"}</h2>
+              <p>{view === "discover" ? "선택한 분야를 기억하고 관련 기사 제목을 우선 선별합니다." : "관심사는 언제든 변경할 수 있습니다."}</p>
             </div>
-            {activeTopics.length > 0 && <button className="todayInterestReset" type="button" onClick={() => view === "home" ? setPersonalFocus([]) : clearTodayTopics()}>{view === "home" ? "선택 해제" : "전체 보기"}</button>}
+            {activeTopics.length > 0 && <button className="todayInterestReset" type="button" onClick={() => view === "discover" ? setPersonalFocus([]) : clearTodayTopics()}>{view === "home" ? "선택 해제" : "전체 보기"}</button>}
           </div>
-{view !== "home" && (
+{view === "my" && (
           <div className="sourceFreshnessBar">
             <span className="sourceFreshnessText" aria-live="polite" aria-atomic="true">
               <span
@@ -276,18 +288,18 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
           <div className="todayInterestChips">
             {TODAY_TOPICS.map(topic => (
               <button type="button" key={topic.id} aria-pressed={activeTopics.includes(topic.id)}
-                onClick={() => view === "home" ? updatePersonalFocus(topic.id) : toggleTodayTopic(topic.id)}>
+                onClick={() => view === "discover" ? updatePersonalFocus(topic.id) : toggleTodayTopic(topic.id)}>
                 <span aria-hidden="true">{activeTopics.includes(topic.id) ? "✓ " : ""}</span>{topic.label}
               </button>
             ))}
           </div>
           <p className="todayInterestNote" aria-live="polite">
-            {view === "home"
+            {view === "discover"
               ? activeTopics.length
                 ? `${activeTopics.length}개 분야 선택 · 관심 분야에 일치하는 실제 기사 제목을 먼저 보여드립니다.`
                 : "관심사 미설정 · 하나 이상 고르면 맞춤 뉴스 브리핑을 시작합니다."
               : `${todayTopics.length ? `${todayTopics.length}개 관심사 선택 · 주제 일치 자료만 표시` : "전체 주제 표시"} · 한국시간 기준 다음 날 초기화`}
-            {view === "home" && " 선택한 관심사는 이 브라우저에 유지되고 언제든 변경할 수 있습니다."}
+            {view === "discover" && " 선택한 관심사는 이 브라우저에 유지되고 언제든 변경할 수 있습니다."}
           </p>
         </section>
       )}
