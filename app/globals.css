@@ -2888,3 +2888,18 @@ section[id] {
   .opportunityTabs button { padding: 8px 2px; font-size: 11px; }
   .opportunityNotice h3 { font-size: 15px; }
 }
+
+/* One-tap beta invitation: optional fallback remains available. */
+.newsAiInviteConnected {
+  display: grid; gap: 5px; margin: 12px 0 2px;
+  padding: 12px 14px; border: 1px solid #d5e4dd;
+  border-radius: 7px; background: #f7fbf8; color: #27513d;
+  font-size: 12px; line-height: 1.55;
+}
+.newsAiInviteConnected strong { font-weight: 750; }
+.newsAiInviteConnected span { font-size: 11px; }
+.newsAiInviteConnected button {
+  width: fit-content; min-height: 40px; margin-top: 4px;
+  font: inherit; text-decoration: underline; text-underline-offset: 3px; color: inherit;
+}
+.newsAiInviteConnected button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
