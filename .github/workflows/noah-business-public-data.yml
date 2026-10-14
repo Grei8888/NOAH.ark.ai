@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - chatgpt/noah-business-support-data-v1
+      - chatgpt/noah-two-path-home-v1
   pull_request:
     branches:
       - chatgpt/noah-personalized-event-briefing-v1
