@@ -37,6 +37,8 @@ Use a **separate** Vercel project with Root Directory = \`products/noah-housing\
 
 **Housing → ARK:** optional public URL \`NEXT_PUBLIC_NOAH_ARK_URL\`; link-only.
 
+**Housing → HOME:LINK:** *not integrated yet*. An additional strict supply-summary contract is drafted in `lib/homelink-contract.mjs`: coarse region, sale/rental type, aggregate available units, an advertised price/deposit range, date and affirmative export approval. No exact dwelling addresses, customer identities or business-confidential unpublished terms without the project owner's approval. For rental cases, price range means **refundable deposit**, not sale price or revenue. Tenant matching, public release and transport are not implemented.
+
 **HOME:LINK → Housing:** *not integrated yet*. Future contract: \`schema/source/regionCode/asOf/sampleSize/qualifiedInterestCount/method/useApproved\`. No contact data, address, per-person eligibility, customer identifiers or automatically claimed conversions. Validation of a schema does **not** mean consent or anonymization was legally confirmed. Before any API: real HOME:LINK repository/system, documented lawful basis, purpose limitation, bounded geography, aggregation threshold, anti-differencing protections, authenticated signed transport, audit, retention and cross-service approval are required.
 
 ## Out of scope (must not be misrepresented)
