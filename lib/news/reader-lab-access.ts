@@ -1,3 +1,4 @@
+import { publicBetaRequested, publicBetaConfigured } from "@/lib/news/public-link-budget-policy";
 import { createHash, timingSafeEqual } from "node:crypto";
 
 function inviteDigests(): string[] | null {
@@ -10,10 +11,12 @@ function inviteDigests(): string[] | null {
   return hashes;
 }
 
-/** Same real model in 10-user preview and later rollout, but costly access disabled by default. */
+/** Preview lab opt-in; public-link beta has its own durable shared spend gate. */
 export function readerLabConfigured(): boolean {
   const preview = process.env.VERCEL_ENV === "preview";
   const local = process.env.NODE_ENV !== "production" && !process.env.VERCEL_ENV;
+  // A malformed requested public beta MUST NOT fall back to the 10-person allowlist.
+  if (publicBetaRequested()) return publicBetaConfigured();
   const hashes = inviteDigests();
   const invitationsConfigured = hashes !== null && hashes.length > 0;
   const legacyLocalOnly = local &&
@@ -28,10 +31,15 @@ export function readerLabModelReady(): boolean {
   return readerLabConfigured() && !!process.env.OPENAI_API_KEY?.trim();
 }
 
-/** Returns stable non-identifying invite ID; preview always requires individual invite codes. */
+/** Returns stable non-identifying invite ID; one revocable shared secret in public mode. */
 export function readerLabInviteId(value: string | null): string | null {
   if (!readerLabConfigured() || !value || value.length < 32 || value.length > 256) return null;
   const hash = createHash("sha256").update(value).digest();
+  if (publicBetaRequested()) {
+    if (!publicBetaConfigured()) return null;
+    const expected = process.env.NOAH_SHARED_BETA_LINK_SHA256!;
+    return timingSafeEqual(hash, Buffer.from(expected, "hex")) ? hash.toString("hex") : null;
+  }
   const hashes = inviteDigests();
   if (hashes !== null) {
     let accepted = false;

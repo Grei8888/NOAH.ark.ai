@@ -2618,6 +2618,10 @@ section[id] {
   .newsAiStories .newsDiscoveryItem { padding: 17px 0; }
   .newsAiStories .newsDiscoveryItem h3 { font-size: 15px; }
   .newsAiStories .newsDiscoveryTopics button { flex: 1 1 calc(25% - 6px); }
+  /* Keep the question input visible above iOS bottom navigation/browser chrome. */
+  .newsAiMobileTabs { scroll-margin-top: 26px; }
+  .newsAiCompanion { scroll-margin-top: 22px; }
+  .newsAiCompanion #newsAiQuestion { scroll-margin-top: 90px; scroll-margin-bottom: 145px; }
 }
 
 /* Personalized briefing v1 — minimal monochrome/navy hierarchy; no fake imagery. */
@@ -2700,3 +2704,725 @@ section[id] {
 
 /* This is government RSS freshness, deliberately outside personal news focus. */
 .officialFreshnessBar { margin: 14px 0 6px; border-top: 1px solid var(--border); padding-top: 10px; }
+
+/* My Business: official public support-program metadata, not eligibility certification. */
+.businessSupportSection { margin: 8px 0 43px; padding: 24px 0 29px; border-top: 2px solid var(--navy); border-bottom: 2px solid #dce4ed; }
+.businessSupportHeader { display: flex; align-items: start; justify-content: space-between; gap: 15px; }
+.businessSupportEyebrow { display: block; color: #70819a; font-size: 10px; letter-spacing: 1.3px; font-weight: 750; margin-bottom: 9px; }
+.businessSupportHeader h2 { color: var(--intro-navy); font-size: clamp(20px,2vw,27px); font-weight: 800; letter-spacing: -.5px; }
+.businessSupportHeader p { color: var(--slate); font-size: 12px; line-height: 1.7; margin-top: 7px; }
+.businessSupportHeader>a { font-size: 11px; color: var(--intro-navy); font-weight: 700; white-space: nowrap; padding: 10px 0; min-height: 40px; }
+.businessSupportProfile { margin-top: 21px; background: #f5f7fa; border: 1px solid #dce5ee; border-radius: 10px; padding: 17px; }
+.businessSupportProfileTitle { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+.businessSupportProfileTitle strong { color: var(--navy); font-size: 12px; }
+.businessSupportProfileTitle span { color: var(--slate); font-size: 10px; }
+.businessSupportInputs { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
+.businessSupportInputs label { min-width: 0; display: block; }
+.businessSupportInputs label>span { display: block; color: var(--slate); font-size: 10px; font-weight: 650; margin-bottom: 6px; }
+.businessSupportInputs select { display: block; width: 100%; min-width: 0; border: 1px solid #ccd9e5; border-radius: 7px; background: white; color: var(--navy); padding: 10px 7px; min-height: 42px; font-size: 11px; }
+.businessSupportInputs select:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.businessSupportStatus { padding: 22px; margin-top: 19px; border: 1px solid #d9e4ed; border-radius: 9px; background: #f8fafc; color: var(--slate); font-size: 12px; line-height: 1.75; }
+.businessSupportStatus strong { display: block; font-size: 13px; color: var(--navy); margin-bottom: 7px; }
+.businessSupportStatus a { display: inline-flex; align-items: center; min-height: 43px; margin-top: 8px; color: var(--intro-navy); text-decoration: underline; text-underline-offset: 4px; font-weight: 750; }
+.businessSupportCount { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--slate); font-size: 11px; margin: 18px 0 4px; }
+.businessSupportNotice { padding: 19px 0 18px; border-top: 1px solid var(--border); }
+.businessSupportNoticeMeta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 10px; color: var(--slate); }
+.businessSupportNoticeMeta>span:first-child { font-weight: 750; color: var(--navy); }
+.businessSupportNoticeStatus { margin-left: auto; padding: 4px 7px; color: #4c6075; border: 1px solid #d5dee8; border-radius: 6px; font-weight: 650; }
+.businessSupportNotice h3 { color: var(--intro-navy); font-size: 16px; line-height: 1.55; margin-top: 9px; }
+.businessSupportNotice h3 a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.businessSupportTarget { color: var(--navy); margin-top: 9px; font-size: 11px; line-height: 1.7; }
+.businessSupportPeriod { color: var(--slate); font-size: 11px; line-height: 1.65; margin-top: 6px; }
+.businessSupportReasons { margin-top: 9px; background: #f8fafc; border-left: 2px solid #bcc9d5; padding: 9px 11px; }
+.businessSupportReasons p { font-size: 11px; color: var(--slate); line-height: 1.8; }
+.businessSupportOriginal { display: inline-flex; min-height: 44px; align-items: center; color: var(--intro-navy); font-size: 11px; font-weight: 750; margin-top: 9px; }
+.businessSupportMore { border: 1px solid var(--border); border-radius: 7px; color: var(--navy); font-size: 12px; font-weight: 750; padding: 11px 15px; min-height: 44px; }
+.businessSupportDisclaimer { color: var(--slate); font-size: 10px; line-height: 1.85; border-top: 1px solid var(--border); padding-top: 13px; margin-top: 15px; word-break: keep-all; }
+.businessSupportSection :is(a,button):focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (max-width: 1050px) {
+ .businessSupportInputs { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 767px) {
+ .businessSupportSection { padding-top: 20px; margin-bottom: 29px; }
+ .businessSupportHeader h2 { font-size: 20px; }
+ .businessSupportHeader p { font-size: 11px; }
+ .businessSupportProfile { padding: 12px; }
+ .businessSupportProfileTitle { display: block; }
+ .businessSupportProfileTitle span { display: block; margin-top: 5px; }
+ .businessSupportNotice h3 { font-size: 15px; }
+}
+
+/* My Business — explicit action after choosing four profile fields. */
+.businessSupportSubmitRow { display:flex; align-items:center; justify-content:space-between; gap:13px; padding-top:17px; margin-top:15px; border-top:1px solid #dbe3ec; }
+.businessSupportSubmitRow>span { font-size:11px; color:var(--slate); line-height:1.65; }
+.businessSupportQueryButton {
+  display:inline-flex; justify-content:center; align-items:center; flex:0 0 auto;
+  background:var(--navy); color:#fff; font-size:12px; font-weight:750;
+  border:1px solid var(--navy); border-radius:7px; padding:10px 18px; min-height:46px;
+}
+.businessSupportQueryButton:disabled { opacity:.48; cursor:not-allowed; }
+.businessProfileCaution { margin-top:13px; padding:9px 11px; font-size:11px; line-height:1.7; background:#f7f2e8; color:#715c37; border-left:3px solid #c7ab6c; }
+.businessSupportPending { margin:15px 0 6px; padding:11px 13px; border:1px solid #dbe4ed; background:#f8fafc; border-radius:7px; font-size:11px; color:var(--slate); line-height:1.7; }
+@media (max-width:767px) {
+  .businessSupportSubmitRow { align-items:stretch; flex-direction:column; }
+  .businessSupportQueryButton { width:100%; }
+}
+
+
+/* Article-first mobile reader v1: publisher's headline is the primary content. */
+.newsAiCompanion {
+  background: #fafbfd;
+  box-shadow: none;
+}
+.newsAiSelected {
+  gap: 6px;
+  margin-top: 0;
+  padding: 0 0 12px;
+  background: transparent;
+  border-left: 0;
+  border-bottom: 1px solid #dce4ed;
+  border-radius: 0;
+  scroll-margin-top: 14px;
+}
+.newsAiSelected > span { font-size: 11px; color: #64748b; }
+.newsAiSelected strong {
+  font-size: clamp(17px, 1.35vw, 21px);
+  line-height: 1.45;
+  font-weight: 800;
+  letter-spacing: -.35px;
+  color: var(--navy);
+  overflow-wrap: anywhere;
+}
+.newsAiSelected a {
+  font-size: 12px;
+  min-height: 33px;
+  font-weight: 750;
+}
+.newsAiCompanionHeader {
+  align-items: center;
+  margin-top: 11px;
+}
+.newsAiModeLegend {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+.newsAiModes { margin: 10px 0 8px; }
+.newsAiModeButtons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+}
+.newsAiModeButtons button {
+  min-width: 0;
+  min-height: 42px;
+  padding: 7px 2px;
+  font-size: 10px;
+  white-space: nowrap;
+  border-radius: 7px;
+}
+.newsAiLabel { margin: 7px 0 5px; }
+.newsAiCompanion textarea { min-height: 84px; font-size: 14px; line-height: 1.55; }
+.newsAiDisabled {
+  margin: 9px 0 0;
+  padding: 9px 10px;
+  font-size: 10px;
+  line-height: 1.6;
+}
+.newsAiSubmit { margin-top: 10px; min-height: 41px; }
+.newsAiFootnote { margin-top: 11px; padding-top: 10px; }
+@media (max-width: 767px) {
+  .newsAiCompanion { padding: 14px; }
+  .newsAiSelected strong { font-size: clamp(20px, 5.4vw, 23px); line-height: 1.4; }
+  .newsAiCompanionHeader { margin-top: 10px; }
+  .newsAiEyebrow { font-size: 10px; letter-spacing: .9px; }
+  .newsAiCompanion textarea { min-height: 84px; resize: vertical; }
+  .newsAiStories .newsDiscoveryItem h3 { font-size: 17px; }
+  .newsAiCompanion #newsAiQuestion { scroll-margin-top: 65px; scroll-margin-bottom: 90px; }
+}
+@media (max-width: 355px) {
+  .newsAiCompanion { padding: 11px; }
+  .newsAiModeButtons { gap: 3px; }
+  .newsAiModeButtons button { font-size: 9px; padding: 5px 1px; }
+}
+
+/* MY BUSINESS: separate support, research and public procurement opportunities. */
+.businessOpportunityPanel { margin: 14px 0 39px; border-top: 2px solid var(--navy); padding: 23px 0 19px; }
+.businessOpportunityHeading h2 { font-size: clamp(20px,2vw,27px); color: var(--navy); line-height: 1.45; font-weight: 800; }
+.businessOpportunityHeading p { margin-top: 7px; font-size: 12px; color: var(--slate); line-height: 1.7; }
+.opportunityTabs { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-top: 18px; }
+.opportunityTabs button { min-width: 0; min-height: 45px; font-size: 12px; font-weight: 750; color: var(--navy); border: 1px solid #d4dfe9; border-radius: 8px; background: #fff; padding: 9px 6px; }
+.opportunityTabs button[aria-selected="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+.businessOpportunityPanel :is(a,button,input):focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.opportunityTabPanel { min-width: 0; }
+.opportunityTabPanel > .businessSupportSection { border: 0; margin: 7px 0 0; padding: 0; }
+.opportunityTabPanel > .businessSupportSection > .businessSupportHeader { display: none; }
+.opportunitySearchLabel { display: block; color: var(--navy); font-size: 11px; font-weight: 750; margin: 20px 0 8px; }
+.opportunitySearchLabel span { color: var(--slate); font-size: 10px; font-weight: 400; }
+.opportunityKeyword { width: 100%; min-height: 45px; padding: 9px 13px; border: 1px solid #d4dfe9; border-radius: 8px; font-size: 12px; color: var(--navy); background: #fff; }
+.opportunityQuickTopics { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 16px; }
+.opportunityQuickTopics button { min-height: 40px; padding: 8px 13px; background: #fff; color: var(--navy); border: 1px solid #d4dfe9; border-radius: 24px; font-size: 11px; }
+.opportunityQuickTopics button[aria-pressed="true"] { background: #e8edf3; border-color: #a6b4c6; font-weight: 700; }
+.opportunitySourceLine { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; border-top: 1px solid #dce3eb; padding-top: 13px; color: var(--slate); font-size: 10px; line-height: 1.7; }
+.opportunitySourceLine a { color: var(--navy); text-decoration: underline; text-underline-offset: 3px; }
+.opportunityNotice { border-bottom: 1px solid #e0e6ed; padding: 17px 0 19px; }
+.opportunityNoticeMeta { font-size: 10px; color: #667990; font-weight: 700; margin-bottom: 8px; }
+.opportunityNotice h3 { font-size: clamp(14px,1.6vw,17px); font-weight: 750; line-height: 1.55; word-break: keep-all; color: var(--navy); }
+.opportunityNotice h3 a:hover { text-decoration: underline; }
+.opportunityDeadline { font-size: 11px; font-weight: 650; color: var(--navy); line-height: 1.7; margin-top: 8px; }
+.opportunityScope { font-size: 11px; color: var(--slate); line-height: 1.7; margin-top: 7px; }
+.opportunityCaution { font-size: 11px; line-height: 1.7; color: #695c45; border-left: 2px solid #c5b386; padding: 5px 10px; margin-top: 10px; }
+.opportunityReference, .opportunityCoverage { font-size: 10px; line-height: 1.8; color: var(--slate); margin-top: 9px; }
+.opportunityNoticeState { padding: 17px; margin: 16px 0; border: 1px solid #dbe4ec; background: #f8fafc; border-radius: 8px; font-size: 12px; line-height: 1.8; color: var(--slate); }
+.opportunityNoticeState strong { display: block; color: var(--navy); margin-bottom: 4px; }
+.opportunityNoticeState a { color: var(--navy); font-weight: 700; text-decoration: underline; }
+.opportunityOfficialLink { display: inline-flex; min-height: 43px; align-items: center; font-size: 11px; font-weight: 750; color: var(--navy); text-decoration: underline; text-underline-offset: 3px; }
+.opportunityFooter { border-top: 1px solid #e0e6ed; margin-top: 16px; padding-top: 13px; font-size: 10px; line-height: 1.85; color: var(--slate); }
+@media (max-width: 767px) {
+  .businessOpportunityPanel { padding-top: 20px; }
+  .businessOpportunityHeading h2 { font-size: 21px; }
+  .businessOpportunityHeading p { font-size: 11px; }
+  .opportunityTabs { gap: 5px; }
+  .opportunityTabs button { padding: 8px 2px; font-size: 11px; }
+  .opportunityNotice h3 { font-size: 15px; }
+}
+
+/* One-tap beta invitation: optional fallback remains available. */
+.newsAiInviteConnected {
+  display: grid; gap: 5px; margin: 12px 0 2px;
+  padding: 12px 14px; border: 1px solid #d5e4dd;
+  border-radius: 7px; background: #f7fbf8; color: #27513d;
+  font-size: 12px; line-height: 1.55;
+}
+.newsAiInviteConnected strong { font-weight: 750; }
+.newsAiInviteConnected span { font-size: 11px; }
+.newsAiInviteConnected button {
+  width: fit-content; min-height: 40px; margin-top: 4px;
+  font: inherit; text-decoration: underline; text-underline-offset: 3px; color: inherit;
+}
+.newsAiInviteConnected button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.readerInviteAccess { display: grid; gap: 6px; margin-top: 12px; font-size: 12px; }
+.readerInviteStatus { display: grid; gap: 5px; color: var(--slate); line-height: 1.55; }
+.readerInviteAccess input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font: inherit; }
+.readerInviteAction { width: fit-content; min-height: 44px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font: inherit; color: var(--navy); }
+
+
+/*
+ * Unified NOAH mobile experience v1.
+ * The Home/Discover/Startup/Saved/My NOAH views share the same shell;
+ * mobile has its own hierarchy, touch targets and article-first layout.
+ */
+@media (max-width: 767px) {
+  html { scroll-padding-top: 80px; }
+  .appShell--compactRail {
+    width: 100%;
+    max-width: 680px;
+    padding-inline: clamp(14px, 4vw, 22px);
+  }
+  .appShell--compactRail .mobileHeader {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    height: 64px;
+    gap: 8px;
+    background: rgba(255, 255, 255, .97);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  .appShell--compactRail .mobileHeader .brandSymbol { width: 46px; }
+  .appShell--compactRail .mobileHeader .brandWordmark { font-size: 19px; }
+  .appShell--compactRail .mobileHeader .brandWordmark > span { font-size: 12px; }
+  .appShell--compactRail .mobileHeader .iconButton {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+  }
+  .appShell--compactRail .readingColumn {
+    padding-top: 20px;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  }
+  .appShell--compactRail .mobileNav {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    justify-items: stretch;
+    gap: 0;
+    min-height: 70px;
+    padding: 6px 8px max(8px, env(safe-area-inset-bottom));
+    box-shadow: 0 -5px 20px rgba(23, 42, 68, .045);
+  }
+  .appShell--compactRail .mobileNav a {
+    min-width: 0;
+    min-height: 54px;
+    position: relative;
+    gap: 5px;
+    padding: 6px 1px;
+    font-size: 11px;
+    letter-spacing: -.15px;
+    line-height: 1.25;
+    white-space: nowrap;
+    border-radius: 6px;
+  }
+  .appShell--compactRail .mobileNav a[aria-current="page"] {
+    color: var(--navy);
+    background: #f2f5f9;
+  }
+  .appShell--compactRail .mobileNav svg {
+    width: 21px;
+    height: 21px;
+    flex-shrink: 0;
+  }
+  .appShell--compactRail .homeIntro { margin-bottom: 20px; }
+  .appShell--compactRail .dateLine { margin-bottom: 13px; }
+  .appShell--compactRail .dateLine > span { font-size: 10px; }
+  .appShell--compactRail .greeting { font-size: 12px; line-height: 1.5; }
+  .appShell--compactRail .homeIntro h1 {
+    font-size: clamp(25px, 6.3vw, 30px);
+    line-height: 1.32;
+  }
+  .appShell--compactRail .editionLine { font-size: 11px; line-height: 1.6; gap: 7px; }
+  .appShell--compactRail .sectionHeading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 20px 0 13px;
+  }
+  .appShell--compactRail .sectionHeading h2 {
+    font-size: 16px;
+    line-height: 1.45;
+    letter-spacing: -.2px;
+  }
+  .appShell--compactRail .sectionHeading p {
+    font-size: 12px;
+    line-height: 1.65;
+  }
+  .appShell--compactRail .sectionHeading > span { font-size: 10px; }
+  .appShell--compactRail .trustNotice { font-size: 11px; line-height: 1.6; padding: 11px; }
+  .appShell--compactRail .trustNotice strong { font-size: 10px; }
+  .appShell--compactRail .personalFocusPanel {
+    margin: 19px 0 27px;
+    padding: 17px 14px;
+  }
+  .appShell--compactRail .todayInterestHeading { align-items: flex-start; }
+  .appShell--compactRail .todayInterestHeading h2 { font-size: 16px; }
+  .appShell--compactRail .todayInterestHeading p { font-size: 12px; line-height: 1.55; }
+  .appShell--compactRail .todayInterestChips { gap: 8px; }
+  .appShell--compactRail .todayInterestChips button {
+    min-height: 46px;
+    font-size: 13px;
+    padding: 10px 13px;
+  }
+  .appShell--compactRail .todayInterestNote,
+  .appShell--compactRail .personalFocusPanel .todayInterestNote {
+    font-size: 11px;
+    line-height: 1.7;
+  }
+  .appShell--compactRail .myBriefingHead { flex-wrap: wrap; align-items: flex-start; }
+  .appShell--compactRail .myBriefingHead > div { min-width: 0; flex: 1 1 200px; }
+  .appShell--compactRail .myBriefingSettings {
+    margin-left: auto;
+    min-height: 44px;
+    font-size: 12px;
+  }
+  .appShell--compactRail .myBriefingBody h3 { font-size: 17px; }
+  .appShell--compactRail .myBriefingWhy { font-size: 12px; }
+  .appShell--compactRail .myBriefingActions :is(button,a) { min-height: 44px; font-size: 12px; }
+  .appShell--compactRail .sourceSearch { max-width: none; width: 100%; min-width: 0; }
+  .appShell--compactRail :is(.sourceSearch input, .newsDiscoveryFilter input, .opportunityKeyword, .businessSupportInputs select, .newsAiCompanion textarea, .newsAiCompanion input) {
+    font-size: 16px;
+    min-height: 46px;
+  }
+  .appShell--compactRail .sourceFilters button { min-height: 44px; font-size: 12px; }
+  /* Decorative source covers add clutter on narrow screens: keep the article title. */
+  .appShell--compactRail .sourceVisualLink { display: none; }
+  .appShell--compactRail .sourceNewsItem {
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 11px;
+    padding: 20px 0;
+  }
+  .appShell--compactRail .sourceNewsItem h3 {
+    font-size: 18px;
+    line-height: 1.52;
+    margin: 6px 0 10px;
+  }
+  .appShell--compactRail .sourceNewsItem .eventMeta { font-size: 11px; gap: 6px; }
+  .appShell--compactRail .sourceNewsActions { gap: 9px 16px; }
+  .appShell--compactRail .sourceNewsActions > :is(a,button) { min-height: 44px; font-size: 12px; }
+  .appShell--compactRail .newsDiscoveryTopics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 14px 0;
+  }
+  .appShell--compactRail .newsDiscoveryTopics button {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    font-size: 13px;
+    padding: 9px 8px;
+  }
+  .appShell--compactRail .newsAiMobileTabs {
+    position: sticky;
+    top: 64px;
+    z-index: 12;
+    padding: 8px 0;
+    margin: 9px 0 13px;
+    background: rgba(255,255,255,.98);
+  }
+  .appShell--compactRail .newsAiMobileTabs button { font-size: 14px; min-height: 46px; }
+  .appShell--compactRail .newsAiStories .newsDiscoveryItem h3 { font-size: 18px; line-height: 1.5; }
+  .appShell--compactRail .newsAiStories .newsDiscoverySource { font-size: 11px; }
+  .appShell--compactRail .newsAiCompanion { padding: 15px; }
+  .appShell--compactRail .newsAiSelected strong { font-size: 20px; line-height: 1.45; }
+  .appShell--compactRail .newsAiModeButtons { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+  .appShell--compactRail .newsAiModeButtons button {
+    min-height: 46px;
+    font-size: 13px;
+    padding: 9px 5px;
+  }
+  .appShell--compactRail .newsAiLabel { font-size: 12px; margin-top: 12px; }
+  .appShell--compactRail .newsAiSubmit { min-height: 48px; font-size: 14px; }
+  .appShell--compactRail .newsAiSelected { scroll-margin-top: 130px; }
+  .appShell--compactRail .businessSupportProfile { padding: 14px; }
+  .appShell--compactRail .businessSupportInputs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 9px; }
+  .appShell--compactRail .businessSupportInputs label > span { font-size: 12px; }
+  .appShell--compactRail .opportunityTabs { gap: 7px; }
+  .appShell--compactRail .opportunityTabs button { min-height: 49px; font-size: 12px; line-height: 1.3; }
+  .appShell--compactRail .opportunityNotice h3 { font-size: 17px; }
+  .appShell--compactRail .sourceSettings p { font-size: 14px; }
+}
+@media (max-width: 380px) {
+  .appShell--compactRail .mobileHeader .brandSymbol { width: 41px; }
+  .appShell--compactRail .mobileHeader .brandWordmark { font-size: 18px; }
+  .appShell--compactRail .mobileNav a { font-size: 10px; }
+  .appShell--compactRail .businessSupportInputs { grid-template-columns: minmax(0, 1fr); }
+  .appShell--compactRail .todayInterestChips button { flex: 1 1 calc(50% - 8px); }
+}
+
+
+/* Editorial list rhythm v1: numbered publisher items vs official government notices.
+   Numbers show visible list order, never inferred importance or verified rank. */
+.newsDiscoveryItem {
+  display: grid;
+  grid-template-columns: 25px minmax(0, 1fr);
+  gap: 11px;
+  align-items: start;
+}
+.newsDiscoveryRank {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: -.3px;
+  color: #95a3b2;
+  padding-top: 3px;
+}
+.newsDiscoveryBody { min-width: 0; }
+.newsListOrderA11y {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap;
+  border: 0;
+}
+.newsSourceKind {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  min-height: 23px;
+  padding: 2px 7px;
+  border: 1px solid #dce4ed;
+  border-radius: 4px;
+  background: #f4f6f9;
+  color: #475a72;
+  font-size: 10px;
+  font-weight: 750;
+}
+.newsDiscoverySource .newsSourcePublisher {
+  font-size: 11px;
+  color: #697b90;
+}
+.newsDiscoveryItem h3 { letter-spacing: -.25px; }
+.newsDiscoveryItem[data-selected="true"] .newsDiscoveryRank { color: #8b682c; }
+.sourceKindBadge {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  min-height: 23px;
+  padding: 2px 7px;
+  border: 1px solid #e4d9c0;
+  border-radius: 4px;
+  color: #755f39;
+  background: #faf8f2;
+  font-size: 10px;
+  font-weight: 750;
+}
+.sourceNewsItem--press .sourceKindBadge {
+  border-color: #d8e1ea;
+  background: #f4f7fa;
+  color: #53677c;
+}
+.sourcePublisherName { color: var(--slate); }
+.sourceDateMobile { display: none; }
+.sourceNewsItem .eventMeta time { margin-left: auto; font-variant-numeric: tabular-nums; }
+.feedSection > .sectionHeading h2 {
+  border-left: 3px solid #b49a60;
+  padding-left: 11px;
+}
+.newsDiscoveryPanel > .sectionHeading h2 {
+  border-left: 3px solid #304f73;
+  padding-left: 11px;
+}
+@media (max-width: 767px) {
+  /* Avoid text showing through the fixed mobile article/AI selector. */
+  .appShell--compactRail .newsAiMobileTabs {
+    background: #fff;
+    border-bottom: 1px solid #e5eaf0;
+    box-shadow: 0 5px 12px rgba(21, 40, 67, .045);
+    margin-bottom: 8px;
+  }
+  .appShell--compactRail .newsAiMobileTabs button {
+    background: #fff;
+  }
+  .appShell--compactRail .newsAiMobileTabs button[aria-pressed="true"] {
+    background: var(--navy);
+  }
+
+  /* Press: soft grey serial, compact text flow and safe-height actions. */
+  .appShell--compactRail .newsAiStories .newsDiscoveryItem {
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 10px;
+    padding: 12px 0 13px;
+    border-bottom-color: #e7edf3;
+  }
+  .appShell--compactRail .newsDiscoveryRank { font-size: 12px; padding-top: 3px; }
+  .appShell--compactRail .newsAiStories .newsDiscoverySource {
+    gap: 5px 8px;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  .appShell--compactRail .newsAiStories .newsDiscoveryItem h3 {
+    font-size: 18px;
+    font-weight: 750;
+    line-height: 1.42;
+    margin: 5px 0 4px;
+  }
+  .appShell--compactRail .newsAiStories .newsDiscoveryActions {
+    gap: 4px 17px;
+  }
+  .appShell--compactRail .newsAiStories .newsDiscoveryActions :is(a, button) {
+    font-size: 12px;
+    min-height: 44px;
+    padding-block: 4px;
+  }
+  .appShell--compactRail .newsDiscoveryIntro > p { line-height: 1.55; }
+
+  /* Official sources: gold-edged section, government label, shorter dated row. */
+  .appShell--compactRail .sourceNewsItem {
+    position: relative;
+    padding: 13px 0 13px 9px;
+    gap: 10px;
+    border-left: 2px solid #d6c8a7;
+    margin-top: 0;
+  }
+  .appShell--compactRail .sourceNewsItem--press { border-left-color: #d2dce7; }
+  .appShell--compactRail .sourceNewsItem .eventRank {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #9b855a;
+  }
+  .appShell--compactRail .sourceNewsItem--press .eventRank { color: #8594a5; }
+  .appShell--compactRail .sourceNewsItem .eventMeta {
+    gap: 5px 8px;
+    line-height: 1.45;
+    align-items: center;
+  }
+  .appShell--compactRail .sourceKindBadge { font-size: 10px; }
+  .appShell--compactRail .sourceDateDesktop { display: none; }
+  .appShell--compactRail .sourceDateMobile { display: inline; }
+  .appShell--compactRail .sourceNewsItem h3 {
+    font-size: 18px;
+    font-weight: 750;
+    line-height: 1.42;
+    margin: 6px 0 4px;
+  }
+  .appShell--compactRail .sourceNewsActions {
+    gap: 4px 15px;
+  }
+  .appShell--compactRail .sourceNewsActions > :is(a, button) {
+    font-size: 12px;
+    min-height: 44px;
+    padding: 4px 0;
+  }
+  .appShell--compactRail .sourceNewsActions > a:first-child { margin-right: 0; }
+  .appShell--compactRail .sourceNewsActions > button:first-of-type { margin-left: auto; }
+}
+@media (max-width: 380px) {
+  .appShell--compactRail .newsAiStories .newsDiscoveryItem { gap: 8px; }
+  .appShell--compactRail .sourceNewsItem { gap: 8px; padding-left: 7px; }
+  .appShell--compactRail .sourceNewsActions { gap: 3px 12px; }
+}
+
+
+/* Two clear NOAH journeys: Home is navigation, News is reading, Business is public opportunities. */
+.homeGatewayHero { margin: 32px 0 24px; }
+.homeGatewayHero h1 { font-size: clamp(31px, 3.4vw, 44px); letter-spacing: -1.4px; }
+.homeGatewaySubtitle { margin: 14px 0 0; font-size: 14px; color: var(--slate); line-height: 1.7; }
+.homeGateway { margin: 18px 0 56px; }
+.homeGatewayIntro { font-size: 13px; color: var(--slate); margin-bottom: 21px; line-height: 1.7; }
+.homeGatewayGrid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: clamp(14px, 2vw, 25px); }
+.homeGatewayCard {
+  display: flex; flex-direction: column; align-items: stretch; min-width: 0;
+  min-height: 390px; padding: clamp(22px, 2.8vw, 34px);
+  background: #f7f9fc; border: 1px solid #dce4ed;
+  border-radius: 15px; color: var(--navy);
+  text-decoration: none; transition: border-color .18s, box-shadow .18s, transform .18s;
+}
+.homeGatewayCard--business { background: #fff; }
+.homeGatewayCard:hover { border-color: #8e9fb4; box-shadow: 0 13px 33px rgba(27, 48, 81, .08); transform: translateY(-2px); }
+.homeGatewayCard:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
+.homeGatewayTop { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.homeGatewayEyebrow { font-size: 10px; letter-spacing: 1.25px; font-weight: 750; color: #697d97; }
+.homeGatewaySymbol { display: grid; width: 48px; height: 48px; place-items: center; border: 1px solid #d7e1ec; border-radius: 12px; background: #fff; flex: 0 0 48px; }
+.homeGatewaySymbol svg { width: 24px; height: 24px; }
+.homeGatewayCard > strong { display: block; margin-top: 25px; font-size: clamp(27px, 2.5vw, 35px); font-weight: 800; letter-spacing: -1.2px; }
+.homeGatewayLead { display: block; margin-top: 9px; font-size: 17px; line-height: 1.5; font-weight: 700; letter-spacing: -.2px; }
+.homeGatewayDescription { margin-top: 15px; font-size: 13px; line-height: 1.9; color: var(--slate); word-break: keep-all; }
+.homeGatewayTags { display: flex; gap: 7px; flex-wrap: wrap; margin: 19px 0 24px; }
+.homeGatewayTags span { border: 1px solid #dbe4ed; background: #fff; border-radius: 40px; color: #4a6280; padding: 7px 10px; font-size: 11px; }
+.homeGatewayAction {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: auto; padding-top: 17px; border-top: 1px solid #dce4ed;
+  color: var(--intro-navy); font-size: 14px; font-weight: 750;
+}
+.homeGatewayAction svg { width: 19px; height: 19px; }
+.homeGatewayFoot { margin-top: 20px; color: var(--slate); font-size: 11px; line-height: 1.8; }
+.officialPolicyGroup {
+  margin: 32px 0 44px;
+  padding: 29px 0 0;
+  border-top: 3px solid var(--navy);
+}
+.officialPolicyHeader > span {
+  display: block; margin-bottom: 11px; color: #74849a;
+  font-size: 10px; letter-spacing: 1.1px; font-weight: 750;
+}
+.officialPolicyHeader h2 { color: var(--intro-navy); font-size: clamp(21px, 2vw, 27px); line-height: 1.4; }
+.officialPolicyHeader > p { color: var(--slate); margin-top: 10px; font-size: 12px; line-height: 1.85; word-break: keep-all; }
+.officialPolicyHeader .sourceFreshnessBar { padding-top: 12px; margin-top: 12px; border-top: 1px solid #e4ebf1; }
+.officialPolicyGroup .sourceToolbar { padding-top: 17px; }
+.officialPolicyGroup .feedSection { margin: 15px 0 20px; }
+.officialPolicyGroup .sectionHeading { padding-top: 12px; }
+
+/* The landing page must not reserve the empty right intelligence column. */
+@media (min-width: 1024px) {
+  .appShell--compactRail:has(.homeGateway) {
+    grid-template-columns: 168px minmax(0, 1fr);
+    max-width: 1270px;
+    gap: clamp(32px, 3.5vw, 48px);
+  }
+}
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .appShell--compactRail:has(.homeGateway) { grid-template-columns: 146px minmax(0, 1fr); }
+}
+@media (max-width: 767px) {
+  .homeGatewayHero { margin: 7px 0 21px; }
+  .homeGatewayHero h1 { font-size: clamp(27px, 7vw, 34px); }
+  .homeGatewaySubtitle { font-size: 13px; margin-top: 9px; }
+  .homeGateway { margin: 14px 0 24px; }
+  .homeGatewayIntro { font-size: 12px; margin-bottom: 16px; }
+  .homeGatewayGrid { grid-template-columns: minmax(0,1fr); gap: 14px; }
+  .homeGatewayCard { min-height: 0; padding: 21px 20px; border-radius: 13px; }
+  .homeGatewayEyebrow { font-size: 9px; }
+  .homeGatewaySymbol { width: 43px; height: 43px; flex-basis: 43px; }
+  .homeGatewayCard > strong { font-size: 27px; margin-top: 12px; }
+  .homeGatewayLead { font-size: 16px; }
+  .homeGatewayDescription { font-size: 13px; margin-top: 10px; line-height: 1.7; }
+  .homeGatewayTags { margin: 13px 0 17px; }
+  .homeGatewayTags span { font-size: 11px; }
+  .homeGatewayAction { min-height: 47px; padding-top: 13px; font-size: 14px; }
+  .officialPolicyGroup { margin: 29px 0 34px; padding-top: 21px; }
+  .officialPolicyHeader h2 { font-size: 22px; }
+  .officialPolicyHeader > p { font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .homeGatewayCard { transition: none; }
+  .homeGatewayCard:hover { transform: none; }
+}
+
+
+/* Home: fast orientation before the two clear destination choices. */
+.homeDailyBrief {
+  margin: 11px 0 36px;
+  padding: clamp(21px, 2.7vw, 31px);
+  border: 1px solid #dbe4ed; border-radius: 13px;
+  background: #fafbfd;
+}
+.homeDailyHeading { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 14px; margin-bottom: 17px; }
+.homeDailyEyebrow { display: block; font-size: 10px; font-weight: 750; letter-spacing: 1.1px; color: #77859a; margin-bottom: 8px; }
+.homeDailyHeading h2 { font-size: clamp(23px, 2.4vw, 30px); letter-spacing: -.75px; color: var(--intro-navy); }
+.homeDailyHeading p { margin-top: 6px; color: var(--slate); font-size: 13px; line-height: 1.7; }
+.homeDailyScope { flex: 0 0 auto; font-size: 11px; font-weight: 600; color: #728199; }
+.homeDailyTakeaway { margin-bottom: 20px; padding: 15px 17px; border-left: 3px solid var(--gold); background: #fff; }
+.homeDailyTakeaway strong { display: block; color: var(--navy); font-size: 12px; margin-bottom: 6px; }
+.homeDailyTakeaway p { font-size: 13px; color: #455874; line-height: 1.85; word-break: keep-all; }
+.homeDailyTakeaway b { font-weight: 650; }
+.homeDailyColumns { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: clamp(18px, 3vw, 36px); }
+.homeDailyGroup { min-width: 0; }
+.homeDailyGroupTitle { padding-bottom: 10px; border-bottom: 1px solid #dbe3ed; }
+.homeDailyGroupTitle h3 { font-size: 16px; font-weight: 750; letter-spacing: -.2px; color: var(--intro-navy); }
+.homeDailyGroupTitle > span { display: block; color: var(--slate); margin-top: 3px; font-size: 11px; }
+.homeDailyArticles { margin: 0; padding: 0; list-style: none; }
+.homeDailyArticles li { padding: 13px 0 12px; border-bottom: 1px solid #e8edf3; }
+.homeDailyArticles li a { display: block; font-size: 14px; font-weight: 650; color: var(--navy); line-height: 1.55; overflow-wrap: anywhere; text-decoration: none; }
+.homeDailyArticles li a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.homeDailyArticles li a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.homeDailyArticles li > span { display: block; font-size: 11px; color: var(--slate); margin-top: 6px; }
+.homeDailyState { padding: 18px 0; font-size: 12px; color: var(--slate); line-height: 1.7; }
+.homeDailyFooter { display: flex; flex-wrap: wrap; gap: 10px 18px; justify-content: space-between; align-items: center; margin-top: 18px; }
+.homeDailyFooter p { flex: 1 1 300px; font-size: 11px; color: var(--slate); line-height: 1.7; }
+.homeDailyFooter a { display: inline-flex; align-items: center; font-size: 12px; min-height: 44px; font-weight: 750; color: var(--navy); text-decoration: underline; text-underline-offset: 3px; }
+.homeGatewayIntro { color: var(--navy); font-weight: 700; font-size: 16px; margin-bottom: 16px; }
+.homeGateway { margin-top: 8px; }
+
+/* A subtle route suggestion at a natural break between content areas. */
+.crossWorkspaceNudge {
+  display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 18px;
+  margin: 25px 0 30px; padding: 17px 20px; border: 1px solid #dce4ed;
+  border-radius: 10px; background: #f8fafc;
+}
+.crossWorkspaceCopy { flex: 1 1 230px; min-width: 0; }
+.crossWorkspaceCopy > span { display: block; font-size: 9px; color: #7d8ca0; letter-spacing: 1px; font-weight: 750; margin-bottom: 5px; }
+.crossWorkspaceCopy strong { font-size: 14px; color: var(--intro-navy); display: block; line-height: 1.5; }
+.crossWorkspaceCopy p { margin-top: 3px; color: var(--slate); font-size: 11px; line-height: 1.6; }
+.crossWorkspaceAction {
+  display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; gap: 8px;
+  min-height: 46px; padding: 10px 13px; border-radius: 7px; border: 1px solid #bdcad9;
+  color: var(--navy); font-size: 12px; font-weight: 750; text-decoration: none;
+  background: #fff;
+}
+.crossWorkspaceAction svg { width: 17px; height: 17px; }
+.crossWorkspaceAction:hover { border-color: var(--navy); }
+.crossWorkspaceAction:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+@media (max-width: 767px) {
+  .homeDailyBrief { margin: 5px 0 26px; padding: 19px 15px; }
+  .homeDailyHeading h2 { font-size: 25px; }
+  .homeDailyHeading p { font-size: 13px; }
+  .homeDailyTakeaway { padding: 13px; }
+  .homeDailyTakeaway p { font-size: 13px; }
+  .homeDailyColumns { grid-template-columns: minmax(0,1fr); gap: 21px; }
+  .homeDailyGroupTitle h3 { font-size: 16px; }
+  .homeDailyArticles li a { font-size: 15px; }
+  .homeDailyFooter { align-items: stretch; }
+  .homeDailyFooter a { font-size: 13px; }
+  .crossWorkspaceNudge { padding: 15px; margin: 21px 0; gap: 14px; }
+  .crossWorkspaceCopy strong { font-size: 14px; }
+  .crossWorkspaceCopy p { font-size: 12px; }
+  .crossWorkspaceAction { width: 100%; font-size: 13px; }
+}
+
+/* Share-link beta usage notice: keeps budget visible without another modal. */
+.newsAiBudgetNote { color: #63768d; font-size: 11px; line-height: 1.7; margin: 12px 0; padding: 10px 12px; background: #f4f7fa; border: 1px solid #e1e8ef; border-radius: 8px; }
+@media (max-width: 767px) {
+  .newsAiBudgetNote { font-size: 12px; padding: 11px; }
+}

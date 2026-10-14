@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NewsInlineCompanion, type SelectedNews } from "@/components/home/NewsInlineCompanion";
 import { MyBriefingPanel } from "@/components/home/MyBriefingPanel";
+import { CrossWorkspaceNudge } from "@/components/home/CrossWorkspaceNudge";
 import { requiredSearchTopics } from "@/lib/news/personalized-briefing";
 import type { TodayTopic } from "@/lib/news/daily-interests";
 import { NEWS_SEARCH_TOPICS, type NewsSearchItem, type NewsSearchSnapshot, type NewsSearchTopic } from "@/lib/news/news-search-contract";
@@ -27,6 +28,17 @@ function safeSnapshot(data: unknown, topic: NewsSearchTopic): NewsSearchSnapshot
   return valid ? obj as NewsSearchSnapshot : null;
 }
 
+/**
+ * The mobile reader panel replaces the article list, so the viewport must
+ * follow the newly visible target after React commits the layout switch.
+ */
+export function mobileNewsScrollDestination(
+  panel: "articles" | "ai", hasSelectedArticle: boolean,
+): "tabs" | "reader" | "article" {
+  if (panel === "articles") return "tabs";
+  return hasSelectedArticle ? "article" : "reader";
+}
+
 export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabled, showBriefing = false, focusTopics = [], preferenceReady = true, onUpdateFocus }: {
   readerLabAvailable: boolean;
   readerModelReady: boolean;
@@ -44,7 +56,12 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
   const [filter, setFilter] = useState("");
   const [selectedNews, setSelectedNews] = useState<SelectedNews | null>(null);
   const [mobilePanel, setMobilePanel] = useState<"articles" | "ai">("articles");
-  const requestId = useRef(0);
+  const mobileTabsRef = useRef<HTMLElement>(null);
+  const mobileAiRef = useRef<HTMLDivElement>(null);
+  // Increment even if the same article is selected again: every deliberate tap navigates.
+  const [mobileJump, setMobileJump] = useState<{ target: "articles" | "ai"; sequence: number }>({
+    target: "articles", sequence: 0,
+  });
 
   async function loadTopic(next: NewsSearchTopic): Promise<void> {
     if (!enabled || data[next]) return;
@@ -109,10 +126,46 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
   const selectedQuery = NEWS_SEARCH_TOPICS.find(item => item.id === topic)!.query;
   const googleNewsPage = "https://news.google.com/search?q=" +
     encodeURIComponent(selectedQuery) + "&hl=ko&gl=KR&ceid=KR%3Ako";
+  function navigateMobile(target: "articles" | "ai") {
+    setMobilePanel(target);
+    setMobileJump(previous => ({ target, sequence: previous.sequence + 1 }));
+  }
+
   function selectArticle(item: NewsSearchItem) {
     setSelectedNews({ item, topic });
-    setMobilePanel("ai");
+    navigateMobile("ai");
   }
+
+  useEffect(() => {
+    if (!mobileJump.sequence || mobilePanel !== mobileJump.target ||
+        !window.matchMedia("(max-width: 767px)").matches) return;
+    // iOS Safari needs the previous news list to be hidden and the new AI panel
+    // laid out before scrolling. Two frames avoid jumping to the old position.
+// Scroll to the ARTICLE, not to the textarea: reader sees the headline
+// and question composer together. The textarea must not grab focus.
+    let followupFrame = 0;
+    const firstFrame = window.requestAnimationFrame(() => {
+      followupFrame = window.requestAnimationFrame(() => {
+        const scrollTarget = mobileNewsScrollDestination(mobileJump.target, Boolean(selectedNews));
+        const destination = scrollTarget === "tabs" ? mobileTabsRef.current
+          : scrollTarget === "article"
+            ? mobileAiRef.current?.querySelector<HTMLElement>(".newsAiSelected")
+            : mobileAiRef.current?.querySelector<HTMLElement>(".newsAiCompanion");
+        if (!destination) return;
+        destination.scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+          block: "start",
+          inline: "nearest",
+        });
+        // Deliberately do NOT focus the textarea: Safari would unexpectedly
+        // open the keyboard and hide the selected article context.
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      window.cancelAnimationFrame(followupFrame);
+    };
+  }, [mobileJump, mobilePanel, selectedNews]);
   const current = data[topic];
   const loading = pendingTopics.includes(topic);
   const error = errors[topic] || "";
@@ -129,21 +182,24 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
         onSelectArticle={(item, searchTopic) => {
           setTopic(searchTopic);
           setSelectedNews({ item, topic: searchTopic });
-          setMobilePanel("ai");
-          document.getElementById("news-discovery-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          navigateMobile("ai");
+          if (typeof window !== "undefined" && !window.matchMedia("(max-width: 767px)").matches) {
+            document.getElementById("news-discovery-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
         }} />
     )}
+    {showBriefing && <CrossWorkspaceNudge from="news" />}
     <section className={showBriefing ? "newsDiscoveryPanel newsDiscoverySecondary" : "newsDiscoveryPanel"} aria-labelledby="news-discovery-title">
       <div className="sectionHeading">
         <div>
           <h2 id="news-discovery-title">{showBriefing ? "DISCOVER · 전체 기사 탐색" : "NEWS · 언론사 원문 탐색"}</h2>
-          <p>{showBriefing ? "맞춤 브리핑 외의 기사도 직접 살펴볼 수 있습니다." : "실제 언론사의 기사 제목·출처·원문 링크를 확인하세요."}</p>
+          <p>{showBriefing ? "맞춤 브리핑 외의 기사도 직접 살펴볼 수 있습니다." : "언론사 기사 제목·출처·원문 링크를 확인하세요. 목록 번호는 중요도 순위가 아닙니다."}</p>
         </div>
         <span>{enabled ? "SEARCH API" : "API 준비 중"}</span>
       </div>
-      <nav className="newsAiMobileTabs" aria-label="뉴스 기사와 AI 독해 화면 전환">
-        <button type="button" aria-pressed={mobilePanel === "articles"} onClick={() => setMobilePanel("articles")}>뉴스 목록</button>
-        <button type="button" aria-pressed={mobilePanel === "ai"} onClick={() => setMobilePanel("ai")}>AI 질문하기</button>
+      <nav ref={mobileTabsRef} className="newsAiMobileTabs" aria-label="뉴스 기사와 AI 독해 화면 전환">
+        <button type="button" aria-pressed={mobilePanel === "articles"} onClick={() => navigateMobile("articles")}>뉴스 목록</button>
+        <button type="button" aria-pressed={mobilePanel === "ai"} onClick={() => navigateMobile("ai")}>AI 질문하기</button>
       </nav>
       <div className="newsAiSplit">
       <div className="newsAiStories" data-mobile-active={mobilePanel === "articles"}>
@@ -179,22 +235,26 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
         filtered.length === 0 ? <p className="newsDiscoveryStatus">
           {current ? "조건에 맞는 검색 결과가 없습니다." : "주제를 선택하면 실제 뉴스가 표시됩니다."}
         </p> : (
-          <div className="newsDiscoveryResults">
-            {filtered.map(item => (
+          <div className="newsDiscoveryResults" aria-label="언론사 기사 목록">
+            {filtered.map((item, index) => (
               <article key={item.url} className="newsDiscoveryItem" data-selected={selectedNews?.item.url === item.url}>
-                <div className="newsDiscoverySource">
-                  <span>기사</span><span aria-hidden="true">·</span><span>{item.sourceName}</span>
-                  {item.publishedAt && <time dateTime={item.publishedAt}>
-                    {newsDate.format(new Date(item.publishedAt))}
-                  </time>}
-                </div>
-                <h3><a href={item.url} target="_blank" rel="noopener noreferrer">{item.title}</a></h3>
-                <div className="newsDiscoveryActions">
-                  <a href={item.url} target="_blank" rel="noopener noreferrer">언론사 원문 보기 ↗</a>
-                  <button type="button" onClick={() => selectArticle(item)}
-                    aria-pressed={selectedNews?.item.url === item.url}>
-                    AI에게 질문 ↗
-                  </button>
+                <span className="newsDiscoveryRank" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                <div className="newsDiscoveryBody">
+                  <span className="newsListOrderA11y">목록 {index + 1}번. 중요도 순위가 아닙니다.</span>
+                  <div className="newsDiscoverySource">
+                    <span className="newsSourceKind">언론 기사</span><span className="newsSourcePublisher">{item.sourceName}</span>
+                    {item.publishedAt && <time dateTime={item.publishedAt}>
+                      {newsDate.format(new Date(item.publishedAt))}
+                    </time>}
+                  </div>
+                  <h3><a href={item.url} target="_blank" rel="noopener noreferrer">{item.title}</a></h3>
+                  <div className="newsDiscoveryActions">
+                    <a href={item.url} target="_blank" rel="noopener noreferrer">원문 보기 ↗</a>
+                    <button type="button" onClick={() => selectArticle(item)}
+                      aria-pressed={selectedNews?.item.url === item.url}>
+                      AI에게 질문 ↗
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}
@@ -206,7 +266,7 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
         세부 사실은 반드시 언론사 원문에서 확인하세요.
       </p>
       </div>
-      <div className="newsAiSide" data-mobile-active={mobilePanel === "ai"}>
+      <div ref={mobileAiRef} className="newsAiSide" data-mobile-active={mobilePanel === "ai"}>
         <NewsInlineCompanion selected={selectedNews} modelReady={readerModelReady} labAvailable={readerLabAvailable} />
       </div>
       </div>
