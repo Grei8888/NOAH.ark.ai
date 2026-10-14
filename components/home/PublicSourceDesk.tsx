@@ -373,14 +373,14 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
               </div>
           <section className="feedSection" aria-label="공식 자료 목록">
             <div className="sectionHeading">
-              <div><h2>POLICY · 정부 공식자료</h2><p>출처: 중소벤처기업부 공식 RSS · 공고·보도자료는 원문에서 확인하세요.</p></div>
+              <div><h2>{view === "startup" ? "정책 발표 · 사업공고 원문" : "POLICY · 정부 공식자료"}</h2><p>중소벤처기업부 공식 RSS · 상세 요건은 원문에서 확인하세요.</p></div>
               <span>{ready || view !== "saved" ? filtered.length : "—"} LINKS</span>
             </div>
             {view === "saved" && !ready ? (
               <p className="emptyState">이 브라우저에 저장된 자료를 확인하는 중입니다.</p>
             ) : filtered.length === 0 ? (
               <div className="emptyState" role="status">
-                {view === "saved" ? "아직 저장한 자료가 없습니다. 홈에서 자료를 저장해 보세요." :
+                {view === "saved" ? "아직 저장한 자료가 없습니다. 사업기회에서 정부자료를 저장해 보세요." :
                   currentSnapshot.items.length > 0
                     ? `공식자료는 전체 ${currentSnapshot.items.length}건 있습니다. 현재 관심사·검색 조건에 맞는 자료가 0건입니다.`
                     : "최근 14일에 표시할 정부 공식자료가 없습니다. RSS 연결 상태를 확인해 주세요."}
@@ -391,11 +391,10 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
                       setQuery("");
                       setFilter("all");
                     }}>관심사·검색 조건 해제하고 전체 보기 →</button>
-                    {view === "startup" && <Link href="/?view=discover">전체 자료 탐색으로 이동 ↗</Link>}
                   </div>
                 )}
               </div>
-            ) : filtered.slice(0, view === "home" ? 14 : 40).map((s: OfficialSourceLink, i: number) => (
+            ) : filtered.slice(0, 40).map((s: OfficialSourceLink, i: number) => (
               <article className={`sourceNewsItem sourceNewsItem--${s.kind}`} key={s.url}>
                 <div className="eventRank">{String(i + 1).padStart(2, "0")}</div>
                 <a className="sourceVisualLink" href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.title + " 원문 열기"}>
@@ -420,10 +419,13 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
                 </div>
               </article>
             ))}
-            {view === "home" && filtered.length > 14 && <Link className="sourceMoreLink" href="/?view=discover">원문 자료 더 보기 →</Link>}
           </section>
-          <p className="sourceDisclaimer"><strong>정부 공식자료 출처:</strong> 중소벤처기업부 RSS(사업공고·보도자료). {newsSearchEnabled && <><strong>언론 기사 출처:</strong> 각 카드에 표시된 개별 언론사 · 검색 경로: SerpApi / Google News. </>}제목과 원문 링크를 제공하며 본문과 사진은 재게시하지 않습니다. 기사 사실관계는 해당 언론사에서, 정책 시행 여부·신청자격·기한은 관계기관 원문에서 확인하세요.</p>
+          <p className="sourceDisclaimer"><strong>정부 공식자료 출처:</strong> 중소벤처기업부 RSS(사업공고·보도자료). 제목과 원문 링크만 제공하며 본문·사진은 재게시하지 않습니다. 정책 시행 여부·신청자격·기한은 소관 기관 원문에서 확인하세요.</p>
+            </section>
+          )
         </>
+      )}
+      </>
       )}
     </AppShell>
   );
