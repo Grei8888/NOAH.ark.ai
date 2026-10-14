@@ -8,6 +8,7 @@ import { SourceCardVisual } from "@/components/home/SourceCardVisual";
 import { ReaderAudiencePanel } from "@/components/home/ReaderAudiencePanel";
 import { NewsDiscoveryPanel } from "@/components/home/NewsDiscoveryPanel";
 import { BusinessOpportunityPanel } from "@/components/home/BusinessOpportunityPanel";
+import { CrossWorkspaceNudge } from "@/components/home/CrossWorkspaceNudge";
 import { HomeGateway } from "@/components/home/HomeGateway";
 import type { OfficialFeedSnapshot, OfficialSourceLink } from "@/lib/news/public-official-sources";
 import { TODAY_TOPICS, matchesTodayTopic, restoreTodayTopics, validTodayTopics, todayKstDate, type TodayTopic } from "@/lib/news/daily-interests";
@@ -234,13 +235,13 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
     )}>
       <div className="topUtility">
         <span>NOAH ARK / {readerLabAvailable ? "10-READER PRIVATE BETA" : "PUBLIC BETA v0.1"}</span>
-        <span>{view === "home" ? "CHOOSE YOUR WORKSPACE" : view === "startup" ? "SUPPORT · R&D · PROCUREMENT" : newsSearchEnabled ? "PUBLISHER LINKS + OFFICIAL SOURCES" : "OFFICIAL SOURCES ONLY"}</span>
+        <span>{view === "home" ? "CHOOSE YOUR WORKSPACE" : view === "startup" ? "SUPPORT · R&D · PROCUREMENT · POLICY" : newsSearchEnabled ? "PUBLISHER LINKS + OFFICIAL SOURCES" : "OFFICIAL SOURCES ONLY"}</span>
       </div>
       <header className="homeIntro">
         <div className="dateLine"><span>{kstDay}</span><span>ONLY WHAT MATTERS.</span></div>
         <p className="greeting">{view === "home" ? "정보는 나누고, 선택은 간단하게." : view === "startup" ? "정부와 공공기관이 제공하는 사업 기회를 찾아보세요." : "Your AI News Partner. · 어려운 뉴스를 이해하기 쉽게."}</p>
         <h1>{title}</h1>
-        <div className="editionLine"><span className="signalDot" /><span>{view === "home" ? "뉴스 · 사업기회" : view === "startup" ? "지원사업 · 국가 R&D · 공공입찰" : newsSearchEnabled ? "언론사 기사 검색 + 정부 공식자료" : "실제 정부 RSS · 최근 14일 · 최신순"}</span><span>{readerLabAvailable ? "10명 사전검증" : "무료 공개 베타"}</span></div>
+        <div className="editionLine"><span className="signalDot" /><span>{view === "home" ? "뉴스 · 사업기회" : view === "startup" ? "지원사업 · 국가 R&D · 공공입찰 · 정부 정책" : newsSearchEnabled ? "언론사 기사 검색 + 정부 공식자료" : "실제 정부 RSS · 최근 14일 · 최신순"}</span><span>{readerLabAvailable ? "10명 사전검증" : "무료 공개 베타"}</span></div>
         {readerLabAvailable && view === "discover" && <div className="readerBetaPrompt"><Link href="/lab/reader">원문과 AI를 나란히 보는 독해 도우미 →</Link></div>}
       </header>
       {view === "home" ? (
@@ -335,7 +336,10 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
               onUpdateFocus={focusInterestControls} />
           )}
           {view === "startup" && (
-            <BusinessOpportunityPanel enabled={businessSupportEnabled} />
+            <>
+              <BusinessOpportunityPanel enabled={businessSupportEnabled} />
+              <CrossWorkspaceNudge from="business" />
+            </>
           )}
           {showOfficialSources && (
             <section className={view === "startup" ? "officialPolicyGroup" : "officialLibraryGroup"}
@@ -412,7 +416,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
                   <h3><a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a></h3>
                   <div className="sourceNewsActions">
                     <a href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.title + " 원문 열기"}>원문 보기 <Icon name="arrow" /></a>
-                    {readerLabAvailable && <Link href={`/lab/reader?source=${encodeURIComponent(s.url)}`} aria-label={s.title + " AI 독해 도우미에서 질문하기"}>AI로 이해하기 ↗</Link>}
+                    {readerLabAvailable && view !== "startup" && <Link href={`/lab/reader?source=${encodeURIComponent(s.url)}`} aria-label={s.title + " AI 독해 도우미에서 질문하기"}>AI로 이해하기 ↗</Link>}
                     <button type="button" onClick={() => changeSaved(s.url)} aria-pressed={saved.includes(s.url)}>{saved.includes(s.url) ? "저장됨 ✓" : "저장"}</button>
                     {view !== "saved" && <button type="button" onClick={() => hide(s.url)} aria-label={s.title + " 숨기기"}>숨기기</button>}
                   </div>
