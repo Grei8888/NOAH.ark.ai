@@ -327,48 +327,42 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
               </div>
             </section>
           )}
-          {showControls && view !== "home" && (
-            <div className="sourceToolbar">
-              <label className="sourceSearch">
-                <Icon name="search" />
-                <input value={query} onChange={e => setQuery(e.target.value)} placeholder="자료 제목 검색" aria-label="자료 제목 검색"/>
-              </label>
-              {view !== "startup" && view !== "my" && <div className="sourceFilters" aria-label="자료 종류">
-                {(["all", "notice", "press"] as const).map(k => (
-                  <button key={k} type="button" aria-pressed={currentKind === k} onClick={() => setFilter(k)}>{sourceLabel(k)}</button>
-                ))}
-              </div>}
-            </div>
-          )}
-          {(view === "home" || view === "discover" || view === "startup") && (
+
+          {view === "discover" && (
             <NewsDiscoveryPanel readerLabAvailable={readerLabAvailable}
               readerModelReady={readerModelReady} enabled={newsSearchEnabled}
-              showBriefing={view === "home"} focusTopics={focusTopics}
-              preferenceReady={ready} onUpdateFocus={focusInterestControls}
-              businessSupportEnabled={businessSupportEnabled} showBusinessSupport={view === "home" || view === "startup"} />
+              showBriefing focusTopics={focusTopics} preferenceReady={ready}
+              onUpdateFocus={focusInterestControls} />
           )}
-          {view === "home" && (
-            <div className="officialFreshnessBar">
-              <div className="sourceFreshnessBar">
-                <span className="sourceFreshnessText" aria-live="polite" aria-atomic="true">
-                  {refreshStatus?.text ?? (currentSnapshot.availableFeeds > 0 && currentSnapshot.retrievedAt
-                    ? `정부자료 확인 ${refreshTime.format(new Date(currentSnapshot.retrievedAt))} · 신청기한은 원문 확인`
-                    : "정부 공식자료의 최신 확인이 지연되고 있습니다.")}
-                </span>
-                <button type="button" className="sourceRefreshButton" onClick={refreshSources} disabled={refreshing}>
-                  <Icon name="refresh" /> {refreshing ? "확인 중…" : "공식 RSS 새로 확인"}
-                </button>
-              </div>
-            </div>
+          {view === "startup" && (
+            <BusinessOpportunityPanel enabled={businessSupportEnabled} />
           )}
-          {view === "home" && (
-            <div className="officialDataControls">
-              <p>정부 공식자료 · 제목으로 직접 찾기</p>
+          {showOfficialSources && (
+            <section className={view === "startup" ? "officialPolicyGroup" : "officialLibraryGroup"}
+              aria-label={view === "startup" ? "정부 정책과 공식자료" : "저장·관심 정부자료"}>
+              {view === "startup" && (
+                <header className="officialPolicyHeader">
+                  <span>GOVERNMENT POLICY · OFFICIAL SOURCES</span>
+                  <h2>정부 정책 · 공식자료</h2>
+                  <p>정부 정책 발표와 사업공고를 사업기회 아래에서 함께 확인하세요. 현재 공식 RSS는 중소벤처기업부 자료이며, 모든 부처를 포괄하는 것은 아닙니다.</p>
+                  <div className="sourceFreshnessBar">
+                    <span className="sourceFreshnessText" role="status">
+                      {refreshStatus?.text ?? (currentSnapshot.availableFeeds > 0
+                        ? "최근 확인 " + refreshTime.format(new Date(currentSnapshot.retrievedAt)) + " · 정책 시행·기한은 원문 확인"
+                        : "정부 공식자료 연결 확인 필요")}
+                    </span>
+                    <button type="button" className="sourceRefreshButton" onClick={refreshSources} disabled={refreshing}>
+                      <Icon name="refresh" /> {refreshing ? "확인 중…" : "정부자료 새로 확인"}
+                    </button>
+                  </div>
+                </header>
+              )}
               <div className="sourceToolbar">
                 <label className="sourceSearch">
                   <Icon name="search" />
                   <input value={query} onChange={e => setQuery(e.target.value)}
-                    placeholder="정부 공고·보도자료 제목 검색" aria-label="정부 공식자료 제목 검색" />
+                    placeholder={view === "startup" ? "정책·사업공고 제목 검색" : "자료 제목 검색"}
+                    aria-label="정부 공식자료 제목 검색" />
                 </label>
                 <div className="sourceFilters" aria-label="정부 자료 종류">
                   {(["all", "notice", "press"] as const).map(k => (
@@ -377,8 +371,6 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
                   ))}
                 </div>
               </div>
-            </div>
-          )}
           <section className="feedSection" aria-label="공식 자료 목록">
             <div className="sectionHeading">
               <div><h2>POLICY · 정부 공식자료</h2><p>출처: 중소벤처기업부 공식 RSS · 공고·보도자료는 원문에서 확인하세요.</p></div>
