@@ -199,7 +199,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
     return !query.trim() || (s.title + s.sourceName).toLocaleLowerCase("ko-KR").includes(query.trim().toLocaleLowerCase("ko-KR"));
   }), [currentSnapshot.items, saved, hidden, interests, todayTopics, currentKind, query, view]);
 
-  const showOfficialSources = view === "discover" || view === "saved" || view === "my";
+  const showOfficialSources = view === "startup" || view === "saved" || view === "my";
   const title = view === "saved" ? "내가 저장한 자료" : view === "my" ? "내 관심 분야" :
     view === "startup" ? "사업기회" : view === "discover" ? "나에게 중요한 뉴스" : view === "settings" ? "서비스 안내" : "무엇을 살펴볼까요?";
   const kstDay = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "long", day: "numeric", weekday: "long" }).format(new Date());
@@ -264,7 +264,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
               <h2>{view === "discover" ? "MY FOCUS · 나의 관심사" : "오늘의 관심사"}</h2>
               <p>{view === "discover" ? "선택한 분야를 기억하고 관련 기사 제목을 우선 선별합니다." : "관심사는 언제든 변경할 수 있습니다."}</p>
             </div>
-            {activeTopics.length > 0 && <button className="todayInterestReset" type="button" onClick={() => view === "discover" ? setPersonalFocus([]) : clearTodayTopics()}>{view === "home" ? "선택 해제" : "전체 보기"}</button>}
+            {activeTopics.length > 0 && <button className="todayInterestReset" type="button" onClick={() => view === "discover" ? setPersonalFocus([]) : clearTodayTopics()}>{view === "discover" ? "선택 해제" : "전체 보기"}</button>}
           </div>
 {view === "my" && (
           <div className="sourceFreshnessBar">
