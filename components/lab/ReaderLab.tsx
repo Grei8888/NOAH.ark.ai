@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { readBetaInvitation, forgetBetaInvitation } from "@/lib/news/beta-invitation";
 import Link from "next/link";
 import { READER_MODES, type ReaderMode } from "@/lib/news/reader-companion";
 import { readerWordTokens, termExplanationQuestion } from "@/lib/news/reader-word-selection";
@@ -29,6 +30,12 @@ export function ReaderLab({
   modelReady: boolean;
 }) {
   const [accessCode, setAccessCode] = useState("");
+  const [inviteLinked, setInviteLinked] = useState(false);
+  useEffect(() => {
+    const code = readBetaInvitation();
+    if (!code) return;
+    queueMicrotask(() => { setAccessCode(code); setInviteLinked(true); });
+  }, []);
   const [headline, setHeadline] = useState(initialNews?.title ?? initialSource?.title ?? "");
   const [url, setUrl] = useState(initialNews?.url ?? initialSource?.url ?? "");
   const [sourceQuery, setSourceQuery] = useState("");
@@ -319,10 +326,22 @@ export function ReaderLab({
             <textarea id="lab-question" rows={4} maxLength={380}
               value={question} onChange={event => setQuestion(event.target.value)}
               placeholder="이 기사에서 이해하기 어려운 부분은 무엇인가요?" />
-            <label htmlFor="lab-access" className="readerAIFieldLabel">테스터 초대 코드 <small>(이 화면에서만 사용)</small></label>
-            <input id="lab-access" type="password" autoComplete="off"
-              value={accessCode} onChange={event => setAccessCode(event.target.value)}
-              placeholder="개별 발급 코드" />
+            {inviteLinked ? (
+              <div className="newsAiInviteConnected" role="status">
+                <strong>✓ 초대 링크 인식 완료</strong>
+                <span>별도 코드 입력 없이 질문할 수 있습니다. 실제 인증은 질문할 때 진행됩니다.</span>
+                <button type="button" disabled={busy} onClick={() => {
+                  forgetBetaInvitation(); setInviteLinked(false); setAccessCode("");
+                }}>다른 초대코드 사용</button>
+              </div>
+            ) : (
+              <>
+                <label htmlFor="lab-access" className="readerAIFieldLabel">테스터 초대 코드 <small>(초대 링크로 접속하면 생략)</small></label>
+                <input id="lab-access" type="password" autoComplete="off"
+                  value={accessCode} onChange={event => setAccessCode(event.target.value)}
+                  placeholder="개별 발급 코드" />
+              </>
+            )}
             <button type="button" className="readerLabAsk"
               disabled={!modelReady || busy || question.trim().length < 4 || accessCode.length < 32}
               onClick={() => void ask()}>
