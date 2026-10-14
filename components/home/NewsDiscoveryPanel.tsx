@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { NewsInlineCompanion, type SelectedNews } from "@/components/home/NewsInlineCompanion";
 import { MyBriefingPanel } from "@/components/home/MyBriefingPanel";
-import { BusinessOpportunityPanel } from "@/components/home/BusinessOpportunityPanel";
 import { requiredSearchTopics } from "@/lib/news/personalized-briefing";
 import type { TodayTopic } from "@/lib/news/daily-interests";
 import { NEWS_SEARCH_TOPICS, type NewsSearchItem, type NewsSearchSnapshot, type NewsSearchTopic } from "@/lib/news/news-search-contract";
@@ -39,15 +38,13 @@ export function mobileNewsScrollDestination(
   return hasSelectedArticle ? "article" : "reader";
 }
 
-export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabled, showBriefing = false, focusTopics = [], preferenceReady = true, businessSupportEnabled = false, showBusinessSupport = false, onUpdateFocus }: {
+export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabled, showBriefing = false, focusTopics = [], preferenceReady = true, onUpdateFocus }: {
   readerLabAvailable: boolean;
   readerModelReady: boolean;
   enabled: boolean;
   showBriefing?: boolean;
   focusTopics?: readonly TodayTopic[];
   preferenceReady?: boolean;
-  businessSupportEnabled?: boolean;
-  showBusinessSupport?: boolean;
   onUpdateFocus?: () => void;
 }) {
   const [topic, setTopic] = useState<NewsSearchTopic>("economy");
@@ -190,7 +187,6 @@ export function NewsDiscoveryPanel({ readerLabAvailable, readerModelReady, enabl
           }
         }} />
     )}
-    {showBusinessSupport && <BusinessOpportunityPanel enabled={businessSupportEnabled} />}
     <section className={showBriefing ? "newsDiscoveryPanel newsDiscoverySecondary" : "newsDiscoveryPanel"} aria-labelledby="news-discovery-title">
       <div className="sectionHeading">
         <div>
