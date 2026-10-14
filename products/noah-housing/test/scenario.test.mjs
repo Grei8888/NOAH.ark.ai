@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { analyze, EMPTY } from "../lib/scenario.mjs";
-import { checkHomeLinkAggregate, HOMELINK_SCHEMA } from "../lib/homelink-contract.mjs";
+import { checkHomeLinkAggregate, HOMELINK_SCHEMA, checkHousingSupplySummary, SUPPLY_SCHEMA } from "../lib/homelink-contract.mjs";
 
 test("blank fields do not create fictitious assumptions", () => {
   assert.ok(Object.values(analyze(EMPTY)).every(x => x === null));
@@ -31,4 +31,13 @@ test("HOME:LINK contract excludes personal fields and small buckets", () => {
   assert.equal(checkHomeLinkAggregate({...valid,qualifiedInterestCount:50}).ok,false);
   assert.equal(checkHomeLinkAggregate({...valid,asOf:"2026-02-30"}).ok,false);
   assert.equal(checkHomeLinkAggregate({...valid,useApproved:false}).ok,false);
+});
+
+test("Housing supply contract never accepts direct dwelling or customer identifiers", () => {
+  const supply = {schema:SUPPLY_SCHEMA, source:"NOAH-HOUSING", regionCode:"28177", asOf:"2026-10-14", supplyKind:"rental", availableUnits:240, priceMinEok:2, priceMaxEok:4, exportApproved:true};
+  assert.equal(checkHousingSupplySummary(supply).ok,true);
+  assert.equal(checkHousingSupplySummary({...supply,tenantName:"A"}).ok,false);
+  assert.equal(checkHousingSupplySummary({...supply,detailedAddress:"Apt 1"}).ok,false);
+  assert.equal(checkHousingSupplySummary({...supply,priceMaxEok:1}).ok,false);
+  assert.equal(checkHousingSupplySummary({...supply,exportApproved:false}).ok,false);
 });
