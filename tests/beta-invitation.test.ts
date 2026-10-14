@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { forgetBetaInvitation, readBetaInvitation } from "@/lib/news/beta-invitation";
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => { forgetBetaInvitation(); vi.unstubAllGlobals(); });
 
 function fakeBrowser(fragment: string) {
   const data = new Map<string, string>();
@@ -29,7 +29,7 @@ describe("home-to-news invitation continuity", () => {
     expect(home).toContain("<HomeInviteCapture />");
     expect(home.indexOf("<HomeInviteCapture />")).toBeLessThan(home.indexOf("<HomeGateway />"));
     expect(capture).toContain("readBetaInvitation();");
-    expect(reader).toContain("readBetaInvitation()");
+    expect(reader).toContain("useReaderInvitation(labAvailable)");
   });
 });
 
@@ -50,6 +50,14 @@ describe("one-tap beta access link", () => {
     expect(browser.location.hash).toBe("");
     expect(browser.data.size).toBe(0);
   });
+  it("does not reuse an older stored code after a malformed new invitation", () => {
+    const browser = fakeBrowser("#join=" + code);
+    expect(readBetaInvitation()).toBe(code);
+    browser.location.hash = "#join=invalid-new-invitation";
+    expect(readBetaInvitation()).toBe("");
+    expect(readBetaInvitation()).toBe("");
+    expect(browser.data.size).toBe(0);
+  });
   it("does not disturb unrelated hash navigation", () => {
     const browser = fakeBrowser("#articles");
     expect(readBetaInvitation()).toBe("");
@@ -62,5 +70,9 @@ describe("one-tap beta access link", () => {
       sessionStorage: { setItem: () => { throw new Error("disabled"); } },
     });
     expect(readBetaInvitation()).toBe(code);
+    window.location.hash = "";
+    expect(readBetaInvitation()).toBe(code);
+    forgetBetaInvitation();
+    expect(readBetaInvitation()).toBe("");
   });
 });

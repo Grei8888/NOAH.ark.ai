@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readerLabConfigured, readerLabInviteId } from "@/lib/news/reader-lab-access";
+import { verifyReaderLabRequest } from "@/lib/news/reader-lab-request-access";
 import { validateReaderLabInput } from "@/lib/news/reader-companion";
 import { answerReadingQuestion } from "@/lib/news/reading-companion-service";
 
@@ -33,13 +33,9 @@ function result(data: object, status: number) {
 
 export async function POST(request: NextRequest) {
   // Never enable payable AI queries on the real production alias.
-  if (!readerLabConfigured()) return result({ error: "독해 실험실이 비활성화되어 있습니다." }, 404);
-
-  const origin = request.headers.get("origin");
-  if (!origin || origin !== new URL(request.url).origin) return result({ error: "요청 출처를 확인할 수 없습니다." }, 403);
-  if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json")) return result({ error: "요청 형식이 잘못됐습니다." }, 415);
-  const inviteId = readerLabInviteId(request.headers.get("x-noah-lab-token"));
-  if (!inviteId) return result({ error: "테스터 초대 코드를 확인해 주세요." }, 401);
+  const access = verifyReaderLabRequest(request);
+  if (!access.ok) return result({ error: access.error, code: access.code }, access.status);
+  const { inviteId } = access;
   if (Number(request.headers.get("content-length") || "0") > 4000) return result({ error: "입력이 너무 깁니다." }, 413);
   let body: unknown;
   try {

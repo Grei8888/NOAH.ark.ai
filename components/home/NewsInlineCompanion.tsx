@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { readBetaInvitation, forgetBetaInvitation } from "@/lib/news/beta-invitation";
+import { useState } from "react";
+import { useReaderInvitation } from "@/components/lab/useReaderInvitation";
+import { ReaderInvitationControl } from "@/components/lab/ReaderInvitationControl";
 import Link from "next/link";
 import { READER_MODES, type ReaderMode } from "@/lib/news/reader-companion";
 import type { NewsSearchItem, NewsSearchTopic } from "@/lib/news/news-search-contract";
@@ -18,13 +19,7 @@ export function NewsInlineCompanion({
 }) {
   const [mode, setMode] = useState<ReaderMode>("terms");
   const [question, setQuestion] = useState<string>(READER_MODES[0].hint);
-  const [inviteCode, setInviteCode] = useState("");
-  const [inviteLinked, setInviteLinked] = useState(false);
-  useEffect(() => {
-    const code = readBetaInvitation();
-    if (!code) return;
-    queueMicrotask(() => { setInviteCode(code); setInviteLinked(true); });
-  }, []);
+  const invitation = useReaderInvitation(labAvailable);
   const [pending, setPending] = useState(false);
   const [answerState, setAnswerState] = useState<{ url: string; value: string } | null>(null);
   const [errorState, setErrorState] = useState<{ url: string; value: string } | null>(null);
@@ -42,8 +37,8 @@ export function NewsInlineCompanion({
   }
 
   async function submitQuestion() {
-    if (!selected || !modelReady || pending) return;
-    if (inviteCode.length < 32 || question.trim().length < 4 || question.trim().length > 380) {
+    if (!selected || !modelReady || pending || !invitation.verified) return;
+    if (question.trim().length < 4 || question.trim().length > 380) {
       setErrorState({ url: selected.item.url, value: "테스터 초대 코드와 4~380자의 질문을 확인해 주세요." });
       return;
     }
@@ -58,12 +53,13 @@ export function NewsInlineCompanion({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-noah-lab-token": inviteCode,
+          "x-noah-lab-token": invitation.code,
         },
         body: JSON.stringify({ headline: selected.item.title, mode, question: question.trim() }),
         cache: "no-store",
         signal: AbortSignal.timeout(18000),
       });
+      if (response.status === 401) invitation.reject();
       const data: ResponseBody = await response.json();
       if (!response.ok || typeof data.answer !== "string" || !data.answer.trim()) {
         throw new Error(typeof data.error === "string" ? data.error : "AI의 답변을 확인하지 못했습니다.");
@@ -114,28 +110,10 @@ export function NewsInlineCompanion({
         onChange={event => setQuestion(event.target.value)}
         placeholder="모르는 용어나 궁금한 경제·정책 배경을 질문해 보세요." />
 
-      {labAvailable && (
-        inviteLinked ? (
-          <div className="newsAiInviteConnected" role="status">
-            <strong>✓ 초대 링크 인식 완료</strong>
-            <span>코드를 따로 입력하지 않아도 됩니다. 질문할 때 인증됩니다.</span>
-            <button type="button" disabled={pending} onClick={() => {
-              forgetBetaInvitation(); setInviteLinked(false); setInviteCode("");
-            }}>다른 초대코드 사용</button>
-          </div>
-        ) : (
-          <>
-            <label className="newsAiLabel" htmlFor="newsAiInvite">테스터 초대 코드 <small>초대 링크로 접속하면 입력할 필요가 없습니다</small></label>
-            <input id="newsAiInvite" type="password" autoComplete="off" maxLength={256}
-              value={inviteCode} disabled={pending}
-              onChange={event => setInviteCode(event.target.value)}
-              placeholder="개별 발급 코드" />
-          </>
-        )
-      )}
+      {labAvailable && <ReaderInvitationControl invitation={invitation} id="newsAiInvite" busy={pending} />}
 
       <button className="newsAiSubmit" type="button" onClick={() => void submitQuestion()}
-        disabled={!selected || !modelReady || pending || question.trim().length < 4 || inviteCode.length < 32}>
+        disabled={!selected || !modelReady || pending || question.trim().length < 4 || !invitation.verified}>
         {pending ? "NOAH가 살펴보는 중…" : modelReady ? "AI에게 물어보기 ↗" : "AI 연결 대기"}
       </button>
       {!modelReady && (
