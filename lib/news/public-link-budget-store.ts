@@ -23,6 +23,20 @@ export type Admission =
   | { kind: "duplicate" }
   | { kind: "exhausted" };
 
+/** Read-only health/status check for the Preview ledger. Admission still happens atomically. */
+export async function publicBudgetStatus(at: Date = new Date()) {
+  const client = await db();
+  const dayKey = koreaBudgetDate(at);
+  const rows = await client.$queryRaw<Array<{ reserved_krw: number; admitted_count: number }>>`
+    SELECT reserved_krw, admitted_count FROM noah_beta_daily_budget
+    WHERE day_key = ${dayKey} LIMIT 1
+  `;
+  const reservedKRW = rows[0]?.reserved_krw ?? 0;
+  return { dayKST: dayKey, dailyLimitKRW: PUBLIC_BETA_DAILY_KRW, reservedKRW,
+    remainingKRW: Math.max(0, PUBLIC_BETA_DAILY_KRW - reservedKRW),
+    requestCount: rows[0]?.admitted_count ?? 0 };
+}
+
 /** Database cache is shared across instances; only canned public prompts use it. */
 export async function cachedPublicAnswer(cacheKey: string | null): Promise<string | null> {
   const client = await db(); // No DB => fail closed even if there is a cache key.
