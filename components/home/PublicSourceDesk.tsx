@@ -422,7 +422,7 @@ export function PublicSourceDesk({ snapshot, view, readerLabAvailable = false, r
           </section>
           <p className="sourceDisclaimer"><strong>정부 공식자료 출처:</strong> 중소벤처기업부 RSS(사업공고·보도자료). 제목과 원문 링크만 제공하며 본문·사진은 재게시하지 않습니다. 정책 시행 여부·신청자격·기한은 소관 기관 원문에서 확인하세요.</p>
             </section>
-          )
+          )}
         </>
       )}
       </>
