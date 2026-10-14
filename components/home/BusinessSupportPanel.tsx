@@ -9,6 +9,15 @@ import {
 
 const PROFILE_KEY = "noah:business-profile:v1";
 const sourceLink = "https://www.bizinfo.go.kr/apiDetail.do?id=bizinfoApi";
+const housingLink = (() => {
+  const raw = process.env.NEXT_PUBLIC_NOAH_HOUSING_URL;
+  if (!raw) return null;
+  try {
+    const url = new URL(raw);
+    return url.protocol === "https:" && !url.username && !url.password && !url.search && !url.hash
+      ? url.toString() : null;
+  } catch { return null; }
+})();
 type NoticePayload = Partial<BusinessSupportSnapshot> & { error?: string };
 
 function validNotice(n:unknown):n is BusinessSupportNotice {
@@ -96,6 +105,7 @@ export function BusinessSupportPanel({enabled}:{enabled:boolean}){
           <span className="businessSupportEyebrow">MY BUSINESS · PUBLIC DATA</span>
           <h2 id="business-support-title">내 사업에 맞는 지원사업 찾기</h2>
           <p>공식 공고 조건을 먼저 확인하고, 내 사업과 관련 있어 보이는 공고를 선별합니다.</p>
+          <p>{housingLink ? <a href={housingLink} target="_blank" rel="noopener noreferrer" style={{ color: "var(--navy)", fontWeight: 650, textDecoration: "underline" }}>NOAH Housing Intelligence ↗</a> : <span style={{ color: "var(--muted)", fontSize: 12 }}>NOAH Housing Intelligence · 독립 서비스 연결 준비 중</span>}</p>
         </div>
         <a href="https://www.bizinfo.go.kr/" target="_blank" rel="noopener noreferrer">기업마당 ↗</a>
       </div>
