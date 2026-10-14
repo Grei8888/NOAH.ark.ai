@@ -6,7 +6,7 @@ export function readBetaInvitation(): string {
   if (typeof window === "undefined") return "";
   const { hash, pathname, search } = window.location;
   if (hash.startsWith("#join=")) {
-    const candidate = decodeURIComponent(hash.slice(6));
+    const candidate = hash.slice(6);
     window.history.replaceState(window.history.state, "", pathname + search);
     if (!/^[a-zA-Z0-9_-]{32,128}$/.test(candidate)) return "";
     try { window.sessionStorage.setItem(KEY, candidate); } catch { /* storage disabled */ }
