@@ -82,7 +82,7 @@ export function ReaderLab({
     const actualMode = override?.mode ?? mode;
     const actualQuestion = override?.question ?? question;
     if (actualQuestion.trim().length < 4 || !invitation.verified) {
-      if (override?.inline) setBubbleError("먼저 오른쪽 AI 패널에서 초대코드를 확인해 주세요.");
+      if (override?.inline) setBubbleError("먼저 오른쪽 AI 패널에서 공유 링크를 인증해 주세요.");
       return;
     }
     setBusy(true);
@@ -206,7 +206,7 @@ export function ReaderLab({
     <main className="readerLabPage readerLabWorkspacePage">
       <header className="readerLabHeader readerWorkspaceHeader">
         <Link className="readerLabHome" href="/">NOAH ARK</Link>
-        <span>READING COMPANION · 10명 비공개 베타 · {modelReady ? "AI 연결됨" : "AI API 연결 대기"}</span>
+        <span>READING COMPANION · 링크 공유 베타 · {modelReady ? "AI 연결됨" : "AI API 연결 대기"}</span>
         <h1>읽는 흐름을 끊지 않는 AI 뉴스 파트너.</h1>
         <p>왼쪽에서 원문을 읽고 오른쪽 AI에게 질문해 보세요. 뉴스 제목이나 직접 옮긴 짧은 문장의 단어를 누르면 설명 말풍선이 열립니다.</p>
       </header>
@@ -347,7 +347,7 @@ export function ReaderLab({
               <a href="https://noah-ark-ai.vercel.app/beta"
                 target="_blank" rel="noopener noreferrer">NOAH ARK 기존 피드백 공유하기 ↗</a>
             </div>
-            <p className="readerAISmall">AI는 원문 페이지에 접속하거나 기사 본문을 읽지 않습니다. 제목과 질문만 참고합니다. 테스터별 요청 제한은 서버별로 적용되며 총 비용 한도를 보장하지는 않습니다.</p>
+            <p className="readerAISmall">AI는 원문 페이지에 접속하거나 기사 본문을 읽지 않습니다. 제목과 질문만 참고합니다. AI 요청은 전체 사용자 합산 하루 약 1,000원 예약 예산으로 통제되며, 소진 시 다음 날 다시 이용할 수 있습니다. 실제 청구액의 절대 상한은 아닙니다.</p>
           </div>
         </aside>
       </div>

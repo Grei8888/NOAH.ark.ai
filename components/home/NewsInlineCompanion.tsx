@@ -39,7 +39,7 @@ export function NewsInlineCompanion({
   async function submitQuestion() {
     if (!selected || !modelReady || pending || !invitation.verified) return;
     if (question.trim().length < 4 || question.trim().length > 380) {
-      setErrorState({ url: selected.item.url, value: "테스터 초대 코드와 4~380자의 질문을 확인해 주세요." });
+      setErrorState({ url: selected.item.url, value: "공유 링크 인증과 4~380자의 질문을 확인해 주세요." });
       return;
     }
     setPending(true);
@@ -110,7 +110,7 @@ export function NewsInlineCompanion({
         onChange={event => setQuestion(event.target.value)}
         placeholder="모르는 용어나 궁금한 경제·정책 배경을 질문해 보세요." />
 
-      {labAvailable && <ReaderInvitationControl invitation={invitation} id="newsAiInvite" busy={pending} />}
+      {labAvailable && <><p className="newsAiBudgetNote">AI는 전체 사용자 합산 하루 약 1,000원 예약 예산 내에서 제공됩니다. 예산 소진 시 무료 뉴스·공공자료는 계속 이용할 수 있습니다.</p><ReaderInvitationControl invitation={invitation} id="newsAiInvite" busy={pending} /></>}
 
       <button className="newsAiSubmit" type="button" onClick={() => void submitQuestion()}
         disabled={!selected || !modelReady || pending || question.trim().length < 4 || !invitation.verified}>

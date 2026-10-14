@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyReaderLabRequest } from "@/lib/news/reader-lab-request-access";
 import { validateReaderLabInput } from "@/lib/news/reader-companion";
 import { answerReadingQuestion } from "@/lib/news/reading-companion-service";
+import { publicBetaRequested } from "@/lib/news/public-link-budget-policy";
+import { answerPublicReadingQuestion } from "@/lib/news/public-link-answer";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -45,6 +47,11 @@ export async function POST(request: NextRequest) {
   } catch { return result({ error: "요청 내용을 확인해 주세요." }, 400); }
   const data = validateReaderLabInput(body);
   if (!data) return result({ error: "질문은 4~380자로 입력해 주세요." }, 400);
+  if (publicBetaRequested()) {
+    // One DB-backed all-users budget, NEVER the per-instance Map below.
+    const reply = await answerPublicReadingQuestion(data);
+    return result(reply.body, reply.status);
+  }
   if (throttle(inviteId)) return result({ error: "테스트 이용 한도(1시간 6회 / 24시간 20회)에 도달했습니다." }, 429);
   if (active.has(inviteId)) return result({ error: "이전 질문이 처리 중입니다. 응답 후 다시 시도해 주세요." }, 429);
   active.add(inviteId);

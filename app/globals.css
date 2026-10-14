@@ -3420,3 +3420,9 @@ section[id] {
   .crossWorkspaceCopy p { font-size: 12px; }
   .crossWorkspaceAction { width: 100%; font-size: 13px; }
 }
+
+/* Share-link beta usage notice: keeps budget visible without another modal. */
+.newsAiBudgetNote { color: #63768d; font-size: 11px; line-height: 1.7; margin: 12px 0; padding: 10px 12px; background: #f4f7fa; border: 1px solid #e1e8ef; border-radius: 8px; }
+@media (max-width: 767px) {
+  .newsAiBudgetNote { font-size: 12px; padding: 11px; }
+}

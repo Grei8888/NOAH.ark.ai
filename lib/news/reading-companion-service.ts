@@ -9,7 +9,7 @@ export type ReadingResult =
   | { ok: true; answer: string }
   | { ok: false; reason: "provider_limit" | "provider_unavailable" | "empty" | "timeout" };
 
-export async function answerReadingQuestion(input: ReaderLabInput): Promise<ReadingResult> {
+export async function answerReadingQuestion(input: ReaderLabInput, pinnedModel?: string): Promise<ReadingResult> {
   if (!process.env.OPENAI_API_KEY?.trim()) return { ok: false, reason: "provider_unavailable" };
   try {
     const response = await fetch("https://api.openai.com/v1/responses", {
@@ -19,7 +19,7 @@ export async function answerReadingQuestion(input: ReaderLabInput): Promise<Read
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: process.env.NOAH_READER_LAB_MODEL || "gpt-4.1-mini",
+        model: pinnedModel ?? (process.env.NOAH_READER_LAB_MODEL || "gpt-4.1-mini"),
         instructions: readerLabInstructions(),
         input: readerLabUserMessage(input),
         max_output_tokens: 550,
