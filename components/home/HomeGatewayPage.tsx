@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/home/AppShell";
 import { HomeGateway } from "@/components/home/HomeGateway";
 import { HomeDailyBrief } from "@/components/home/HomeDailyBrief";
+import { HomeInviteCapture } from "@/components/home/HomeInviteCapture";
 
 /**
  * The landing shell stays fast. The client brief reuses cached news search
@@ -9,6 +10,7 @@ import { HomeDailyBrief } from "@/components/home/HomeDailyBrief";
 export function HomeGatewayPage({ privateBeta }: { privateBeta: boolean }) {
   return (
     <AppShell view="home" compactRail>
+      <HomeInviteCapture />
       <div className="topUtility">
         <span>NOAH ARK / {privateBeta ? "PRIVATE BETA" : "PUBLIC BETA"}</span>
         <span>ONLY WHAT MATTERS.</span>
