@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { clearReaderInvite, readBetaInvitation } from "@/lib/news/beta-invitation";
+import { forgetBetaInvitation, readBetaInvitation } from "@/lib/news/beta-invitation";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -28,7 +28,7 @@ describe("one-tap beta access link", () => {
     expect(browser.location.hash).toBe("");
     expect(browser.replaceState).toHaveBeenCalledWith(null, "", "/?view=home");
     expect(readBetaInvitation()).toBe(code);
-    clearReaderInvite();
+    forgetBetaInvitation();
     expect(readBetaInvitation()).toBe("");
   });
   it("rejects malformed and short links without caching them", () => {
