@@ -96,6 +96,7 @@ export function BusinessSupportPanel({enabled}:{enabled:boolean}){
           <span className="businessSupportEyebrow">MY BUSINESS · PUBLIC DATA</span>
           <h2 id="business-support-title">내 사업에 맞는 지원사업 찾기</h2>
           <p>공식 공고 조건을 먼저 확인하고, 내 사업과 관련 있어 보이는 공고를 선별합니다.</p>
+          <p><a href="/tools/housing" style={{ color: "var(--navy)", fontWeight: 650, textDecoration: "underline" }}>전문가용 주거사업 분석도구 열기 ↗</a></p>
         </div>
         <a href="https://www.bizinfo.go.kr/" target="_blank" rel="noopener noreferrer">기업마당 ↗</a>
       </div>
